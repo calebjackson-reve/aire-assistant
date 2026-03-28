@@ -1,0 +1,145 @@
+// AIRE Intelligence Platform - Prisma Schema
+// Database: Neon PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"}
+
+// ============== PHASE 1: Auth + Billing ==============
+
+enum Tier {
+  FREE
+  PRO
+  INVESTOR
+}
+
+enum TransactionStatus {
+  DRAFT
+  ACTIVE
+  PENDING_INSPECTION
+  PENDING_APPRAISAL
+  PENDING_FINANCING
+  CLOSING
+  CLOSED
+  CANCELLED
+}
+
+model User {
+  id              String    @id @default(cuid())
+  clerkId         String    @unique
+  email           String    @unique
+  firstName       String?
+  lastName        String?
+  tier            Tier      @default(FREE)
+  stripeCustomerId String?  @unique
+  subscriptionId  String?
+  subscriptionStatus String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  transactions    Transaction[]
+  deadlines       Deadline[]
+  voiceCommands   VoiceCommand[]
+}
+
+// ============== PHASE 2: Transaction Core ==============
+
+model Transaction {
+  id                String            @id @default(cuid())
+  userId            String
+  user              User              @relation(fields: [userId], references: [id])
+
+  // Property info
+  propertyAddress   String
+  propertyCity      String            @default("Baton Rouge")
+  propertyState     String            @default("LA")
+  propertyZip       String?
+  propertyType      String?           // residential, commercial, land
+  mlsNumber         String?
+
+  // Deal info
+  listPrice         Float?
+  offerPrice        Float?
+  acceptedPrice     Float?
+  status            TransactionStatus @default(DRAFT)
+
+  // Parties
+  buyerName         String?
+  buyerEmail        String?
+  buyerPhone        String?
+  sellerName        String?
+  sellerEmail       String?
+  sellerPhone       String?
+  lenderName        String?
+  titleCompany      String?
+
+  // Key dates
+  contractDate      DateTime?
+  inspectionDeadline DateTime?
+  appraisalDeadline  DateTime?
+  financingDeadline  DateTime?
+  closingDate        DateTime?
+
+  // Dotloop integration
+  dotloopLoopId     String?
+
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  deadlines         Deadline[]
+  documents         Document[]
+  voiceCommands     VoiceCommand[]
+}
+
+model Deadline {
+  id              String      @id @default(cuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id])
+  transactionId   String
+  transaction     Transaction @relation(fields: [transactionId], references: [id])
+
+  name            String      // e.g., "Inspection Deadline", "Financing Contingency"
+  dueDate         DateTime
+  alertSent       Boolean     @default(false)
+  completedAt     DateTime?
+  notes           String?
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model Document {
+  id              String      @id @default(cuid())
+  transactionId   String
+  transaction     Transaction @relation(fields: [transactionId], references: [id])
+
+  name            String
+  type            String      // addendum, amendment, disclosure, contract
+  templateId      String?
+  filledData      Json?
+  dotloopDocId    String?
+  signatureStatus String?     // draft, sent, signed, declined
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model VoiceCommand {
+  id              String       @id @default(cuid())
+  userId          String
+  user            User         @relation(fields: [userId], references: [id])
+  transactionId   String?
+  transaction     Transaction? @relation(fields: [transactionId], references: [id])
+
+  rawTranscript   String
+  parsedIntent    String?
+  parsedEntities  Json?
+  confidence      Float?
+  result          Json?
+  status          String       @default("pending") // pending, processing, completed, failed
+
+  createdAt       DateTime     @default(now())
+}
