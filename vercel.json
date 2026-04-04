@@ -1,0 +1,20 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/morning-brief",
+      "schedule": "30 11 * * *"
+    },
+    {
+      "path": "/api/cron/deadline-alerts",
+      "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/relationship-intelligence",
+      "schedule": "0 13 * * 1"
+    },
+    {
+      "path": "/api/cron/email-scan",
+      "schedule": "*/30 * * * *"
+    }
+  ]
+}

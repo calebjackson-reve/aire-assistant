@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint"
   },
@@ -14,14 +14,23 @@
     "@neondatabase/serverless": "^1.0.2",
     "@prisma/adapter-neon": "^7.5.0",
     "@prisma/client": "^6.19.2",
+    "@react-three/fiber": "^9.5.0",
+    "@types/three": "^0.183.1",
+    "@vercel/blob": "^2.3.3",
     "canvas": "^3.2.2",
+    "framer-motion": "^12.38.0",
+    "lucide-react": "^1.7.0",
     "next": "16.2.1",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^5.5.207",
     "prisma": "^6.19.2",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "sharp": "^0.34.5",
     "stripe": "^20.4.1",
-    "svix": "^1.89.0"
+    "svix": "^1.89.0",
+    "three": "^0.183.2",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -31,6 +40,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.1",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

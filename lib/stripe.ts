@@ -1,9 +1,25 @@
 import Stripe from "stripe";
 
-// Initialize Stripe with secret key
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-02-24.acacia" as Stripe.LatestApiVersion,
-  typescript: true,
+// Lazy-init Stripe — avoids crash when STRIPE_SECRET_KEY is missing at build time
+let _stripe: Stripe | null = null;
+export function getStripe(): Stripe {
+  if (!_stripe) {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      throw new Error("STRIPE_SECRET_KEY is not set");
+    }
+    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2025-02-24.acacia" as Stripe.LatestApiVersion,
+      typescript: true,
+    });
+  }
+  return _stripe;
+}
+
+// Backwards compat — existing code imports `stripe` directly
+export const stripe = new Proxy({} as Stripe, {
+  get(_, prop) {
+    return (getStripe() as unknown as Record<string | symbol, unknown>)[prop];
+  },
 });
 
 // ============== Checkout Session ==============
@@ -47,7 +63,7 @@ export async function createCustomerPortalSession(customerId: string) {
 
 // ============== Subscription Status ==============
 export async function getSubscriptionStatus(subscriptionId: string) {
-  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId) as any;
   return {
     status: subscription.status,
     currentPeriodEnd: new Date(subscription.current_period_end * 1000),

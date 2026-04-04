@@ -6,7 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"}
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
 // ============== PHASE 1: Auth + Billing ==============
 
@@ -43,6 +45,12 @@ model User {
   transactions    Transaction[]
   deadlines       Deadline[]
   voiceCommands   VoiceCommand[]
+  documentMemories DocumentMemory[]
+  contacts        Contact[]
+  relationshipIntelLogs RelationshipIntelLog[]
+  morningBriefs   MorningBrief[]
+  airSignEnvelopes AirSignEnvelope[]
+  emailAccounts   EmailAccount[]
 }
 
 // ============== PHASE 2: Transaction Core ==============
@@ -92,6 +100,26 @@ model Transaction {
   deadlines         Deadline[]
   documents         Document[]
   voiceCommands     VoiceCommand[]
+  documentMemories  DocumentMemory[]
+  workflowEvents    WorkflowEvent[]
+
+  @@index([userId])
+}
+
+// ============== Workflow Event Log ==============
+
+model WorkflowEvent {
+  id            String      @id @default(cuid())
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  fromStatus    String?
+  toStatus      String
+  trigger       String      // "document_uploaded" | "deadline_passed" | "deadline_completed" | "manual" | "voice_command" | "system"
+  triggeredBy   String?     // userId or "system"
+  metadata      Json?
+  createdAt     DateTime    @default(now())
+
+  @@index([transactionId, createdAt])
 }
 
 model Deadline {
@@ -109,22 +137,82 @@ model Deadline {
 
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
+
+  @@index([userId, dueDate])
+  @@index([dueDate, alertSent])
 }
 
 model Document {
   id              String      @id @default(cuid())
-  transactionId   String
-  transaction     Transaction @relation(fields: [transactionId], references: [id])
+  transactionId   String?
+  transaction     Transaction? @relation(fields: [transactionId], references: [id])
 
   name            String
-  type            String      // addendum, amendment, disclosure, contract
+  type            String      // purchase_agreement, property_disclosure, agency_disclosure, lead_paint, inspection_response, addendum, amendment, disclosure, contract
+  category        String?     // mandatory, addendum, federal, broker
   templateId      String?
-  filledData      Json?
+  filledData      Json?       // AI-extracted field values
+  extractedText   String?     // Raw text extracted from PDF
+  classification  Json?       // AI classification result with confidence
+  fileUrl         String?     // Path or URL to uploaded file
+  fileSize        Int?
+  pageCount       Int?
   dotloopDocId    String?
   signatureStatus String?     // draft, sent, signed, declined
+  checklistStatus String?     // missing, uploaded, extracted, verified
 
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
+
+  @@index([transactionId])
+}
+
+// ============== PHASE 3: Document Memory (Self-Improving Classification) ==============
+
+enum DocumentMemoryStatus {
+  AUTO_FILED
+  NEEDS_REVIEW
+  AGENT_CONFIRMED
+  AGENT_CORRECTED
+  UNKNOWN_TYPE
+}
+
+model DocumentMemory {
+  id                String               @id @default(cuid())
+  userId            String
+  user              User                 @relation(fields: [userId], references: [id])
+  transactionId     String?
+  transaction       Transaction?         @relation(fields: [transactionId], references: [id])
+
+  // Document fingerprint
+  fileHash          String               // SHA-256 of file content
+  fileName          String
+  fileSize          Int
+  pageCount         Int?
+
+  // Classification result
+  classifiedType    String
+  classifiedConf    Float
+  formNumber        String?
+  extractionMethod  String?
+
+  // Extracted fields snapshot
+  extractedFields   Json?
+
+  // Learning/feedback state
+  status            DocumentMemoryStatus @default(AUTO_FILED)
+  correctedType     String?
+  correctedBy       String?
+  correctedAt       DateTime?
+  correctionNotes   String?
+
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  @@index([fileHash])
+  @@index([classifiedType])
+  @@index([status])
+  @@index([userId, createdAt])
 }
 
 model VoiceCommand {
@@ -142,4 +230,319 @@ model VoiceCommand {
   status          String       @default("pending") // pending, processing, completed, failed
 
   createdAt       DateTime     @default(now())
+}
+
+// ============== Consensus Engine ==============
+
+model ConsensusLog {
+  id           String   @id @default(cuid())
+  agentId      String
+  feature      String
+  prompt       String
+  responses    Json
+  agreedResult Json?
+  confidence   Float
+  agreed       Boolean
+  createdAt    DateTime @default(now())
+
+  @@index([agentId, createdAt])
+  @@index([feature, agreed])
+}
+
+// ============== Relationship Intelligence ==============
+
+model Contact {
+  id               String    @id @default(cuid())
+  agentId          String
+  firstName        String
+  lastName         String
+  email            String?
+  phone            String?
+  type             String    @default("LEAD")      // LEAD | BUYER | SELLER | PAST_CLIENT | REFERRAL_SOURCE | VENDOR
+  source           String?                         // how they came in: zillow | referral | open_house | sign_call | etc
+  notes            String?
+
+  // Address / property context
+  neighborhood     String?
+  parish           String?
+  currentAddress   String?
+  priceRange       String?                         // "$200K-$300K"
+  timeline         String?                         // "60-90 days", "just looking"
+
+  // Relationship tracking
+  lastContactedAt  DateTime?
+  lastResponseAt   DateTime?
+  contactCount     Int       @default(0)
+  responseCount    Int       @default(0)
+  tags             String[]
+
+  // AI scoring
+  relationshipScore Int      @default(50)          // 0-100, updated weekly
+  lastScoredAt     DateTime?
+  scoreReason      String?
+
+  // Lifecycle
+  convertedAt      DateTime?
+  transactionId    String?
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  user             User    @relation(fields: [agentId], references: [id])
+  intelLogs        RelationshipIntelLog[]
+
+  @@index([agentId, relationshipScore])
+  @@index([agentId, lastContactedAt])
+  @@index([agentId, type])
+}
+
+model RelationshipIntelLog {
+  id               String   @id @default(cuid())
+  agentId          String
+  contactId        String
+  runDate          DateTime @default(now())
+
+  // Individual agent scores (0-100 each)
+  behavioralScore  Int
+  lifeEventScore   Int
+  marketTimingScore Int
+  recencyScore     Int
+
+  // Synthesis
+  finalScore       Int
+  recommendation   String
+  reasoning        String
+  suggestedMessage String
+  channel          String
+  priority         String
+
+  // Consensus metadata
+  consensusAgreed  Boolean  @default(false)
+  consensusLogId   String?
+
+  createdAt        DateTime @default(now())
+
+  user             User     @relation(fields: [agentId], references: [id])
+  contact          Contact  @relation(fields: [contactId], references: [id])
+
+  @@index([agentId, runDate])
+  @@index([agentId, finalScore])
+}
+
+// ============== Morning Brief ==============
+
+model MorningBrief {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+
+  briefDate       DateTime @db.Date
+  status          String   @default("pending") // pending, approved, dismissed
+
+  // Researcher outputs (raw JSON from each researcher)
+  deadlineData    Json?
+  pipelineData    Json?
+  contactData     Json?
+
+  // QA validation
+  qaFlags         Json?    // Fair Housing flags, LREC compliance issues
+  qaPassedAt      DateTime?
+
+  // Synthesized brief (Claude output)
+  summary         String?  // The actual morning brief text
+  actionItems     Json?    // Structured action items for UI buttons
+
+  // Human approval gate
+  approvedAt      DateTime?
+  approvedBy      String?  // clerkId of approver
+  dismissedAt     DateTime?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, briefDate])
+  @@index([userId, status])
+}
+
+// ============== AirSign ==============
+
+enum EnvelopeStatus {
+  DRAFT
+  SENT
+  IN_PROGRESS
+  COMPLETED
+  VOIDED
+  EXPIRED
+}
+
+enum FieldType {
+  SIGNATURE
+  INITIALS
+  DATE
+  TEXT
+  CHECKBOX
+}
+
+model AirSignEnvelope {
+  id              String         @id @default(cuid())
+  userId          String
+  user            User           @relation(fields: [userId], references: [id])
+  transactionId   String?
+
+  name            String         // e.g., "Purchase Agreement - 123 Main St"
+  status          EnvelopeStatus @default(DRAFT)
+  documentUrl     String?        // Vercel Blob URL for the PDF
+  pageCount       Int?
+
+  // Delivery
+  sentAt          DateTime?
+  completedAt     DateTime?
+  expiresAt       DateTime?
+  voidedAt        DateTime?
+  voidReason      String?
+
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  signers         AirSignSigner[]
+  fields          AirSignField[]
+  auditEvents     AirSignAuditEvent[]
+
+  @@index([userId, status])
+  @@index([transactionId])
+}
+
+model AirSignSigner {
+  id              String         @id @default(cuid())
+  envelopeId      String
+  envelope        AirSignEnvelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+
+  name            String
+  email           String
+  phone           String?
+  role            String         @default("SIGNER") // SIGNER, WITNESS, NOTARY
+  order           Int            @default(1)        // signing order
+
+  // Signing state
+  token           String         @unique @default(cuid()) // unique link token for /sign/[token]
+  viewedAt        DateTime?
+  signedAt        DateTime?
+  declinedAt      DateTime?
+  declineReason   String?
+  ipAddress       String?
+  userAgent       String?
+
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  fields          AirSignField[]
+  auditEvents     AirSignAuditEvent[]
+
+  @@index([envelopeId])
+  @@index([token])
+}
+
+model AirSignField {
+  id              String         @id @default(cuid())
+  envelopeId      String
+  envelope        AirSignEnvelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+  signerId        String?
+  signer          AirSignSigner?  @relation(fields: [signerId], references: [id], onDelete: SetNull)
+
+  type            FieldType      @default(SIGNATURE)
+  label           String?
+  required        Boolean        @default(true)
+
+  // Position on page (percentage-based for responsiveness)
+  page            Int            @default(1)
+  xPercent        Float          // 0-100, left edge
+  yPercent        Float          // 0-100, top edge
+  widthPercent    Float          // 0-100
+  heightPercent   Float          // 0-100
+
+  // Value after signing
+  value           String?
+  filledAt        DateTime?
+
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([envelopeId, page])
+  @@index([signerId])
+}
+
+model AirSignAuditEvent {
+  id              String         @id @default(cuid())
+  envelopeId      String
+  envelope        AirSignEnvelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+  signerId        String?
+  signer          AirSignSigner?  @relation(fields: [signerId], references: [id], onDelete: SetNull)
+
+  action          String         // created, sent, viewed, signed, declined, voided, completed, resent
+  ipAddress       String?
+  userAgent       String?
+  metadata        Json?
+
+  createdAt       DateTime       @default(now())
+
+  @@index([envelopeId, createdAt])
+}
+
+// ============== Email Intelligence ==============
+
+model EmailAccount {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+  email        String
+  provider     String    // "gmail" | "outlook"
+  accessToken  String?   @db.Text
+  refreshToken String?   @db.Text
+  tokenExpiry  DateTime?
+  isActive     Boolean   @default(true)
+  lastScan     DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  scans        EmailScan[]
+
+  @@unique([userId, email])
+  @@index([userId, isActive])
+}
+
+model EmailScan {
+  id               String         @id @default(cuid())
+  accountId        String
+  account          EmailAccount   @relation(fields: [accountId], references: [id])
+  scanStart        DateTime       @default(now())
+  scanEnd          DateTime?
+  emailsScanned    Int            @default(0)
+  attachmentsFound Int            @default(0)
+  documentsCreated Int            @default(0)
+  status           String         @default("running") // running | complete | failed
+  error            String?        @db.Text
+  createdAt        DateTime       @default(now())
+
+  attachments      EmailAttachment[]
+
+  @@index([accountId, createdAt])
+}
+
+model EmailAttachment {
+  id           String    @id @default(cuid())
+  scanId       String
+  scan         EmailScan @relation(fields: [scanId], references: [id])
+  emailId      String
+  emailSubject String?
+  emailFrom    String?
+  filename     String
+  mimeType     String
+  size         Int
+  downloaded   Boolean   @default(false)
+  classified   Boolean   @default(false)
+  documentId   String?
+  createdAt    DateTime  @default(now())
+
+  @@index([scanId])
+  @@index([emailId])
 }

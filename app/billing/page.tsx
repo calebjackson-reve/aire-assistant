@@ -2,7 +2,7 @@
 
 import { useUser } from "@clerk/nextjs";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 
 const PLANS = [
   {
@@ -54,6 +54,14 @@ const PLANS = [
 ];
 
 export default function BillingPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: 40, textAlign: "center" }}>Loading billing...</div>}>
+      <BillingContent />
+    </Suspense>
+  );
+}
+
+function BillingContent() {
   const { user } = useUser();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState<string | null>(null);

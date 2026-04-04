@@ -3,10 +3,22 @@
 import { useState, useRef, useCallback } from "react";
 
 interface VoiceResult {
+  id: string;
   intent: string;
   entities: Record<string, string>;
   response: string;
   action?: string;
+  confidence: number;
+  needsClarification?: boolean;
+  clarification_options?: string[];
+}
+
+interface ExecutionResult {
+  success: boolean;
+  action: string;
+  message: string;
+  requiresConfirmation?: boolean;
+  data?: Record<string, unknown>;
 }
 
 export default function VoiceCommandBar() {
@@ -14,8 +26,11 @@ export default function VoiceCommandBar() {
   const [transcript, setTranscript] = useState("");
   const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState<VoiceResult | null>(null);
+  const [executionResult, setExecutionResult] = useState<ExecutionResult | null>(null);
+  const [executing, setExecuting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
 
   const startListening = useCallback(() => {
     if (!("webkitSpeechRecognition" in window) && !("SpeechRecognition" in window)) {
@@ -38,7 +53,8 @@ export default function VoiceCommandBar() {
       setTranscript("");
     };
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onresult = (event: any) => {
       let interim = "";
       let final = "";
 
@@ -62,7 +78,8 @@ export default function VoiceCommandBar() {
       }
     };
 
-    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onerror = (event: any) => {
       setIsListening(false);
       setError(`Speech error: ${event.error}`);
     };
@@ -102,6 +119,48 @@ export default function VoiceCommandBar() {
     }
   }
 
+  async function executeVoiceAction(confirmed: boolean = false) {
+    if (!result) return;
+    setExecuting(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/voice-command/execute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          voiceCommandId: result.id,
+          intent: result.intent,
+          entities: result.entities,
+          confirmed,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Execution failed");
+
+      const data: ExecutionResult = await res.json();
+
+      if (data.requiresConfirmation) {
+        // Show confirmation — user must click again
+        setExecutionResult(data);
+      } else {
+        setExecutionResult(data);
+        if (data.success) {
+          // Clear voice input after successful execution
+          setTimeout(() => {
+            setResult(null);
+            setExecutionResult(null);
+            setTranscript("");
+          }, 3000);
+        }
+      }
+    } catch {
+      setError("Failed to execute command. Please try again.");
+    } finally {
+      setExecuting(false);
+    }
+  }
+
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter" && transcript.trim()) {
       processCommand(transcript);
@@ -120,11 +179,49 @@ export default function VoiceCommandBar() {
                   {result.intent}
                 </p>
                 <p className="text-white mt-1">{result.response}</p>
-                {result.action && (
-                  <button className="mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-semibold transition-colors">
-                    Confirm: {result.action}
-                  </button>
+                {result.needsClarification && result.clarification_options && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {result.clarification_options.map((opt, i) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          setResult(null);
+                          setTranscript(opt.replace(/^Try:\s*/i, ""));
+                          processCommand(opt.replace(/^Try:\s*/i, ""));
+                        }}
+                        className="px-3 py-1.5 bg-zinc-700 hover:bg-zinc-600 rounded-lg text-xs text-zinc-300 transition-colors"
+                      >
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
                 )}
+                {executionResult ? (
+                  <div className={`mt-3 px-4 py-2 rounded-lg text-sm font-semibold ${
+                    executionResult.success ? "bg-green-800 text-green-200" :
+                    executionResult.requiresConfirmation ? "bg-yellow-800 text-yellow-200" :
+                    "bg-red-800 text-red-200"
+                  }`}>
+                    {executionResult.message}
+                    {executionResult.requiresConfirmation && (
+                      <button
+                        onClick={() => executeVoiceAction(true)}
+                        disabled={executing}
+                        className="ml-3 px-3 py-1 bg-yellow-600 hover:bg-yellow-500 rounded text-sm text-white disabled:opacity-50"
+                      >
+                        {executing ? "Executing..." : "Yes, confirm"}
+                      </button>
+                    )}
+                  </div>
+                ) : result.action ? (
+                  <button
+                    onClick={() => executeVoiceAction(false)}
+                    disabled={executing}
+                    className="mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
+                  >
+                    {executing ? "Executing..." : `Confirm: ${result.action}`}
+                  </button>
+                ) : null}
               </div>
               <button
                 onClick={() => setResult(null)}
@@ -209,7 +306,9 @@ export default function VoiceCommandBar() {
 // Add type declarations for Web Speech API
 declare global {
   interface Window {
-    SpeechRecognition: typeof SpeechRecognition;
-    webkitSpeechRecognition: typeof SpeechRecognition;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    SpeechRecognition: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    webkitSpeechRecognition: any;
   }
 }
