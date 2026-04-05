@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import * as pdfjsLib from "pdfjs-dist"
 
-// Use the bundled worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`
+// Use local worker (copied from node_modules/pdfjs-dist/build/)
+pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs"
 
 export interface PageDimensions {
   width: number
@@ -40,14 +40,17 @@ export function PDFViewer({
       try {
         setLoading(true)
         setError(null)
-        const doc = await pdfjsLib.getDocument(pdfUrl).promise
+        const doc = await pdfjsLib.getDocument({
+          url: pdfUrl,
+          withCredentials: false,
+        }).promise
         if (cancelled) return
         pdfDocRef.current = doc
         setPageCount(doc.numPages)
       } catch (err) {
         if (!cancelled) {
-          console.error("PDF load error:", err)
-          setError("Failed to load PDF")
+          console.error("PDF load error:", err, "URL:", pdfUrl)
+          setError(`Failed to load PDF: ${err instanceof Error ? err.message : "Unknown error"}`)
         }
       }
     }

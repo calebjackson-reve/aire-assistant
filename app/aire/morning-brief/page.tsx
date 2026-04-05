@@ -13,7 +13,8 @@ function parseDeadlines(data: unknown): DeadlineItem[] {
   const d = data as Record<string, unknown>
   const all: DeadlineItem[] = []
   for (const urgency of ["overdue", "today", "urgent", "upcoming"]) {
-    const items = (d[urgency] as DeadlineItem[]) || []
+    const raw = d[urgency]
+    const items = Array.isArray(raw) ? (raw as DeadlineItem[]) : []
     all.push(...items.map((item) => ({ ...item, urgency })))
   }
   return all.slice(0, 8)
@@ -70,7 +71,7 @@ export default async function MorningBriefPage() {
             <p className="text-[#6b7d52] text-[10px] font-medium tracking-[0.25em] uppercase">
               AIRE Intelligence
             </p>
-            <h1 className="font-[family-name:var(--font-newsreader)] italic text-[#1e2416] text-3xl mt-1">
+            <h1 className="font-[family-name:var(--font-cormorant)] italic text-[#1e2416] text-3xl mt-1">
               Morning Brief
             </h1>
           </div>
