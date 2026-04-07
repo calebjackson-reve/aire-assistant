@@ -197,7 +197,7 @@ Run all 4 analyses and provide your recommendation.
         userId,
         transactionId,
         incomingOfferPrice: incomingOffer.price,
-        incomingTerms: incomingOffer.terms as Record<string, unknown>,
+        incomingTerms: JSON.parse(JSON.stringify(incomingOffer.terms)),
         marketAnalysis: {
           cmaEstimate: cma?.cmaEstimate || null,
           offerVsList: txn.listPrice
@@ -223,7 +223,7 @@ Run all 4 analyses and provide your recommendation.
           typeof analysis.expectedNetProceeds === "number"
             ? analysis.expectedNetProceeds
             : null,
-        scenarios: scenarios as unknown as Record<string, unknown>[],
+        scenarios: JSON.parse(JSON.stringify(scenarios)),
       },
     })
   } catch (err) {

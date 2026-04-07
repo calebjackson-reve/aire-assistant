@@ -168,8 +168,8 @@ MLS#: ${txn.mlsNumber || "Pending"}
         emailTemplate: campaign.content.email,
         smsTemplate: campaign.content.sms,
         status: campaign.fairHousingCheck.passed ? "PENDING_REVIEW" : "DRAFT",
-        fairHousingCheck: campaign.fairHousingCheck as unknown as Record<string, unknown>,
-        calendarDays: campaign.calendar as unknown as Record<string, unknown>[],
+        fairHousingCheck: JSON.parse(JSON.stringify(campaign.fairHousingCheck)),
+        calendarDays: JSON.parse(JSON.stringify(campaign.calendar)),
       },
     })
     campaignId = record.id

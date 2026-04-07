@@ -256,9 +256,9 @@ export async function runComplianceAudit(
       data: {
         userId,
         transactionId,
-        documentCheck: documentCheck as unknown as Record<string, unknown>[],
-        deadlineCheck: deadlineCheck as unknown as Record<string, unknown>[],
-        disclosureCheck: disclosureCheck as unknown as Record<string, unknown>[],
+        documentCheck: JSON.parse(JSON.stringify(documentCheck)),
+        deadlineCheck: JSON.parse(JSON.stringify(deadlineCheck)),
+        disclosureCheck: JSON.parse(JSON.stringify(disclosureCheck)),
         finalStatus,
         blockers,
         runDate,

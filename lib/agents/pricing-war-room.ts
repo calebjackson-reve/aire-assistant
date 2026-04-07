@@ -188,7 +188,7 @@ Generate the 3-tier pricing analysis with DOM projections, net proceeds, and 5 s
         domProjection30: analysis.conservative.domProjection,
         domProjection60: analysis.target.domProjection,
         domProjection90: analysis.aggressive.domProjection,
-        objections: analysis.objections as unknown as Record<string, unknown>[],
+        objections: JSON.parse(JSON.stringify(analysis.objections)),
       },
     })
   } catch (err) {
