@@ -67,6 +67,15 @@ model User {
   communicationLogs CommunicationLog[]
   missedCallLogs  MissedCallLog[]
   vendors         Vendor[]
+  contentCampaigns ContentCampaign[]
+  cmaAnalyses     CMAAnalysis[]
+  leadScoreLogs   LeadScoreLog[]
+  kpiLogs         KPILog[]
+  dealHealthLogs  DealHealthLog[]
+  complianceAuditLogs ComplianceAuditLog[]
+  pricingAnalysisLogs PricingAnalysisLog[]
+  negotiationLogs NegotiationLog[]
+  agentRuns       AgentRun[]
 }
 
 // ============== PHASE 2: Transaction Core ==============
@@ -118,6 +127,11 @@ model Transaction {
   voiceCommands     VoiceCommand[]
   documentMemories  DocumentMemory[]
   workflowEvents    WorkflowEvent[]
+  contentCampaigns  ContentCampaign[]
+  domProjections    DOMProjection[]
+  dealHealthLogs    DealHealthLog[]
+  complianceAuditLogs ComplianceAuditLog[]
+  negotiationLogs   NegotiationLog[]
 
   @@index([userId])
 }
@@ -306,6 +320,7 @@ model Contact {
 
   user             User    @relation(fields: [agentId], references: [id])
   intelLogs        RelationshipIntelLog[]
+  leadScoreLogs    LeadScoreLog[]
 
   @@index([agentId, relationshipScore])
   @@index([agentId, lastContactedAt])
@@ -657,4 +672,250 @@ model MissedCallLog {
   createdAt   DateTime @default(now())
 
   @@index([userId, returned, callTime])
+}
+
+// ============== Agent 5: Content Engine ==============
+
+enum ContentStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  SCHEDULED
+  PUBLISHED
+  REJECTED
+}
+
+model ContentCampaign {
+  id               String        @id @default(cuid())
+  userId           String
+  user             User          @relation(fields: [userId], references: [id])
+  transactionId    String?
+  transaction      Transaction?  @relation(fields: [transactionId], references: [id])
+  propertyAddress  String?
+  mlsNumber        String?
+
+  // Multi-format content
+  mlsDescription   String?       @db.Text
+  instagramCaption String?       @db.Text
+  facebookPost     String?       @db.Text
+  linkedinPost     String?       @db.Text
+  emailTemplate    String?       @db.Text
+  smsTemplate      String?
+
+  // Approval workflow
+  status           ContentStatus @default(DRAFT)
+  fairHousingCheck Json?         // { passed: bool, warnings: string[] }
+  submittedAt      DateTime?
+  approvedAt       DateTime?
+
+  // Scheduling
+  scheduledFor     DateTime?
+  publishedAt      DateTime?
+  calendarDays     Json?         // 30-day posting schedule
+
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@index([userId, status])
+  @@index([transactionId])
+}
+
+// ============== Agent 6: Intelligence Engine ==============
+
+model CMAAnalysis {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id])
+  transactionId    String?
+  propertyAddress  String
+
+  selectedComps    Json?    // [{ address, price, soldDate, adjustments }]
+  cmaEstimate      Float?
+  confidence       Float?   // 0-1
+  adjustments      Json?    // [{ factor: "pool", amount: 15000 }]
+
+  bpsScore         Float?   // Buyer Perception Score
+  ppsScore         Float?   // Pricing Position Score
+  uriScore         Float?   // Unknown Repair Index
+
+  createdAt        DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([propertyAddress])
+}
+
+model LeadScoreLog {
+  id                    String   @id @default(cuid())
+  userId                String
+  user                  User     @relation(fields: [userId], references: [id])
+  contactId             String
+  contact               Contact  @relation(fields: [contactId], references: [id])
+
+  communicationFrequency Float
+  lifeEventSignals       Float
+  marketTiming           Float
+  recencyWarmth          Float
+  finalScore             Float
+  recommendation         String   // "high" | "warm" | "cool" | "dormant"
+
+  createdAt              DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([contactId])
+}
+
+model DOMProjection {
+  id               String   @id @default(cuid())
+  transactionId    String
+  transaction      Transaction @relation(fields: [transactionId], references: [id])
+
+  listPrice        Float
+  projectedDOM30   Int?
+  projectedDOM60   Int?
+  projectedDOM90   Int?
+
+  netProceeds30    Float?
+  netProceeds60    Float?
+  netProceeds90    Float?
+
+  createdAt        DateTime @default(now())
+
+  @@index([transactionId])
+}
+
+model KPILog {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id])
+  period              String   // "2026-03" (month), "2026-Q1" (quarter), "2026" (year)
+
+  closedTransactions  Int      @default(0)
+  avgDaysToClose      Float?
+  totalCommission     Float?
+  avgCommission       Float?
+  pipelineValue       Float?
+  activeDeals         Int      @default(0)
+
+  createdAt           DateTime @default(now())
+
+  @@unique([userId, period])
+}
+
+// ============== Team 2: Deal Rescue ==============
+
+model DealHealthLog {
+  id                String      @id @default(cuid())
+  userId            String
+  user              User        @relation(fields: [userId], references: [id])
+  transactionId     String
+  transaction       Transaction @relation(fields: [transactionId], references: [id])
+
+  timelineScore     Float       // 0-10
+  communicationScore Float      // 0-10
+  documentScore     Float       // 0-10
+  sentimentScore    Float       // 0-10
+  finalHealthScore  Float       // weighted average 1-10
+
+  recommendation    String      // "critical" | "at_risk" | "healthy" | "closing"
+  rescueBrief       String?     @db.Text  // AI-generated action plan
+  runDate           DateTime    @default(now())
+
+  @@index([userId, runDate])
+  @@index([transactionId])
+  @@index([finalHealthScore])
+}
+
+// ============== Team 3: LREC Guardian ==============
+
+model ComplianceAuditLog {
+  id                String      @id @default(cuid())
+  userId            String
+  user              User        @relation(fields: [userId], references: [id])
+  transactionId     String
+  transaction       Transaction @relation(fields: [transactionId], references: [id])
+
+  documentCheck     Json        // { category, required, present, missing[] }
+  deadlineCheck     Json        // { name, dueDate, completed, overdue }
+  disclosureCheck   Json        // { type, signed, signerName, signedDate }
+
+  finalStatus       String      // "green" | "yellow" | "red"
+  blockers          String[]    // exact items preventing submission
+  runDate           DateTime    @default(now())
+
+  @@index([userId, runDate])
+  @@index([transactionId])
+}
+
+// ============== Team 4: Seller Pricing War Room ==============
+
+model PricingAnalysisLog {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id])
+  contactId         String?
+  propertyAddress   String
+
+  cmaEstimate       Float?
+  zillowestimate    Float?
+  avmGapPct         Float?   // gap between Zillow and CMA
+
+  conservativePrice Float?
+  targetPrice       Float?
+  aggressivePrice   Float?
+  recommendedPrice  Float?
+
+  domProjection30   Int?
+  domProjection60   Int?
+  domProjection90   Int?
+
+  objections        Json?    // [{ objection, response }]
+  createdAt         DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+// ============== Team 6: Negotiation Intelligence ==============
+
+model NegotiationLog {
+  id                   String      @id @default(cuid())
+  userId               String
+  user                 User        @relation(fields: [userId], references: [id])
+  transactionId        String
+  transaction          Transaction @relation(fields: [transactionId], references: [id])
+
+  incomingOfferPrice   Float?
+  incomingTerms        Json?       // { earnestMoney, inspectionDays, financingDays, closingDate }
+  marketAnalysis       Json?       // { cmaEstimate, competitive, fairness }
+  sellerMotivation     String?     // "flexible" | "firm" | "desperate" | "time_constrained"
+
+  // Recommendations
+  recommendedAction    String?     // "accept" | "counter" | "reject"
+  recommendedCounter   Float?
+  acceptanceProbability Float?     // 0-1
+  expectedClosingDays  Int?
+  expectedNetProceeds  Float?
+
+  scenarios            Json?       // [{ action, price, probability, netProceeds }]
+  createdAt            DateTime    @default(now())
+
+  @@index([userId, createdAt])
+  @@index([transactionId])
+}
+
+// ============== Agent Infrastructure ==============
+
+model AgentRun {
+  id             String    @id @default(cuid())
+  userId         String?
+  user           User?     @relation(fields: [userId], references: [id])
+  agentName      String    // "morning_brief", "deal_rescue", "email_scan", etc.
+  status         String    @default("running") // "running" | "success" | "failed"
+  startedAt      DateTime  @default(now())
+  completedAt    DateTime?
+  durationMs     Int?
+  error          String?
+  resultMetadata Json?
+
+  @@index([agentName, startedAt])
+  @@index([userId, agentName])
 }

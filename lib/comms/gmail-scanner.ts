@@ -28,6 +28,45 @@ export async function scanGmail(userId: string, sinceMins = 30): Promise<{ inbou
   })
   if (!account?.accessToken) return { inbound: [], outbound: [] }
 
+  // Refresh token if expired or expiring within 5 minutes
+  let accessToken = account.accessToken
+  if (account.tokenExpiry && account.tokenExpiry < new Date(Date.now() + 5 * 60 * 1000)) {
+    if (account.refreshToken) {
+      try {
+        const refreshRes = await fetch("https://oauth2.googleapis.com/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            client_id: process.env.GOOGLE_CLIENT_ID || "",
+            client_secret: process.env.GOOGLE_CLIENT_SECRET || "",
+            refresh_token: account.refreshToken,
+            grant_type: "refresh_token",
+          }),
+        })
+        if (refreshRes.ok) {
+          const data = await refreshRes.json()
+          accessToken = data.access_token
+          await prisma.emailAccount.update({
+            where: { id: account.id },
+            data: {
+              accessToken: data.access_token,
+              tokenExpiry: new Date(Date.now() + data.expires_in * 1000),
+            },
+          })
+        } else {
+          console.error("[CommsMonitor] Token refresh failed:", refreshRes.status)
+          return { inbound: [], outbound: [] }
+        }
+      } catch (err) {
+        console.error("[CommsMonitor] Token refresh error:", err)
+        return { inbound: [], outbound: [] }
+      }
+    } else {
+      console.error("[CommsMonitor] Token expired and no refresh token available")
+      return { inbound: [], outbound: [] }
+    }
+  }
+
   const userEmail = account.email
   const sinceEpoch = Math.floor((Date.now() - sinceMins * 60000) / 1000)
   const query = `after:${sinceEpoch}`
@@ -35,7 +74,7 @@ export async function scanGmail(userId: string, sinceMins = 30): Promise<{ inbou
   // Fetch message list
   const listRes = await fetch(
     `https://gmail.googleapis.com/gmail/v1/users/me/messages?q=${encodeURIComponent(query)}&maxResults=50`,
-    { headers: { Authorization: `Bearer ${account.accessToken}` } }
+    { headers: { Authorization: `Bearer ${accessToken}` } }
   )
   if (!listRes.ok) {
     console.error("[CommsMonitor] Gmail list failed:", listRes.status)
@@ -56,7 +95,7 @@ export async function scanGmail(userId: string, sinceMins = 30): Promise<{ inbou
 
     const msgRes = await fetch(
       `https://gmail.googleapis.com/gmail/v1/users/me/messages/${id}?format=metadata&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Subject`,
-      { headers: { Authorization: `Bearer ${account.accessToken}` } }
+      { headers: { Authorization: `Bearer ${accessToken}` } }
     )
     if (!msgRes.ok) continue
 
