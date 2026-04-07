@@ -1,0 +1,105 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link "A AIRE Intelligence" [ref=e5] [cursor=pointer]:
+        - /url: /aire
+        - generic [ref=e6]: A
+        - generic [ref=e7]:
+          - generic [ref=e8]: AIRE
+          - text: Intelligence
+      - navigation [ref=e10]:
+        - link "Brief" [ref=e11] [cursor=pointer]:
+          - /url: /aire
+          - img [ref=e12]
+          - generic [ref=e18]: Brief
+        - link "Inbox" [ref=e19] [cursor=pointer]:
+          - /url: /aire/email
+          - img [ref=e20]
+          - generic [ref=e23]: Inbox
+        - link "Deals" [ref=e24] [cursor=pointer]:
+          - /url: /aire/transactions
+          - img [ref=e25]
+          - generic [ref=e27]: Deals
+        - link "AirSign" [ref=e28] [cursor=pointer]:
+          - /url: /airsign
+          - img [ref=e30]
+          - generic [ref=e32]: AirSign
+        - link "Contacts" [ref=e33] [cursor=pointer]:
+          - /url: /aire/relationships
+          - img [ref=e34]
+          - generic [ref=e39]: Contacts
+        - link "Market" [ref=e40] [cursor=pointer]:
+          - /url: /aire/intelligence
+          - img [ref=e41]
+          - generic [ref=e42]: Market
+      - generic [ref=e43]:
+        - link "Settings" [ref=e44] [cursor=pointer]:
+          - /url: /aire/settings
+          - img [ref=e45]
+          - text: Settings
+        - link "Back to site" [ref=e48] [cursor=pointer]:
+          - /url: /
+          - img [ref=e49]
+          - text: Back to site
+    - main [ref=e51]:
+      - button "Ask AIRE anything... \"write a contract for 554 Avenue F\" / voice or type" [ref=e54]:
+        - img [ref=e55]
+        - generic [ref=e58]: Ask AIRE anything... "write a contract for 554 Avenue F"
+        - generic [ref=e59]:
+          - generic [ref=e60]: /
+          - generic [ref=e61]: voice or type
+      - generic [ref=e63]:
+        - generic [ref=e64]:
+          - generic [ref=e65]:
+            - paragraph [ref=e66]: AirSign
+            - heading "554 AVENUE F Street" [level=1] [ref=e67]
+          - generic [ref=e68]: SENT
+        - generic [ref=e69]:
+          - button "Edit & Re-place Fields" [ref=e70]:
+            - img [ref=e71]
+            - text: Edit & Re-place Fields
+          - button "Void Envelope" [ref=e74]:
+            - img [ref=e75]
+            - text: Void Envelope
+          - link "Download PDF" [ref=e78] [cursor=pointer]:
+            - /url: https://rvz7w4mrsbnyq6kt.public.blob.vercel-storage.com/airsign/uploads/user_3BPsxwC2Ahn17KlWwzHwsYaWLJY/1775520937055-554%20AVENUE%20F%20streeLREC%20-%20Residential%20Agreement%20to%20Buy%20or%20Sell%20%281%29%20%281%29.pdf
+            - img [ref=e79]
+            - text: Download PDF
+          - link "New Envelope" [ref=e82] [cursor=pointer]:
+            - /url: /airsign/new
+            - img [ref=e83]
+            - text: New Envelope
+        - generic [ref=e84]:
+          - generic [ref=e86]:
+            - paragraph [ref=e89]: Loading page 1...
+            - button "Initials" [ref=e91] [cursor=pointer]:
+              - generic [ref=e92]: Initials
+          - generic [ref=e93]:
+            - generic [ref=e95]:
+              - paragraph [ref=e96]: Progress
+              - generic [ref=e97]: 0 / 1 signed
+            - generic [ref=e99]:
+              - paragraph [ref=e100]: Signers
+              - generic [ref=e102]:
+                - generic [ref=e103]:
+                  - paragraph [ref=e104]: Gavin Shaw
+                  - generic [ref=e105]: Pending
+                - paragraph [ref=e106]: cjjfrancis96@gmail.com · SIGNER
+                - generic [ref=e107]:
+                  - button "Copy signing link" [ref=e108]
+                  - button "Resend email" [ref=e109]
+            - generic [ref=e110]:
+              - paragraph [ref=e111]: Fields
+              - paragraph [ref=e112]: 11 total
+              - paragraph [ref=e113]: 0 completed · 11 pending
+            - generic [ref=e114]:
+              - paragraph [ref=e115]: Audit trail
+              - generic [ref=e116]:
+                - generic [ref=e117]: sentApr 6, 8:09 PM
+                - generic [ref=e118]: createdApr 6, 7:16 PM
+            - generic [ref=e119]:
+              - paragraph [ref=e120]: "Sent: 4/6/2026"
+              - paragraph [ref=e121]: "Expires: 5/6/2026"
+  - button "Open Next.js Dev Tools" [ref=e127] [cursor=pointer]:
+    - img [ref=e128]
+  - alert [ref=e131]

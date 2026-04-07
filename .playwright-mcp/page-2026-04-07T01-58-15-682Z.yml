@@ -1,0 +1,108 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link "A AIRE" [ref=e5] [cursor=pointer]:
+        - /url: /aire
+        - generic [ref=e6]: A
+        - generic [ref=e7]: AIRE
+      - button "Ask AIRE Voice or type a command" [ref=e9]:
+        - img [ref=e11]
+        - generic [ref=e14]:
+          - generic [ref=e15]: Ask AIRE
+          - generic [ref=e16]: Voice or type a command
+      - navigation [ref=e17]:
+        - link "Brief 1" [ref=e18] [cursor=pointer]:
+          - /url: /aire
+          - img [ref=e19]
+          - text: Brief
+          - generic [ref=e25]: "1"
+        - link "Inbox" [ref=e26] [cursor=pointer]:
+          - /url: /aire/email
+          - img [ref=e27]
+          - text: Inbox
+        - link "Deals 2" [ref=e30] [cursor=pointer]:
+          - /url: /aire/transactions
+          - img [ref=e31]
+          - text: Deals
+          - generic [ref=e33]: "2"
+        - link "Contacts" [ref=e34] [cursor=pointer]:
+          - /url: /aire/relationships
+          - img [ref=e35]
+          - text: Contacts
+        - link "Market" [ref=e40] [cursor=pointer]:
+          - /url: /aire/intelligence
+          - img [ref=e41]
+          - text: Market
+      - generic [ref=e42]:
+        - link "AirSign" [ref=e43] [cursor=pointer]:
+          - /url: /airsign
+          - img [ref=e44]
+          - text: AirSign
+        - link "Settings" [ref=e46] [cursor=pointer]:
+          - /url: /aire/settings
+          - img [ref=e47]
+          - text: Settings
+        - link "Back to site" [ref=e50] [cursor=pointer]:
+          - /url: /
+          - img [ref=e51]
+          - text: Back to site
+    - main [ref=e53]:
+      - generic [ref=e54]:
+        - generic [ref=e55]:
+          - generic [ref=e56]:
+            - link "← Dashboard" [ref=e57] [cursor=pointer]:
+              - /url: /aire
+            - heading "Transactions" [level=1] [ref=e58]
+          - generic [ref=e59]:
+            - generic [ref=e60]:
+              - generic [ref=e61]: 2 active
+              - generic [ref=e62]: 0 closed
+            - link "+ New" [ref=e63] [cursor=pointer]:
+              - /url: /aire/transactions/new
+        - generic [ref=e64]:
+          - generic [ref=e65]:
+            - textbox "Search address, buyer, seller, MLS..." [ref=e66]
+            - generic [ref=e67]:
+              - generic [ref=e68]:
+                - button "All" [ref=e69]
+                - button "Active" [ref=e70]
+                - button "Pending" [ref=e71]
+                - button "Closed" [ref=e72]
+              - combobox [ref=e73]:
+                - option "Recent" [selected]
+                - option "Closing Date"
+                - option "Price"
+          - generic [ref=e74]:
+            - link "554 avenue f Active 1 due gavin shaw · 0 docs TBD 28d to close" [ref=e75] [cursor=pointer]:
+              - /url: /aire/transactions/cmnnwobdc005mu13g956una7c
+              - generic [ref=e76]:
+                - generic [ref=e77]:
+                  - generic [ref=e78]:
+                    - paragraph [ref=e79]: 554 avenue f
+                    - generic [ref=e80]: Active
+                    - generic [ref=e81]: 1 due
+                  - generic [ref=e82]:
+                    - generic [ref=e83]: gavin shaw
+                    - generic [ref=e84]: ·
+                    - generic [ref=e85]: 0 docs
+                - generic [ref=e86]:
+                  - paragraph [ref=e87]: TBD
+                  - paragraph [ref=e88]: 28d to close
+            - link "554 Avenue F Inspection 1 due Gavin Shaw · 3 docs TBD 28d to close" [ref=e89] [cursor=pointer]:
+              - /url: /aire/transactions/cmnnut2qx004vu13gc3pvphz9
+              - generic [ref=e90]:
+                - generic [ref=e91]:
+                  - generic [ref=e92]:
+                    - paragraph [ref=e93]: 554 Avenue F
+                    - generic [ref=e94]: Inspection
+                    - generic [ref=e95]: 1 due
+                  - generic [ref=e96]:
+                    - generic [ref=e97]: Gavin Shaw
+                    - generic [ref=e98]: ·
+                    - generic [ref=e99]: 3 docs
+                - generic [ref=e100]:
+                  - paragraph [ref=e101]: TBD
+                  - paragraph [ref=e102]: 28d to close
+  - button "Open Next.js Dev Tools" [ref=e108] [cursor=pointer]:
+    - img [ref=e109]
+  - alert [ref=e112]

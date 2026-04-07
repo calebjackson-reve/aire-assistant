@@ -1,0 +1,181 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link "A AIRE" [ref=e5] [cursor=pointer]:
+        - /url: /aire
+        - generic [ref=e6]: A
+        - generic [ref=e7]: AIRE
+      - button "Ask AIRE Voice or type a command" [ref=e9]:
+        - img [ref=e11]
+        - generic [ref=e14]:
+          - generic [ref=e15]: Ask AIRE
+          - generic [ref=e16]: Voice or type a command
+      - navigation [ref=e17]:
+        - link "Brief 1" [ref=e18] [cursor=pointer]:
+          - /url: /aire
+          - img [ref=e19]
+          - text: Brief
+          - generic [ref=e25]: "1"
+        - link "Inbox" [ref=e26] [cursor=pointer]:
+          - /url: /aire/email
+          - img [ref=e27]
+          - text: Inbox
+        - link "Deals 2" [ref=e30] [cursor=pointer]:
+          - /url: /aire/transactions
+          - img [ref=e31]
+          - text: Deals
+          - generic [ref=e33]: "2"
+        - link "Contacts" [ref=e34] [cursor=pointer]:
+          - /url: /aire/relationships
+          - img [ref=e35]
+          - text: Contacts
+        - link "Market" [ref=e40] [cursor=pointer]:
+          - /url: /aire/intelligence
+          - img [ref=e41]
+          - text: Market
+      - generic [ref=e42]:
+        - link "AirSign" [ref=e43] [cursor=pointer]:
+          - /url: /airsign
+          - img [ref=e44]
+          - text: AirSign
+        - link "Settings" [ref=e46] [cursor=pointer]:
+          - /url: /aire/settings
+          - img [ref=e47]
+          - text: Settings
+        - link "Back to site" [ref=e50] [cursor=pointer]:
+          - /url: /
+          - img [ref=e51]
+          - text: Back to site
+    - main [ref=e53]:
+      - generic [ref=e113]:
+        - link "← All Transactions" [ref=e114] [cursor=pointer]:
+          - /url: /aire/transactions
+        - generic [ref=e115]:
+          - generic [ref=e116]:
+            - generic [ref=e117]:
+              - generic [ref=e118]:
+                - heading "554 Avenue F" [level=1] [ref=e119]
+                - paragraph [ref=e120]: Baton Rouge, LA
+              - generic [ref=e121]: Inspection
+            - generic [ref=e122]:
+              - generic [ref=e123]: Buyer Gavin Shaw
+              - generic [ref=e124]: Seller jane doe
+              - generic [ref=e125]: Day 1 of 28
+              - generic [ref=e126]: Closing in 28 days
+            - generic [ref=e130]: 4%
+          - generic [ref=e131]:
+            - generic [ref=e132]:
+              - generic [ref=e133]: "!"
+              - generic [ref=e134]:
+                - paragraph [ref=e135]: Earnest Money Deposit Due in 2 days
+                - paragraph [ref=e136]: Due Apr 8.
+              - button "Mark Complete" [ref=e138]
+            - generic [ref=e139]:
+              - generic [ref=e140]: i
+              - generic [ref=e141]:
+                - paragraph [ref=e142]: "Missing: Inspection Report"
+                - paragraph [ref=e143]: This document is typically needed at the Inspection stage.
+              - button "Upload Document" [ref=e145]
+            - generic [ref=e146]:
+              - generic [ref=e147]: i
+              - generic [ref=e148]:
+                - paragraph [ref=e149]: Review inspection report
+                - paragraph [ref=e150]: Check findings and decide on repair requests
+            - generic [ref=e151]:
+              - generic [ref=e152]: i
+              - generic [ref=e153]:
+                - paragraph [ref=e154]: Send repair request to seller
+                - paragraph [ref=e155]: Submit any repair requests based on inspection
+            - paragraph [ref=e156]: +3 more suggestions in the tabs below
+          - generic [ref=e158]:
+            - generic [ref=e159]:
+              - paragraph [ref=e160]: Deal Pipeline
+              - generic [ref=e161]: 0% through timeline
+            - generic [ref=e164]:
+              - generic [ref=e165]:
+                - generic [ref=e166]: ✓
+                - paragraph [ref=e167]: Draft
+              - generic [ref=e168]:
+                - generic [ref=e170]: ✓
+                - paragraph [ref=e171]: Active
+              - generic [ref=e172]:
+                - generic [ref=e174]: 🔍
+                - paragraph [ref=e175]: Inspection
+                - paragraph [ref=e176]: 14d left
+              - generic [ref=e177]:
+                - generic [ref=e179]: 📋
+                - paragraph [ref=e180]: Appraisal
+              - generic [ref=e181]:
+                - generic [ref=e183]: 🏦
+                - paragraph [ref=e184]: Financing
+              - generic [ref=e185]:
+                - generic [ref=e187]: 📝
+                - paragraph [ref=e188]: Closing
+              - generic [ref=e189]:
+                - generic [ref=e191]: ✓
+                - paragraph [ref=e192]: Closed
+          - generic [ref=e193]:
+            - button "Overview" [ref=e194]
+            - button "Deadlines" [ref=e195]
+            - button "Documents3" [ref=e196]
+            - button "Comms" [ref=e197]
+          - generic [ref=e198]:
+            - generic [ref=e199]:
+              - generic [ref=e200]:
+                - paragraph [ref=e201]: Deal Info
+                - generic [ref=e202]:
+                  - generic [ref=e203]:
+                    - paragraph [ref=e204]: List Price
+                    - paragraph [ref=e205]: —
+                  - generic [ref=e206]:
+                    - paragraph [ref=e207]: Offer
+                    - paragraph [ref=e208]: $295,000
+                  - generic [ref=e209]:
+                    - paragraph [ref=e210]: Accepted
+                    - paragraph [ref=e211]: —
+                  - generic [ref=e212]:
+                    - paragraph [ref=e213]: Contract Date
+                    - paragraph [ref=e214]: Apr 6, 2026
+                  - generic [ref=e215]:
+                    - paragraph [ref=e216]: Closing Date
+                    - paragraph [ref=e217]: May 4, 2026
+                  - generic [ref=e218]:
+                    - paragraph [ref=e219]: Type
+                    - paragraph [ref=e220]: residential
+              - generic [ref=e221]:
+                - paragraph [ref=e222]: Parties
+                - generic [ref=e223]:
+                  - generic [ref=e224]:
+                    - paragraph [ref=e225]: Buyer
+                    - paragraph [ref=e226]: Gavin Shaw
+                  - generic [ref=e227]:
+                    - paragraph [ref=e228]: Seller
+                    - paragraph [ref=e229]: jane doe
+                  - generic [ref=e230]:
+                    - paragraph [ref=e231]: Lender
+                    - paragraph [ref=e232]: —
+                  - generic [ref=e233]:
+                    - paragraph [ref=e234]: Title Company
+                    - paragraph [ref=e235]: —
+            - generic [ref=e236]:
+              - generic [ref=e237]:
+                - paragraph [ref=e238]: Advance Status
+                - button "→ Appraisal" [ref=e241]
+              - generic [ref=e242]:
+                - generic [ref=e243]:
+                  - paragraph [ref=e244]: Workflow timeline
+                  - generic [ref=e245]: Inspection
+                - generic [ref=e250]:
+                  - paragraph [ref=e251]: Active → Inspection
+                  - paragraph [ref=e252]: Document uploaded · Contract uploaded
+                  - paragraph [ref=e253]: Apr 6 at 7:03 PM
+              - generic [ref=e254]:
+                - paragraph [ref=e255]: Quick Actions
+                - generic [ref=e256]:
+                  - link "Create & send in AirSign" [ref=e257] [cursor=pointer]:
+                    - /url: /airsign/new
+                  - link "Run compliance scan" [ref=e258] [cursor=pointer]:
+                    - /url: /aire/compliance
+  - button "Open Next.js Dev Tools" [ref=e108] [cursor=pointer]:
+    - img [ref=e109]
+  - alert [ref=e112]

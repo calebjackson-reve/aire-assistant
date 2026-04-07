@@ -1,0 +1,1597 @@
+[     145ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[     156ms] [LOG] [Fast Refresh] done in 119ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[     299ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[     363ms] [LOG] [Fast Refresh] done in 172ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[     698ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[     735ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[     987ms] [WARNING] Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[    1050ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[    1113ms] [LOG] [Fast Refresh] done in 175ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[    7881ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[    7896ms] [LOG] [Fast Refresh] done in 127ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   63504ms] [WARNING] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   63634ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   63771ms] [LOG] [Fast Refresh] done in 234ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   65408ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   65471ms] [LOG] [Fast Refresh] done in 176ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   71641ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   71658ms] [LOG] [Fast Refresh] done in 126ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   89885ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   89948ms] [LOG] [Fast Refresh] done in 172ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  129803ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  130082ms] [LOG] [Fast Refresh] done in 390ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  134349ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  134515ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  134793ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  134899ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  134969ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  135049ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  135207ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  135248ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  135335ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  135417ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  135505ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  135582ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  135657ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  135738ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  135812ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  135890ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  135967ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  136043ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  136106ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  136186ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  136248ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  136312ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  136373ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  136436ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  136580ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  136580ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  136686ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  136765ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  136845ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  136921ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  136984ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  137046ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  137107ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  137171ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  137233ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  137295ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  137357ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  137421ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  137486ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  137562ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  137624ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  137684ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  137746ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  137808ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  137870ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  137935ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  137997ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  138065ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  138124ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  138185ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  138247ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  138309ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  138370ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  138432ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  138496ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  138558ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  138619ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  138681ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  138744ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  138804ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  138867ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  138945ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  139006ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  139069ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  139130ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  139192ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  139255ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  139317ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  139379ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  139442ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  139504ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  139568ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  139630ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  139693ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  139756ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  139817ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  139879ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  139940ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  140003ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  140065ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  140128ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  140189ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  140252ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  140314ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  140378ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  140441ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  140504ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  140567ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  140631ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  140694ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  140754ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  140812ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  140875ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  140936ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  140998ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  141061ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  141123ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  141184ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  141246ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  141310ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  141372ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  141434ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  141497ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  141561ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  141622ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  141684ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  141749ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  141812ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  141873ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  141935ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  141997ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  142060ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  142122ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  142184ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  142245ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  142310ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  142371ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  142434ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  142496ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  142558ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  142621ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  142684ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  142747ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  142810ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  142872ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  142934ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  142999ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  143061ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  143124ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  143185ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  143247ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  143310ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  143371ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  143434ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  143495ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  143556ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  143618ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  143680ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  143743ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  143805ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  143867ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  143928ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  143991ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  144053ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  144114ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  144177ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  144236ms] [ERROR] ./app/aire/morning-brief/page.tsx:359:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  357 |     </div>
+  358 |   )
+> 359 | }
+      | ^
+  360 |
+  361 | function SectionLabel({ number, title, count }: { number: string; title: string; count?: ...
+  362 |   return (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[  144363ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  144432ms] [LOG] [Fast Refresh] done in 140ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  144670ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  144738ms] [LOG] [Fast Refresh] done in 187ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  148334ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  148460ms] [LOG] [Fast Refresh] done in 238ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  152930ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  153006ms] [LOG] [Fast Refresh] done in 195ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
