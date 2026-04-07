@@ -75,3 +75,32 @@
 - Build: PASS
 - Deployed: https://aire-assistant.vercel.app
 - Next session starts with: Paste 3 HTML reference files into design-reference/, build /airsign/new and /airsign/[id], rebuild /billing with cognac design
+
+**2026-04-06 — Full platform audit, voice command, AirSign upgrades, transaction wizard, deploy — PASS**
+- Goal: Audit entire project, fix all blockers, build voice command system, upgrade AirSign, deploy to production
+- Built:
+  - `components/layouts/DarkLayout.tsx` — cream sidebar + forest dark content, Ask AIRE voice button, 6-item agent OS nav
+  - `components/VoiceOverlay.tsx` — full Siri-style voice interface with Whisper STT, browser TTS, app navigation, chat UI
+  - `app/api/voice/transcribe/route.ts` — Whisper API transcription with Louisiana vocabulary prompting
+  - `components/airsign/FieldPlacer.tsx` — centered click placement, persistent mode, page nav bar (1-11), date auto-fill, Escape to exit
+  - `app/airsign/new/NewEnvelopeForm.tsx` — auto-extract PDF title → envelope name, show filename + page count
+  - `app/aire/transactions/new/TransactionWizard.tsx` — 4-step Dotloop-style wizard (Address → Template → Details → Finish)
+  - `lib/tc/templates/index.ts` — 10 transaction templates with LREC document checklists + TC task lists
+  - `lib/contracts/agent-profile.ts` — Caleb's agent info auto-fill for contracts
+  - `app/api/contracts/autofill/route.ts` — deal data + agent profile → pre-filled LREC PDF
+  - `app/api/documents/upload/route.ts` — added duplicate detection (file hash), address mismatch warning, filename classifier fallback
+  - `app/sign-in/[[...sign-in]]/page.tsx` — branded sign-in (forest bg, cream card, sage accents)
+- Fixed:
+  - `app/airsign/page.tsx:23` — added DECLINED to EnvelopeStatus counts
+  - `app/components/layout/Navbar.tsx:68` — removed deprecated afterSignOutUrl prop (Clerk v7)
+  - `.env` + `.env.local` — DATABASE_URL updated to new Neon host (ep-muddy-cherry-am44pnvo-pooler)
+  - Seeded user record for Caleb Jackson (PRO tier, onboarded) into new Neon DB
+  - Clerk OAuth providers reduced from 20+ to 6 (Google, Apple, Microsoft, Facebook, X, Instagram)
+- Broke:
+  - Brief page design quality doesn't match AirSign — needs redesign next session
+  - Mobile signing link pointed to localhost (fixed by deploy — now aireintel.org/sign/[token])
+  - Document classifier returns "unknown" for some LREC forms (addendums) — filename fallback added but needs testing
+- Commits: 9dbc23d (main build), 8b8c3a8 (sign-in branding)
+- Build: PASS
+- Deployed: aireintel.org (Vercel production)
+- Next session starts with: Wire MLS API key from broker meeting, redesign Brief page to match AirSign quality, build document folder system with TC checklist per transaction

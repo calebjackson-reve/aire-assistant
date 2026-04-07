@@ -39,23 +39,45 @@
 - LREC form classification — 95% accuracy
 - VoiceCommand, MorningBrief, Contact, Transaction tables confirmed in Neon
 
-## NEEDS VERIFICATION 🟡
-- /billing — checkout flow needs browser test (env vars set but untested)
-- Communications quick-send — emails fall back to console.log without RESEND_API_KEY
-- AirSign email delivery — console.log fallback without RESEND_API_KEY
+## VERIFIED WORKING ✅ (2026-04-06)
+- AirSign email delivery — Resend sends branded "Signature Requested" emails to signers
+- AirSign signing flow — upload, place fields, send, sign on mobile, audit trail
+- Neon DB connected (ep-muddy-cherry-am44pnvo-pooler), Prisma synced, user seeded
+- All env vars configured in .env.local (Anthropic, Stripe, Resend, Blob, Twilio, Google OAuth, Clerk)
+- Sign-in page branded, OAuth reduced to 6 providers
+- Voice command overlay wired to /api/voice-command/v2 with browser TTS
+
+## NEEDS ATTENTION 🟡
+- Brief page design quality doesn't match AirSign — needs full redesign
+- Document classifier returns "unknown" for some LREC filenames — fallback added, needs testing
+- Duplicate document detection added but not yet shown in UI (warnings in API response only)
+- Address mismatch warning added but not yet shown in UI
+- /billing checkout — Stripe keys set but end-to-end checkout not browser-tested
+- Gmail OAuth — stubs exist, full token flow incomplete
+- Signing page UX — signer sees agent's field placer UI, needs simplified "fill and sign" view
 
 ## NOT BUILT YET 🔲
-- Content Agent (autonomous scheduling + publishing — only manual slide generator exists)
-- Dotloop API integration (needs account credentials)
-- Gmail OAuth completion (stubs exist, full redirect/token flow incomplete)
+- Document folder system (Dotloop-style categories per transaction)
+- TC checklist UI (task list with completion tracking)
+- Brief page redesign (match AirSign quality)
+- Calendar integration (Google Calendar API)
+- Content Agent (autonomous scheduling + publishing)
+- Google Contacts import (vCard route exists, needs UI)
+- Whisper integration (route built, needs OPENAI_API_KEY)
+- MLS address autocomplete (routes built, needs MLS API key from broker)
 
-## ENV VARS NEEDED
-- `BLOB_READ_WRITE_TOKEN` — AirSign PDF upload/seal + contract storage
-- `RESEND_API_KEY` — AirSign signing emails + TC party communications
-- `AIRSIGN_INTERNAL_SECRET` — internal AirSign webhook auth
-- `AIRE_WEBHOOK_SECRET` — webhook verification
+## NEXT PRIORITY
+1. Wire MLS API key from broker meeting (2026-04-07)
+2. Redesign Brief page to match AirSign quality
+3. Build document folder system with TC checklist per transaction
+4. Test billing checkout end-to-end
+5. Complete Gmail OAuth flow
+
+## ENV VARS (All Set)
+All configured in .env.local — DATABASE_URL, ANTHROPIC_API_KEY, CLERK_SECRET_KEY, STRIPE_SECRET_KEY, RESEND_API_KEY, BLOB_READ_WRITE_TOKEN, TWILIO_*, GOOGLE_CLIENT_ID/SECRET, AIRSIGN_INTERNAL_SECRET, AIRE_WEBHOOK_SECRET
 
 ## BUILD HISTORY
 - 2026-03-29: Initial deploy — homepage, auth, billing, AirSign dashboard, Morning Brief
 - 2026-04-04 (multi-agent): Document pipeline, TC CRUD, AirSign Layer 1-3, Voice pipeline, Compliance, Contracts, Data layer, Monitoring, Comms monitor, Onboarding, Subscription gates
 - 2026-04-04 (continued): Morning Brief intelligence wiring, Intelligence admin table, Voice SSE streaming, Voice analytics dashboard
+- 2026-04-06: Full audit + voice command system + AirSign upgrades + transaction wizard + contract auto-fill + document intelligence + deploy to aireintel.org
