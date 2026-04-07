@@ -3,13 +3,16 @@
  * Manages preferred vendor lists and auto-schedules inspectors,
  * appraisers, and title companies for transactions.
  *
+ * Vendors are stored in the Prisma Vendor model (per-user).
  * Dev mode: console.log for SMS confirmations.
  * Prod mode: Twilio SMS for vendor outreach.
  */
 
+import prisma from "@/lib/prisma"
+
 // ─── TYPES ──────────────────────────────────────────────────────────────────
 
-export type VendorType = "inspector" | "appraiser" | "title_company" | "surveyor" | "pest_inspector" | "contractor"
+export type VendorType = "inspector" | "appraiser" | "title_company" | "title" | "surveyor" | "pest_inspector" | "pest" | "contractor" | "other"
 
 export interface Vendor {
   name: string
@@ -31,6 +34,7 @@ export interface ScheduleRequest {
   notes?: string
   agentName: string
   agentPhone?: string
+  userId?: string // Prisma user ID for DB vendor lookup
 }
 
 export interface ScheduleResult {
@@ -40,51 +44,75 @@ export interface ScheduleResult {
   error?: string
 }
 
-// ─── PREFERRED VENDOR LIST (Baton Rouge Area) ───────────────────────────────
+// ─── CATEGORY MAPPING ──────────────────────────────────────────────────────
 
-const PREFERRED_VENDORS: Vendor[] = [
-  // Inspectors
-  { name: "Preferred Inspector", company: "BR Home Inspections", phone: "", email: "", type: "inspector", parish: "East Baton Rouge", notes: "Fast turnaround, thorough reports", priority: 1 },
-  { name: "Backup Inspector", company: "Capital City Inspections", phone: "", email: "", type: "inspector", parish: "East Baton Rouge", notes: "Available weekends", priority: 2 },
-
-  // Appraisers (ordered by lender, not agent — included for reference)
-  { name: "Preferred Appraiser", company: "BR Appraisal Group", phone: "", email: "", type: "appraiser", parish: "East Baton Rouge", notes: "Lender-ordered typically", priority: 1 },
-
-  // Title Companies
-  { name: "Preferred Title", company: "Louisiana Title Group", phone: "", email: "", type: "title_company", parish: "East Baton Rouge", notes: "Fast closings, excellent communication", priority: 1 },
-  { name: "Backup Title", company: "Capital Title Services", phone: "", email: "", type: "title_company", parish: "East Baton Rouge", notes: "Good for complex deals", priority: 2 },
-
-  // Surveyors
-  { name: "Preferred Surveyor", company: "BR Land Surveys", phone: "", email: "", type: "surveyor", parish: "East Baton Rouge", notes: "2-3 day turnaround", priority: 1 },
-
-  // Pest Inspectors
-  { name: "Preferred Pest", company: "Bayou Pest Control", phone: "", email: "", type: "pest_inspector", parish: "East Baton Rouge", notes: "WDI reports same day", priority: 1 },
-]
+/** Map VendorType aliases to Prisma category values */
+function toPrismaCategory(type: VendorType): string[] {
+  switch (type) {
+    case "inspector": return ["inspector"]
+    case "appraiser": return ["appraiser"]
+    case "title_company":
+    case "title": return ["title"]
+    case "surveyor": return ["surveyor"]
+    case "pest_inspector":
+    case "pest": return ["pest"]
+    case "contractor":
+    case "other": return ["other"]
+    default: return [type]
+  }
+}
 
 // ─── VENDOR LOOKUP ──────────────────────────────────────────────────────────
 
 /**
- * Get preferred vendors of a given type, sorted by priority.
+ * Get preferred vendors of a given type from the database, sorted by preference.
+ * Falls back to empty array if no vendors found.
  */
-export function getPreferredVendors(type: VendorType, parish?: string): Vendor[] {
-  return PREFERRED_VENDORS
-    .filter(v => v.type === type && (!parish || !v.parish || v.parish === parish))
-    .sort((a, b) => a.priority - b.priority)
+export async function getPreferredVendors(type: VendorType, userId?: string): Promise<Vendor[]> {
+  if (!userId) return []
+
+  const categories = toPrismaCategory(type)
+
+  const dbVendors = await prisma.vendor.findMany({
+    where: {
+      userId,
+      category: { in: categories },
+    },
+    orderBy: [{ preferred: "desc" }, { name: "asc" }],
+  })
+
+  return dbVendors.map((v, i) => ({
+    name: v.name,
+    company: v.company || "",
+    phone: v.phone || "",
+    email: v.email || undefined,
+    type,
+    notes: v.notes || undefined,
+    priority: v.preferred ? 0 : i + 1,
+  }))
 }
 
 /**
  * Get the top preferred vendor for a type.
  */
-export function getTopVendor(type: VendorType, parish?: string): Vendor | null {
-  const vendors = getPreferredVendors(type, parish)
+export async function getTopVendor(type: VendorType, userId?: string): Promise<Vendor | null> {
+  const vendors = await getPreferredVendors(type, userId)
   return vendors[0] || null
 }
 
 /**
- * List all vendor types available.
+ * List all vendor types available for a user.
  */
-export function getAvailableVendorTypes(): VendorType[] {
-  return [...new Set(PREFERRED_VENDORS.map(v => v.type))]
+export async function getAvailableVendorTypes(userId?: string): Promise<string[]> {
+  if (!userId) return []
+
+  const result = await prisma.vendor.findMany({
+    where: { userId },
+    select: { category: true },
+    distinct: ["category"],
+  })
+
+  return result.map(r => r.category)
 }
 
 // ─── SMS DISPATCH ───────────────────────────────────────────────────────────
@@ -122,7 +150,7 @@ async function sendVendorSms(to: string, body: string): Promise<{ ok: boolean; e
  * Falls back to next vendor if primary has no phone.
  */
 export async function scheduleVendor(req: ScheduleRequest): Promise<ScheduleResult> {
-  const vendors = getPreferredVendors(req.vendorType, "East Baton Rouge")
+  const vendors = await getPreferredVendors(req.vendorType, req.userId)
 
   if (vendors.length === 0) {
     return {

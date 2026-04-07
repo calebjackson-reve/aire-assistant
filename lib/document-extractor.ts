@@ -84,6 +84,42 @@ Identify: agent name, license number, brokerage, representation type (buyer/sell
     ],
     prompt: `Extract inspection response details including repair items requested, estimated costs, and seller's response.`,
   },
+  counter_offer: {
+    fields: [
+      "originalOfferDate", "counterPrice", "counterTerms",
+      "responseDeadline", "buyerName", "sellerName", "propertyAddress",
+    ],
+    prompt: `Extract all fields from this LREC-006 Counter-Offer form.
+Pay special attention to:
+- The original offer date being countered
+- Counter-offer price and any changed terms
+- Response deadline for acceptance
+- All party names and the property address`,
+  },
+  listing_agreement: {
+    fields: [
+      "listingAgent", "listingBrokerage", "listPrice",
+      "listDate", "expirationDate", "commissionRate",
+      "propertyAddress", "propertyType", "sellerName",
+    ],
+    prompt: `Extract all fields from this LREC-001 Listing Agreement.
+Pay special attention to:
+- Listing agent name and brokerage
+- List price and commission rate
+- Listing period (start date and expiration date)
+- Property address, type, and seller name`,
+  },
+  buyer_agency: {
+    fields: [
+      "buyerName", "agentName", "brokerage",
+      "startDate", "expirationDate", "commissionRate", "exclusivity",
+    ],
+    prompt: `Extract all fields from this LREC-002 Buyer Agency Agreement.
+Pay special attention to:
+- Buyer name, agent name, and brokerage
+- Agreement period (start and expiration dates)
+- Commission rate and whether the agreement is exclusive or non-exclusive`,
+  },
 };
 
 // extractWithVision was removed — replaced by multiPassExtract in multi-pass-extractor.ts

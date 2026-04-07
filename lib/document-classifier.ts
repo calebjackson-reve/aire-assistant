@@ -39,7 +39,7 @@ const DOCUMENT_PATTERNS: {
       /\b-\s*PA\s/i, // "Name - PA (1).pdf" pattern used by agents
       /\bPA\s*\(/i, // "PA (1)" or "PA(1)" patterns
     ],
-    lrecFormNumber: "LREC-001",
+    lrecFormNumber: "LREC-101",
   },
   {
     type: "property_disclosure",
@@ -149,8 +149,10 @@ const DOCUMENT_PATTERNS: {
     category: "addendum",
     patterns: [
       /counter\s*[\-\s]?offer/i,
+      /counter.?offer|counter.?proposal|LREC.?006/i,
       /\bCO\b(?:\s*\(|\s*-)/, // CO (1), CO-2
     ],
+    lrecFormNumber: "LREC-006",
   },
   {
     type: "inspection_report",
@@ -313,7 +315,7 @@ Filename: ${filename}
 First 3000 chars of content:
 ${extractedText.slice(0, 3000)}
 
-Valid types: purchase_agreement, property_disclosure, agency_disclosure, lead_paint, lead_based_paint, inspection_response, inspection_report, condominium_addendum, deposit_addendum, new_construction_addendum, historic_district_addendum, private_sewerage_addendum, buyer_option_flowchart, home_warranty, property_management, vacant_land, waiver_warranty, general_addendum, counter_offer, appraisal, seller_disclosure, amendment, addendum, contract, other
+Valid types: purchase_agreement, property_disclosure, agency_disclosure, lead_paint, lead_based_paint, inspection_response, inspection_report, condominium_addendum, deposit_addendum, new_construction_addendum, historic_district_addendum, private_sewerage_addendum, buyer_option_flowchart, home_warranty, property_management, vacant_land, waiver_warranty, general_addendum, counter_offer, listing_agreement, buyer_agency, appraisal, seller_disclosure, amendment, addendum, contract, other
 
 Valid categories: mandatory, addendum, federal, additional, broker, disclosure, inspection, appraisal
 

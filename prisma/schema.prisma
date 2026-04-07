@@ -66,6 +66,7 @@ model User {
   emailAccounts   EmailAccount[]
   communicationLogs CommunicationLog[]
   missedCallLogs  MissedCallLog[]
+  vendors         Vendor[]
 }
 
 // ============== PHASE 2: Transaction Core ==============
@@ -311,6 +312,26 @@ model Contact {
   @@index([agentId, type])
 }
 
+// ============== Vendor Management ==============
+
+model Vendor {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  company   String?
+  category  String   // inspector, appraiser, title, surveyor, pest, other
+  phone     String?
+  email     String?
+  notes     String?
+  preferred Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, category])
+}
+
 model RelationshipIntelLog {
   id               String   @id @default(cuid())
   agentId          String
@@ -438,6 +459,7 @@ model AirSignSigner {
   phone           String?
   role            String         @default("SIGNER") // SIGNER, WITNESS, NOTARY
   order           Int            @default(1)        // signing order
+  signingOrder    Int            @default(0)        // sequential signing gate: lowest value signs first
 
   // Signing state
   token           String         @unique @default(cuid()) // unique link token for /sign/[token]

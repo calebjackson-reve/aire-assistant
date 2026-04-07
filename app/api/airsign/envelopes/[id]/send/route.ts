@@ -71,21 +71,24 @@ export async function POST(
       },
     })
 
-    // Sequential signing gate — only invite signers in the lowest order group
+    // Sequential signing gate — only signers with the lowest signingOrder value
+    // receive their invitation emails immediately. Higher-order signers are held
+    // back ("WAITING") and will be invited automatically once the current group
+    // finishes signing (handled in the POST /sign/[token] route).
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-    const minOrder = Math.min(...envelope.signers.map((s) => s.order))
-    const firstBatch = envelope.signers.filter((s) => s.order === minOrder)
-    const waitingSigners = envelope.signers.filter((s) => s.order > minOrder)
+    const minOrder = Math.min(...envelope.signers.map((s) => s.signingOrder))
+    const firstBatch = envelope.signers.filter((s) => s.signingOrder === minOrder)
+    const waitingSigners = envelope.signers.filter((s) => s.signingOrder > minOrder)
 
     const signingLinks = firstBatch.map((s) => ({
       signerName: s.name,
       signerEmail: s.email,
       signingUrl: `${appUrl}/sign/${s.token}`,
-      order: s.order,
+      signingOrder: s.signingOrder,
     }))
 
     for (const s of waitingSigners) {
-      console.log(`[AirSign] Signer ${s.name} (order ${s.order}) queued — will be invited after order ${minOrder} completes`)
+      console.log(`[AirSign] Signer ${s.name} (signingOrder ${s.signingOrder}) queued — WAITING until signingOrder ${minOrder} completes`)
     }
 
     // Send signing invitation emails via Resend (only to first-batch signers)

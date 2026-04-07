@@ -42,6 +42,7 @@ export async function GET() {
       lastName: true,
       tier: true,
       email: true,
+      onboardingData: true,
       _count: {
         select: {
           transactions: true,
@@ -102,7 +103,7 @@ export async function GET() {
       id: "calendar",
       title: "Connect Google Calendar",
       description: "Sync deadlines, closings, and inspections to your calendar",
-      completed: false, // TODO: check Google Calendar connection
+      completed: !!(user.onboardingData as Record<string, unknown> | null)?.calendarConnected,
       required: false,
       href: "/aire/onboarding/calendar",
       tier: "PRO",

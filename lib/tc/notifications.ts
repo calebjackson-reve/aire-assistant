@@ -32,7 +32,7 @@ export interface ReminderBatch {
 
 // ─── Channel Senders ───────────────────────────────────────────
 
-async function sendSMS(to: string, body: string): Promise<{ ok: boolean; error?: string }> {
+export async function sendSMS(to: string, body: string): Promise<{ ok: boolean; error?: string }> {
   const sid = process.env.TWILIO_ACCOUNT_SID;
   const token = process.env.TWILIO_AUTH_TOKEN;
   const from = process.env.TWILIO_PHONE_NUMBER;
@@ -61,7 +61,7 @@ async function sendSMS(to: string, body: string): Promise<{ ok: boolean; error?:
   }
 }
 
-async function sendEmail(
+export async function sendEmail(
   to: string,
   subject: string,
   html: string

@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   const isVercelCron = authHeader === `Bearer ${cronSecret}`
   const isManualTest = req.headers.get("x-aire-internal") === cronSecret
 
-  if (cronSecret && !isVercelCron && !isManualTest) {
+  if (!cronSecret || (!isVercelCron && !isManualTest)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 

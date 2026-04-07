@@ -13,9 +13,9 @@ export const maxDuration = 30
 export async function GET(request: Request) {
   // Verify cron secret in production
   const authHeader = request.headers.get('authorization')
-  if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    // Allow in development
-    if (process.env.NODE_ENV === 'production') {
+  if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    // Allow in development for manual testing
+    if (process.env.NODE_ENV !== 'development') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
   }

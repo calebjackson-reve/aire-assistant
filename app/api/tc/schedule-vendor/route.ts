@@ -22,17 +22,23 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
+  const user = await prisma.user.findUnique({ where: { clerkId } })
+  if (!user) {
+    return NextResponse.json({ error: "User not found" }, { status: 404 })
+  }
+
   const typeParam = req.nextUrl.searchParams.get("type") as VendorType | null
 
   if (typeParam) {
-    const vendors = getPreferredVendors(typeParam)
+    const vendors = await getPreferredVendors(typeParam, user.id)
     return NextResponse.json({ type: typeParam, vendors })
   }
 
-  const types = getAvailableVendorTypes()
-  const vendorsByType = Object.fromEntries(
-    types.map(t => [t, getPreferredVendors(t)])
-  )
+  const types = await getAvailableVendorTypes(user.id)
+  const vendorsByType: Record<string, Awaited<ReturnType<typeof getPreferredVendors>>> = {}
+  for (const t of types) {
+    vendorsByType[t] = await getPreferredVendors(t as VendorType, user.id)
+  }
   return NextResponse.json({ vendorTypes: types, vendors: vendorsByType })
 }
 
@@ -90,6 +96,7 @@ export async function POST(req: NextRequest) {
       preferredTime,
       notes,
       agentName,
+      userId: user.id,
     })
 
     return NextResponse.json({

@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
 import prisma from "@/lib/prisma"
 import { MorningBriefActions } from "./actions"
+import { GenerateBriefButton } from "./GenerateBriefButton"
 import Link from "next/link"
 
 interface ActionItem { action: string; priority: string; category: string }
@@ -120,9 +121,10 @@ export default async function MorningBriefPage() {
             No brief for today
           </p>
           <p className="text-[#6b7d52]/50 text-sm leading-relaxed max-w-sm mx-auto">
-            Your daily intelligence report generates automatically at 6:30 AM CT.
-            Check back tomorrow morning.
+            Your daily intelligence report generates automatically at 6:30 AM CT,
+            or you can generate one now.
           </p>
+          <GenerateBriefButton />
           <div className="mt-8 h-px w-16 bg-[#e8e4d8] mx-auto" />
         </div>
       ) : (

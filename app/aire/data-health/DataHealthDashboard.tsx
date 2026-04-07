@@ -23,6 +23,7 @@ interface TableCount {
 export default function DataHealthDashboard() {
   const [health, setHealth] = useState<HealthData | null>(null)
   const [tables, setTables] = useState<TableCount[]>([])
+  const [tableError, setTableError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
 
@@ -44,8 +45,8 @@ export default function DataHealthDashboard() {
         setTables(data.tables || [])
       }
     } catch {
-      // Tables endpoint may not exist — use health stats
       setTables([])
+      setTableError("Failed to load table data")
     }
   }, [])
 
@@ -97,6 +98,7 @@ export default function DataHealthDashboard() {
       {/* Intelligence Tables */}
       <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
         <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-4">Intelligence Tables</h2>
+        {tableError && <p className="text-red-400 text-sm mb-3">{tableError}</p>}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {['properties_clean', 'market_snapshots', 'aire_scores', 'job_runs', 'error_logs', 'raw_imports', 'backtest_results'].map((name) => {
             const table = tables.find((t) => t.name === name)

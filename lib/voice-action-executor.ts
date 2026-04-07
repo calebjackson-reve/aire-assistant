@@ -10,6 +10,7 @@ import { advanceTransaction } from "@/lib/workflow/state-machine";
 import { AIRE_DATA } from "@/lib/data/market-data";
 import { writeContract } from "@/lib/contracts/contract-writer";
 import { AGENT_PROFILE, buildAutoFillData } from "@/lib/contracts/agent-profile";
+import { sendSMS, sendEmail } from "@/lib/tc/notifications";
 
 export interface ActionRequest {
   userId: string;
@@ -591,15 +592,47 @@ async function sendAlert(
   userId: string,
   entities: Record<string, string>
 ): Promise<ActionResult> {
-  // Placeholder — will integrate with Twilio in production
   const recipient = entities.buyer_name || entities.seller_name || "the other party";
   const address = entities.address || "the transaction";
+  const topic = entities.topic || entities.intent_detail || "your transaction";
+
+  // Look up contact info from the transaction parties
+  let phone: string | undefined;
+  let email: string | undefined;
+
+  if (address) {
+    const txn = await prisma.transaction.findFirst({
+      where: { userId, propertyAddress: { contains: address, mode: "insensitive" as const } },
+    });
+    if (txn) {
+      const isBuyer = recipient.toLowerCase().includes("buyer") || recipient === (txn as Record<string, unknown>).buyerName;
+      phone = (isBuyer ? (txn as Record<string, unknown>).buyerPhone : (txn as Record<string, unknown>).sellerPhone) as string | undefined;
+      email = (isBuyer ? (txn as Record<string, unknown>).buyerEmail : (txn as Record<string, unknown>).sellerEmail) as string | undefined;
+    }
+  }
+
+  const alertBody = `AIRE Alert: Update on ${address} — ${topic}. Contact your agent for details.`;
+  const results: string[] = [];
+
+  if (phone) {
+    const smsResult = await sendSMS(phone, alertBody);
+    results.push(smsResult.ok ? `SMS sent to ${phone}` : `SMS failed: ${smsResult.error}`);
+  }
+
+  if (email) {
+    const emailResult = await sendEmail(email, `Alert: ${address}`, `<p>${alertBody}</p>`);
+    results.push(emailResult.ok ? `Email sent to ${email}` : `Email failed: ${emailResult.error}`);
+  }
+
+  if (!phone && !email) {
+    results.push("No contact info found — alert logged but not delivered");
+  }
 
   return {
     success: true,
     action: "send_alert",
-    message: `Alert queued for ${recipient} regarding ${address}. Delivery via SMS/email will be sent shortly.`,
-    data: { recipient, address, status: "queued" },
+    message: `Alert for ${recipient} regarding ${address}: ${results.join(". ")}.`,
+    data: { recipient, address, results },
   };
 }
 
@@ -640,11 +673,49 @@ async function sendDocument(
     };
   }
 
+  // Find the most recent document on this transaction
+  const doc = await prisma.document.findFirst({
+    where: { transactionId: txn.id },
+    orderBy: { createdAt: "desc" },
+  });
+
+  if (!doc || !doc.fileUrl) {
+    return {
+      success: true,
+      action: "send_document",
+      message: `No uploaded document found for ${txn.propertyAddress}. Upload a PDF first, then send for signatures.`,
+      data: { transactionId: txn.id, redirectTo: `/aire/transactions/${txn.id}` },
+    };
+  }
+
+  // Create AirSign envelope
+  const envelope = await prisma.airSignEnvelope.create({
+    data: {
+      userId,
+      name: `${doc.type || "Document"} — ${txn.propertyAddress}`,
+      status: "DRAFT",
+      documentUrl: doc.fileUrl,
+    },
+  });
+
+  // Add recipient as signer
+  const { randomUUID } = await import("crypto");
+  await prisma.airSignSigner.create({
+    data: {
+      envelopeId: envelope.id,
+      name: recipient,
+      email: entities.email || "",
+      role: "SIGNER",
+      token: randomUUID(),
+      tokenExpiresAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+    },
+  });
+
   return {
     success: true,
     action: "send_document",
-    message: `Document for ${txn.propertyAddress} queued to send to ${recipient}. Open AirSign to complete.`,
-    data: { transactionId: txn.id, recipient, redirectTo: `/airsign?txn=${txn.id}` },
+    message: `AirSign envelope created for ${txn.propertyAddress}. Open it to place fields and send to ${recipient}.`,
+    data: { transactionId: txn.id, envelopeId: envelope.id, redirectTo: `/airsign/${envelope.id}` },
   };
 }
 

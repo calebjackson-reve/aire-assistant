@@ -48,12 +48,17 @@ export function EmailDashboard({ googleConfigured }: { googleConfigured: boolean
   const [connecting, setConnecting] = useState(false)
   const [draftingId, setDraftingId] = useState<string | null>(null)
   const [drafts, setDrafts] = useState<Record<string, string>>({})
+  const [fetchError, setFetchError] = useState<string | null>(null)
 
   const fetchTriage = useCallback(async () => {
     try {
+      setFetchError(null)
       const res = await fetch("/api/email/triage")
       if (res.ok) setData(await res.json())
-    } catch { /* ignore */ }
+      else setFetchError(`Failed to load email data (${res.status})`)
+    } catch {
+      setFetchError("Failed to connect to email service")
+    }
     setLoading(false)
   }, [])
 
@@ -104,6 +109,17 @@ export function EmailDashboard({ googleConfigured }: { googleConfigured: boolean
 
   if (loading) {
     return <div className="text-cream-dim text-sm py-12 text-center">Loading email intelligence...</div>
+  }
+
+  if (fetchError) {
+    return (
+      <div className="border border-brown-border rounded-xl p-8 text-center">
+        <p className="text-red-400 text-sm mb-3">{fetchError}</p>
+        <button onClick={() => { setLoading(true); fetchTriage() }} className="text-copper hover:text-copper-light text-sm">
+          Retry
+        </button>
+      </div>
+    )
   }
 
   const hasAccounts = data && data.accounts.length > 0

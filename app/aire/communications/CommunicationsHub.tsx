@@ -72,7 +72,7 @@ export function CommunicationsHub({
         setDraft(data.draft)
       }
     } catch {
-      setError("Network error")
+      setError("Unable to reach the server. Check your connection and try again.")
     } finally {
       setLoading(false)
     }

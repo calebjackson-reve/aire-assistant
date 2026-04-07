@@ -20,6 +20,7 @@ export function ScoredPropertiesTable() {
   const [properties, setProperties] = useState<ScoredProperty[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [fetchError, setFetchError] = useState<string | null>(null)
   const [search, setSearch] = useState("")
   const [tier, setTier] = useState<string>("")
   const [offset, setOffset] = useState(0)
@@ -27,6 +28,7 @@ export function ScoredPropertiesTable() {
 
   const fetchData = useCallback(async () => {
     setLoading(true)
+    setFetchError(null)
     try {
       const params = new URLSearchParams()
       if (tier) params.set("tier", tier)
@@ -41,7 +43,7 @@ export function ScoredPropertiesTable() {
         setTotal(data.total || 0)
       }
     } catch {
-      // Fail silently — table may not have data
+      setFetchError("Failed to load scored properties")
     } finally {
       setLoading(false)
     }
@@ -94,6 +96,11 @@ export function ScoredPropertiesTable() {
       {/* Table */}
       {loading ? (
         <div className="text-cream-dim text-sm py-8 text-center">Loading scores...</div>
+      ) : fetchError ? (
+        <div className="text-center py-8">
+          <p className="text-red-400 text-sm mb-3">{fetchError}</p>
+          <button onClick={fetchData} className="text-copper hover:text-copper-light text-sm">Retry</button>
+        </div>
       ) : properties.length === 0 ? (
         <div className="text-cream-dim text-sm py-8 text-center">
           No scored properties found. Import data via /api/data/import to populate.

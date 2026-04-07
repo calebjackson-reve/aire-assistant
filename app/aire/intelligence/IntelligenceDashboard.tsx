@@ -76,7 +76,9 @@ export function IntelligenceDashboard({ transactions }: { transactions: Transact
       <div className="border border-brown-border rounded-xl p-5 mb-8">
         <p className="text-cream text-sm font-medium mb-3">Property Valuation</p>
         <div className="flex gap-3">
+          <label htmlFor="intel-address" className="sr-only">Property address</label>
           <input
+            id="intel-address"
             type="text"
             placeholder="Property address..."
             value={address}
@@ -84,14 +86,18 @@ export function IntelligenceDashboard({ transactions }: { transactions: Transact
             onKeyDown={(e) => e.key === "Enter" && runEstimate()}
             className="flex-1 bg-forest-deep border border-brown-border rounded-lg px-4 py-2.5 text-cream text-sm placeholder:text-cream-dark/50 focus:outline-none focus:border-copper/40"
           />
+          <label htmlFor="intel-city" className="sr-only">City</label>
           <input
+            id="intel-city"
             type="text"
             placeholder="City"
             value={city}
             onChange={(e) => setCity(e.target.value)}
             className="w-36 bg-forest-deep border border-brown-border rounded-lg px-3 py-2.5 text-cream text-sm placeholder:text-cream-dark/50 focus:outline-none focus:border-copper/40"
           />
+          <label htmlFor="intel-zip" className="sr-only">ZIP code</label>
           <input
+            id="intel-zip"
             type="text"
             placeholder="ZIP"
             value={zip}

@@ -10,12 +10,20 @@ export default async function SettingsPage() {
   const user = await prisma.user.findUnique({ where: { clerkId: userId } })
   if (!user) redirect("/sign-in")
 
+  const vendorCount = await prisma.vendor.count({ where: { userId: user.id } })
+
   const sections = [
     {
       title: "Email Accounts",
       description: "Connect Gmail for email triage, draft replies, and communication monitoring.",
       href: "/aire/settings/email",
       status: "Configure",
+    },
+    {
+      title: "Vendor Management",
+      description: `Manage preferred vendors for inspections, appraisals, title, and more.${vendorCount > 0 ? ` ${vendorCount} vendors configured.` : ""}`,
+      href: "/aire/settings/vendors",
+      status: vendorCount > 0 ? `${vendorCount} vendors` : "Configure",
     },
     {
       title: "Billing & Subscription",
