@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIRE MLS Auto-Fill</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 360px;
+      min-height: 400px;
+      background: #1e2416;
+      color: #f5f2ea;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #2a3320 0%, #1e2416 100%);
+      padding: 20px;
+      border-bottom: 2px solid #6b7d52;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #c8a870;
+      font-style: italic;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .header p {
+      font-size: 12px;
+      color: #8a9a7a;
+    }
+
+    .content {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #8a9a7a;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      background: #2a3320;
+      border: 1px solid #3d4a30;
+      border-radius: 6px;
+      color: #f5f2ea;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: #c8a870;
+    }
+
+    input::placeholder {
+      color: #5a6a4a;
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a9a7a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+
+    select option {
+      background: #2a3320;
+      color: #f5f2ea;
+    }
+
+    .api-token-section {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .api-token-section .field-group {
+      flex: 1;
+    }
+
+    .btn-save-token {
+      padding: 10px 14px;
+      background: #3d4a30;
+      border: 1px solid #4d5a40;
+      border-radius: 6px;
+      color: #c8a870;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+
+    .btn-save-token:hover {
+      background: #4d5a40;
+    }
+
+    .btn-fill {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #6b7d52 0%, #5a6a42 100%);
+      border: none;
+      border-radius: 8px;
+      color: #f5f2ea;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-fill:hover:not(:disabled) {
+      background: linear-gradient(135deg, #7a8d62 0%, #6b7d52 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(107, 125, 82, 0.3);
+    }
+
+    .btn-fill:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-fill:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .status {
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status.visible {
+      display: flex;
+    }
+
+    .status.loading {
+      background: rgba(200, 168, 112, 0.1);
+      border: 1px solid rgba(200, 168, 112, 0.2);
+      color: #c8a870;
+    }
+
+    .status.success {
+      background: rgba(107, 125, 82, 0.1);
+      border: 1px solid rgba(107, 125, 82, 0.2);
+      color: #6b7d52;
+    }
+
+    .status.error {
+      background: rgba(196, 92, 92, 0.1);
+      border: 1px solid rgba(196, 92, 92, 0.2);
+      color: #c45c5c;
+    }
+
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(200, 168, 112, 0.3);
+      border-top-color: #c8a870;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .txn-info {
+      background: #2a3320;
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 12px;
+      display: none;
+    }
+
+    .txn-info.visible {
+      display: block;
+    }
+
+    .txn-info .label {
+      color: #8a9a7a;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .txn-info .value {
+      color: #f5f2ea;
+      margin-bottom: 6px;
+    }
+
+    .txn-info .value:last-child {
+      margin-bottom: 0;
+    }
+
+    .footer {
+      padding: 12px 20px;
+      text-align: center;
+      border-top: 1px solid #2a3320;
+      font-size: 11px;
+      color: #5a6a4a;
+    }
+
+    .connection-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #c45c5c;
+      margin-right: 6px;
+    }
+
+    .connection-dot.connected {
+      background: #6b7d52;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>AIRE</h1>
+    <p>MLS Auto-Fill Extension</p>
+  </div>
+
+  <div class="content">
+    <div class="field-group">
+      <label for="serverUrl">AIRE Server URL</label>
+      <input type="url" id="serverUrl" value="https://aireintel.org" placeholder="https://aireintel.org">
+    </div>
+
+    <div class="api-token-section">
+      <div class="field-group">
+        <label for="apiToken">API Token</label>
+        <input type="password" id="apiToken" placeholder="Enter your AIRE API token">
+      </div>
+      <button class="btn-save-token" id="btnSaveToken">Save</button>
+    </div>
+
+    <div class="field-group">
+      <label for="transactionSelect">
+        <span class="connection-dot" id="connectionDot"></span>
+        Select Transaction
+      </label>
+      <select id="transactionSelect" disabled>
+        <option value="">-- Load transactions first --</option>
+      </select>
+    </div>
+
+    <div class="txn-info" id="txnInfo">
+      <div class="label">Property</div>
+      <div class="value" id="txnProperty">--</div>
+      <div class="label">Status</div>
+      <div class="value" id="txnStatus">--</div>
+      <div class="label">Price</div>
+      <div class="value" id="txnPrice">--</div>
+    </div>
+
+    <button class="btn-fill" id="btnFill" disabled>Fill MLS Form</button>
+
+    <div class="status" id="status">
+      <div class="spinner" id="statusSpinner"></div>
+      <span id="statusText"></span>
+    </div>
+  </div>
+
+  <div class="footer">
+    AIRE Intelligence &mdash; v1.0.0
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

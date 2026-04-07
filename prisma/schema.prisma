@@ -119,6 +119,44 @@ model Transaction {
   // Dotloop integration
   dotloopLoopId     String?
 
+  // MLS Paragon Listing Fields
+  taxId              String?
+  lotNumber          String?
+  lotDimensions      String?
+  acres              Decimal?
+  bedroomCount       Int?
+  bathroomsFull      Int?
+  bathroomsHalf      Int?
+  sqftLiving         Int?
+  sqftLower          Int?
+  sqftTotal          Int?
+  sqftSource         String?   // "APPRAISAL" | "ASSESSMENT" | "MEASURED"
+  stories            Int?
+  approxAge          String?
+  schoolSystem       String?
+  subdivision        String?
+  yearBuilt          Int?
+
+  // Property Features
+  featureCooling     String?
+  featureHeating     String?
+  featureFoundation  String?
+  featureSiding      String?
+  featureStyle       String?
+  featureParking     String?
+  featureUtilGas     String?
+  featureUtilElec    String?
+  featureWaterSewer  String?
+  mineralRights      String?   // "INCLUDED" | "EXCLUDED" | "NEGOTIABLE"
+
+  // Listing metadata
+  occupiedBy         String?
+  listType           String?
+  limitedService     Boolean?
+  showingInstructions String?
+  mlsSource          String?   // "PARAGON" | "APPRAISAL_EXTRACT" | "OLD_LISTING"
+  mlsLastSyncedAt    DateTime?
+
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 

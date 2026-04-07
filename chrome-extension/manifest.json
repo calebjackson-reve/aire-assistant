@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "AIRE MLS Auto-Fill",
+  "version": "1.0.0",
+  "description": "Auto-fill Paragon MLS listing forms with data from AIRE Intelligence",
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": ["*://paragon.fnismls.com/*", "*://matrix.fnismls.com/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://paragon.fnismls.com/*", "*://matrix.fnismls.com/*"],
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}

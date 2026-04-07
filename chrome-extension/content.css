@@ -1,0 +1,21 @@
+/* AIRE MLS Auto-Fill — Content Styles */
+/* Injected into Paragon MLS pages */
+
+/* Highlight styles for auto-filled fields */
+.aire-filled {
+  outline: 2px solid #6b7d52 !important;
+  outline-offset: 1px;
+  background-color: rgba(107, 125, 82, 0.05) !important;
+}
+
+.aire-missing {
+  outline: 2px solid #c45c5c !important;
+  outline-offset: 1px;
+  background-color: rgba(196, 92, 92, 0.05) !important;
+}
+
+/* Transition for smooth highlight appearance */
+.aire-filled,
+.aire-missing {
+  transition: outline-color 0.3s ease, background-color 0.3s ease;
+}
