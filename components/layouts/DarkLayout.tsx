@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation"
 import { useState } from "react"
 import { VoiceOverlay } from "@/components/VoiceOverlay"
 
-// Primary nav: agent daily operating system
 const NAV_ITEMS = [
   { href: "/aire", label: "Brief", icon: "sun", desc: "Daily overview" },
   { href: "/aire/email", label: "Inbox", icon: "mail", desc: "Email triage" },
@@ -15,7 +14,6 @@ const NAV_ITEMS = [
   { href: "/aire/intelligence", label: "Market", icon: "chart", desc: "Market data" },
 ]
 
-// Secondary — quiet, bottom of sidebar
 const SECONDARY_ITEMS = [
   { href: "/aire/settings", label: "Settings", icon: "settings" },
 ]
@@ -66,27 +64,24 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
   const [voiceOpen, setVoiceOpen] = useState(false)
 
   return (
-    <div className="min-h-screen flex">
-      {/* Sidebar */}
-      <aside className="hidden md:flex flex-col w-[240px] fixed inset-y-0 left-0 z-40 bg-[#171d11] border-r border-[rgba(154,171,126,0.08)]">
+    <div className="min-h-screen flex bg-[#f5f2ea]">
+      {/* ── Sidebar ── */}
+      <aside className="hidden md:flex flex-col w-[240px] fixed inset-y-0 left-0 z-40 bg-white border-r border-[#d4c8b8]/40">
         {/* Logo */}
-        <div className="h-16 flex items-center px-5">
+        <div className="h-16 flex items-center px-5 border-b border-[#d4c8b8]/20">
           <Link href="/aire" className="flex items-center gap-3 no-underline group">
-            <div className="w-8 h-8 rounded-lg bg-warm/15 flex items-center justify-center font-display text-sm italic text-warm group-hover:bg-warm/25 transition-colors">
+            <div className="w-8 h-8 rounded-lg bg-[#6b7d52] flex items-center justify-center font-display text-sm italic text-[#f5f2ea] group-hover:bg-[#5a6c44] transition-colors">
               A
             </div>
             <div>
-              <span className="font-display text-sm italic text-cream block leading-none">AIRE</span>
-              <span className="font-mono text-[9px] text-cream-dim/30 tracking-wider uppercase">Intelligence</span>
+              <span className="font-display text-sm italic text-[#1e2416] block leading-none">AIRE</span>
+              <span className="font-mono text-[9px] text-[#6b7d52] tracking-wider uppercase">Intelligence</span>
             </div>
           </Link>
         </div>
 
-        {/* Spacer — Ask AIRE moved to top bar */}
-        <div className="h-2" />
-
         {/* Primary nav */}
-        <nav className="flex-1 py-1 px-3 space-y-0.5 overflow-y-auto">
+        <nav className="flex-1 py-3 px-3 space-y-0.5 overflow-y-auto">
           {NAV_ITEMS.map((item) => {
             const isActive =
               item.href === "/aire"
@@ -100,21 +95,20 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
               <Link
                 key={item.href}
                 href={item.href}
-                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] no-underline transition-colors ${
+                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] no-underline transition-all duration-200 ${
                   isActive
-                    ? "bg-warm/12 text-cream"
-                    : "text-cream-dim/50 hover:text-cream/80 hover:bg-[rgba(154,171,126,0.06)]"
+                    ? "bg-[#9aab7e]/15 text-[#1e2416] font-medium"
+                    : "text-[#6a6a60] hover:text-[#1e2416] hover:bg-[#9aab7e]/8"
                 }`}
               >
-                {/* Active indicator bar */}
                 {isActive && (
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 rounded-r-full bg-warm" />
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#6b7d52]" />
                 )}
                 <NavIcon name={item.icon} className="w-[18px] h-[18px] shrink-0" />
                 <span className="flex-1">{item.label}</span>
                 {badge !== null && (
                   <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono font-medium ${
-                    item.href === "/aire" ? "bg-[#c45c5c]/20 text-[#c45c5c]" : "bg-warm/15 text-warm"
+                    item.href === "/aire" ? "bg-[#D45B5B]/15 text-[#D45B5B]" : "bg-[#6b7d52]/15 text-[#6b7d52]"
                   }`}>
                     {badge}
                   </span>
@@ -124,18 +118,18 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
           })}
         </nav>
 
-        {/* Secondary — AirSign, Settings */}
-        <div className="px-3 py-3 border-t border-[rgba(154,171,126,0.06)] space-y-0.5">
+        {/* Secondary — Settings, Back */}
+        <div className="px-3 py-3 border-t border-[#d4c8b8]/20 space-y-0.5">
           {SECONDARY_ITEMS.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs no-underline transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-xs no-underline transition-colors ${
                   isActive
-                    ? "text-cream bg-warm/10"
-                    : "text-cream-dim/35 hover:text-cream-dim/60 hover:bg-[rgba(154,171,126,0.04)]"
+                    ? "text-[#1e2416] bg-[#9aab7e]/10"
+                    : "text-[#9a9a90] hover:text-[#6a6a60] hover:bg-[#9aab7e]/5"
                 }`}
               >
                 <NavIcon name={item.icon} className="w-3.5 h-3.5 shrink-0" />
@@ -145,7 +139,7 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
           })}
           <Link
             href="/"
-            className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs text-cream-dim/25 hover:text-cream-dim/45 no-underline transition-colors"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-xs text-[#beb09e] hover:text-[#6a6a60] no-underline transition-colors"
           >
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
@@ -155,26 +149,26 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
         </div>
       </aside>
 
-      {/* Mobile top bar */}
-      <nav className="md:hidden fixed top-0 inset-x-0 z-50 bg-[#171d11]/95 backdrop-blur-xl border-b border-[rgba(154,171,126,0.08)]">
+      {/* ── Mobile top bar ── */}
+      <nav className="md:hidden fixed top-0 inset-x-0 z-50 bg-white/95 backdrop-blur-xl border-b border-[#d4c8b8]/30">
         <div className="px-4 h-14 flex items-center justify-between">
           <Link href="/aire" className="flex items-center gap-2.5 no-underline">
-            <div className="w-7 h-7 rounded-lg bg-warm/15 flex items-center justify-center font-display text-xs italic text-warm">
+            <div className="w-7 h-7 rounded-lg bg-[#6b7d52] flex items-center justify-center font-display text-xs italic text-[#f5f2ea]">
               A
             </div>
-            <span className="font-display text-base italic text-cream">AIRE</span>
+            <span className="font-display text-base italic text-[#1e2416]">AIRE</span>
           </Link>
           <div className="flex items-center gap-2">
             {overdueCount > 0 && (
-              <span className="text-[10px] px-2 py-1 rounded-full bg-[#c45c5c]/20 text-[#c45c5c] font-mono">
+              <span className="text-[10px] px-2 py-1 rounded-full bg-[#D45B5B]/15 text-[#D45B5B] font-mono">
                 {overdueCount}
               </span>
             )}
             <button
               onClick={() => setVoiceOpen(!voiceOpen)}
-              className="w-9 h-9 rounded-xl bg-warm/10 flex items-center justify-center hover:bg-warm/20 transition-colors"
+              className="w-9 h-9 rounded-lg bg-[#9aab7e]/15 flex items-center justify-center hover:bg-[#9aab7e]/25 transition-colors"
             >
-              <svg className="w-4 h-4 text-warm/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg className="w-4 h-4 text-[#6b7d52]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" />
               </svg>
             </button>
@@ -182,8 +176,8 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
         </div>
       </nav>
 
-      {/* Mobile bottom tab bar */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-[#171d11]/95 backdrop-blur-xl border-t border-[rgba(154,171,126,0.08)] pb-[env(safe-area-inset-bottom)]">
+      {/* ── Mobile bottom tab bar ── */}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-xl border-t border-[#d4c8b8]/30 pb-[env(safe-area-inset-bottom)]">
         <div className="grid grid-cols-6 h-16">
           {NAV_ITEMS.map((item) => {
             const isActive =
@@ -199,17 +193,17 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
                 key={item.href}
                 href={item.href}
                 className={`relative flex flex-col items-center justify-center gap-1 no-underline transition-colors ${
-                  isActive ? "text-warm" : "text-cream-dim/30"
+                  isActive ? "text-[#6b7d52]" : "text-[#beb09e]"
                 }`}
               >
                 {isActive && (
-                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[2px] rounded-b bg-warm" />
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[2px] rounded-b bg-[#6b7d52]" />
                 )}
                 <NavIcon name={item.icon} className="w-5 h-5" />
                 <span className="text-[10px] tracking-wide">{item.label}</span>
                 {badge !== null && (
-                  <span className={`absolute top-1 right-[22%] text-[9px] px-1 py-0.5 rounded-full min-w-[14px] text-center font-mono ${
-                    item.href === "/aire" ? "bg-[#c45c5c] text-cream" : "bg-warm text-cream"
+                  <span className={`absolute top-1 right-[22%] text-[9px] px-1 py-0.5 rounded-full min-w-[14px] text-center font-mono text-white ${
+                    item.href === "/aire" ? "bg-[#D45B5B]" : "bg-[#6b7d52]"
                   }`}>
                     {badge}
                   </span>
@@ -220,24 +214,24 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
         </div>
       </nav>
 
-      {/* Main content */}
-      <main className="flex-1 md:ml-[240px] pt-14 md:pt-[56px] pb-20 md:pb-0 min-h-screen bg-forest-deep text-cream">
+      {/* ── Main content ── */}
+      <main className="flex-1 md:ml-[240px] pt-14 md:pt-[56px] pb-20 md:pb-0 min-h-screen bg-[#f5f2ea] text-[#1e2416]">
         {/* Ask AIRE — sticky top command bar */}
-        <div className="hidden md:block fixed top-0 right-0 left-[240px] z-30 bg-[#1e2416]/90 backdrop-blur-xl border-b border-[rgba(154,171,126,0.08)]">
+        <div className="hidden md:block fixed top-0 right-0 left-[240px] z-30 bg-white/90 backdrop-blur-xl border-b border-[#d4c8b8]/30">
           <div className="max-w-3xl mx-auto px-6 py-2.5">
             <button
               onClick={() => setVoiceOpen(!voiceOpen)}
-              className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl bg-[rgba(154,171,126,0.06)] border border-[rgba(154,171,126,0.1)] text-sm transition-all duration-200 hover:bg-[rgba(154,171,126,0.12)] hover:border-[rgba(154,171,126,0.2)] hover:shadow-[0_0_20px_rgba(154,171,126,0.08)] group"
+              className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-[#f5f2ea] border border-[#d4c8b8]/40 text-sm transition-all duration-200 hover:bg-[#efe9e0] hover:border-[#9aab7e]/40 hover:shadow-[0_0_20px_rgba(154,171,126,0.1)] group"
             >
-              <svg className="w-4 h-4 text-warm/40 group-hover:text-warm/70 transition-colors shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg className="w-4 h-4 text-[#9aab7e] group-hover:text-[#6b7d52] transition-colors shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" y1="19" x2="12" y2="23" /><line x1="8" y1="23" x2="16" y2="23" />
               </svg>
-              <span className="text-cream-dim/40 text-[13px] flex-1 text-left">Ask AIRE anything... &quot;write a contract for 554 Avenue F&quot;</span>
+              <span className="text-[#9a9a90] text-[13px] flex-1 text-left">Ask AIRE anything... &quot;write a contract for 554 Avenue F&quot;</span>
               <div className="flex items-center gap-2">
-                <kbd className="inline-flex items-center px-1.5 py-0.5 rounded bg-[rgba(154,171,126,0.08)] text-cream-dim/20 font-mono text-[10px] border border-[rgba(154,171,126,0.06)]">
+                <kbd className="inline-flex items-center px-1.5 py-0.5 rounded bg-[#9aab7e]/10 text-[#6b7d52]/50 font-mono text-[10px] border border-[#9aab7e]/15">
                   /
                 </kbd>
-                <span className="text-cream-dim/20 text-[10px]">voice or type</span>
+                <span className="text-[#beb09e] text-[10px]">voice or type</span>
               </div>
             </button>
           </div>
