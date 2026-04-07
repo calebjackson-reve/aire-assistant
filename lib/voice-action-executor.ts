@@ -9,6 +9,7 @@ import * as chrono from "chrono-node";
 import { advanceTransaction } from "@/lib/workflow/state-machine";
 import { AIRE_DATA } from "@/lib/data/market-data";
 import { writeContract } from "@/lib/contracts/contract-writer";
+import { AGENT_PROFILE, buildAutoFillData } from "@/lib/contracts/agent-profile";
 
 export interface ActionRequest {
   userId: string;
@@ -735,27 +736,74 @@ async function writeContractFromVoice(
   if (entities.buyer_name) parts.push(`buyer ${entities.buyer_name}`)
   if (entities.seller_name) parts.push(`seller ${entities.seller_name}`)
   if (entities.price) parts.push(`price $${entities.price}`)
-  if (entities.date) parts.push(`closing ${entities.date}`)
+  if (entities.date || entities.closing_date) parts.push(`closing ${entities.closing_date || entities.date}`)
   if (entities.earnest_money) parts.push(`earnest money $${entities.earnest_money}`)
+  if (entities.financing_type) parts.push(`financing ${entities.financing_type}`)
+  if (entities.inspection_days) parts.push(`${entities.inspection_days} day inspection`)
 
   const nlCommand = parts.length > 0
     ? `Write purchase agreement for ${parts.join(", ")}`
     : "Write purchase agreement"
 
-  // Check if a transaction exists for this address
+  // Look up existing transaction by address — pre-fill deal data from it
   let transactionId: string | undefined
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let txnData: any = null
   if (entities.address) {
-    const txn = await prisma.transaction.findFirst({
-      where: { userId, propertyAddress: { contains: entities.address, mode: "insensitive" as const } },
+    // Use tiered matching: exact → starts-with → contains
+    let txn = await prisma.transaction.findFirst({
+      where: { userId, propertyAddress: { equals: entities.address, mode: "insensitive" as const } },
     })
-    if (txn) transactionId = txn.id
+    if (!txn) {
+      txn = await prisma.transaction.findFirst({
+        where: { userId, propertyAddress: { startsWith: entities.address, mode: "insensitive" as const } },
+      })
+    }
+    if (!txn) {
+      const matches = await prisma.transaction.findMany({
+        where: { userId, propertyAddress: { contains: entities.address, mode: "insensitive" as const } },
+        take: 2,
+      })
+      if (matches.length === 1) txn = matches[0]
+    }
+    if (txn) {
+      transactionId = txn.id
+      txnData = txn
+    }
   }
+
+  // Build auto-fill fields: voice entities override transaction data, agent profile always fills
+  const price = entities.price ? parseFloat(entities.price.replace(/[^0-9.]/g, "")) : (txnData?.listPrice || undefined)
+  const autoFillFields = buildAutoFillData(AGENT_PROFILE, {
+    address: entities.address || txnData?.propertyAddress || "",
+    city: entities.city || txnData?.propertyCity || undefined,
+    state: txnData?.propertyState || undefined,
+    zip: entities.zip || txnData?.propertyZip || undefined,
+    parish: entities.parish || undefined,
+    mlsNumber: entities.mls_number || txnData?.mlsNumber || undefined,
+    buyerName: entities.buyer_name || txnData?.buyerName || undefined,
+    buyerEmail: entities.buyer_email || txnData?.buyerEmail || undefined,
+    buyerPhone: entities.buyer_phone || txnData?.buyerPhone || undefined,
+    sellerName: entities.seller_name || txnData?.sellerName || undefined,
+    sellerEmail: entities.seller_email || txnData?.sellerEmail || undefined,
+    sellerPhone: entities.seller_phone || txnData?.sellerPhone || undefined,
+    purchasePrice: price,
+    earnestMoney: entities.earnest_money ? parseFloat(entities.earnest_money.replace(/[^0-9.]/g, "")) : undefined,
+    financingType: entities.financing_type || undefined,
+    closingDate: entities.closing_date || entities.date || undefined,
+    inspectionDays: entities.inspection_days ? parseInt(entities.inspection_days) : undefined,
+    titleCompany: entities.title_company || txnData?.titleCompany || undefined,
+    agentSide: "buyer",
+  })
+
+  // Merge: auto-fill is the base, raw voice entities override
+  const mergedFields = { ...autoFillFields, ...entities }
 
   try {
     const result = await writeContract({
       formType: entities.document_type === "addendum" ? "lrec-103" : "lrec-101",
       naturalLanguage: nlCommand,
-      fields: entities,
+      fields: mergedFields,
       transactionId,
       userId,
     })

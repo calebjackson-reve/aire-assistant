@@ -7,16 +7,16 @@ import { VoiceOverlay } from "@/components/VoiceOverlay"
 
 // Primary nav: agent daily operating system
 const NAV_ITEMS = [
-  { href: "/aire", label: "Brief", icon: "sun" },
-  { href: "/aire/email", label: "Inbox", icon: "mail" },
-  { href: "/aire/transactions", label: "Deals", icon: "folder" },
-  { href: "/aire/relationships", label: "Contacts", icon: "users" },
-  { href: "/aire/intelligence", label: "Market", icon: "chart" },
+  { href: "/aire", label: "Brief", icon: "sun", desc: "Daily overview" },
+  { href: "/aire/email", label: "Inbox", icon: "mail", desc: "Email triage" },
+  { href: "/aire/transactions", label: "Deals", icon: "folder", desc: "Transaction pipeline" },
+  { href: "/airsign", label: "AirSign", icon: "pen", desc: "Electronic signing" },
+  { href: "/aire/relationships", label: "Contacts", icon: "users", desc: "Relationship intel" },
+  { href: "/aire/intelligence", label: "Market", icon: "chart", desc: "Market data" },
 ]
 
 // Secondary — quiet, bottom of sidebar
 const SECONDARY_ITEMS = [
-  { href: "/airsign", label: "AirSign", icon: "pen" },
   { href: "/aire/settings", label: "Settings", icon: "settings" },
 ]
 
@@ -42,11 +42,6 @@ function NavIcon({ name, className }: { name: string; className?: string }) {
         <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
       </svg>
     ),
-    credit: (
-      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" />
-      </svg>
-    ),
     chart: (
       <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" />
@@ -66,51 +61,32 @@ function NavIcon({ name, className }: { name: string; className?: string }) {
   return <>{icons[name] || null}</>
 }
 
-// Voice command mic button — Siri-style
-function VoiceButton({ onActivate }: { onActivate: () => void }) {
-  return (
-    <button
-      onClick={onActivate}
-      className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-forest-deep text-cream text-sm font-medium transition-all hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] group"
-    >
-      <div className="w-9 h-9 rounded-full bg-sage/20 flex items-center justify-center group-hover:bg-sage/30 transition-colors shrink-0">
-        <svg className="w-4.5 h-4.5 text-sage" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" y1="19" x2="12" y2="23" /><line x1="8" y1="23" x2="16" y2="23" />
-        </svg>
-      </div>
-      <div className="text-left">
-        <span className="block text-sm">Ask AIRE</span>
-        <span className="block text-[10px] text-cream/50 font-normal">Voice or type a command</span>
-      </div>
-    </button>
-  )
-}
-
 export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { children: React.ReactNode; activeCount?: number; overdueCount?: number }) {
   const pathname = usePathname()
   const [voiceOpen, setVoiceOpen] = useState(false)
 
   return (
     <div className="min-h-screen flex">
-      {/* Sidebar — cream/white bg, forest text for contrast */}
-      <aside className="hidden md:flex flex-col w-[220px] fixed inset-y-0 left-0 z-40 bg-cream border-r border-olive/10">
+      {/* Sidebar */}
+      <aside className="hidden md:flex flex-col w-[240px] fixed inset-y-0 left-0 z-40 bg-[#171d11] border-r border-[rgba(154,171,126,0.08)]">
         {/* Logo */}
-        <div className="h-14 flex items-center px-5 border-b border-olive/10">
-          <Link href="/aire" className="flex items-center gap-2.5 no-underline">
-            <div className="w-7 h-7 rounded-full bg-forest-deep flex items-center justify-center font-display text-xs italic text-cream">
+        <div className="h-16 flex items-center px-5">
+          <Link href="/aire" className="flex items-center gap-3 no-underline group">
+            <div className="w-8 h-8 rounded-lg bg-warm/15 flex items-center justify-center font-display text-sm italic text-warm group-hover:bg-warm/25 transition-colors">
               A
             </div>
-            <span className="font-display text-sm italic text-forest-deep">AIRE</span>
+            <div>
+              <span className="font-display text-sm italic text-cream block leading-none">AIRE</span>
+              <span className="font-mono text-[9px] text-cream-dim/30 tracking-wider uppercase">Intelligence</span>
+            </div>
           </Link>
         </div>
 
-        {/* Voice command — Siri-style, top of nav */}
-        <div className="px-3 pt-4 pb-2">
-          <VoiceButton onActivate={() => setVoiceOpen(!voiceOpen)} />
-        </div>
+        {/* Spacer — Ask AIRE moved to top bar */}
+        <div className="h-2" />
 
         {/* Primary nav */}
-        <nav className="flex-1 py-2 px-3 space-y-0.5 overflow-y-auto">
+        <nav className="flex-1 py-1 px-3 space-y-0.5 overflow-y-auto">
           {NAV_ITEMS.map((item) => {
             const isActive =
               item.href === "/aire"
@@ -124,17 +100,21 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm no-underline transition-all ${
+                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] no-underline transition-colors ${
                   isActive
-                    ? "bg-forest-deep/10 text-forest-deep font-medium"
-                    : "text-olive hover:text-forest-deep hover:bg-forest-deep/5"
+                    ? "bg-warm/12 text-cream"
+                    : "text-cream-dim/50 hover:text-cream/80 hover:bg-[rgba(154,171,126,0.06)]"
                 }`}
               >
+                {/* Active indicator bar */}
+                {isActive && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 rounded-r-full bg-warm" />
+                )}
                 <NavIcon name={item.icon} className="w-[18px] h-[18px] shrink-0" />
-                {item.label}
+                <span className="flex-1">{item.label}</span>
                 {badge !== null && (
-                  <span className={`ml-auto text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
-                    item.href === "/aire" ? "bg-[#c45c5c]/15 text-[#c45c5c]" : "bg-sage/15 text-sage"
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono font-medium ${
+                    item.href === "/aire" ? "bg-[#c45c5c]/20 text-[#c45c5c]" : "bg-warm/15 text-warm"
                   }`}>
                     {badge}
                   </span>
@@ -144,18 +124,18 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
           })}
         </nav>
 
-        {/* Secondary — AirSign, Settings, quiet at bottom */}
-        <div className="px-3 py-3 border-t border-olive/10 space-y-0.5">
+        {/* Secondary — AirSign, Settings */}
+        <div className="px-3 py-3 border-t border-[rgba(154,171,126,0.06)] space-y-0.5">
           {SECONDARY_ITEMS.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs no-underline transition-all ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs no-underline transition-colors ${
                   isActive
-                    ? "text-forest-deep bg-forest-deep/10"
-                    : "text-olive/60 hover:text-olive"
+                    ? "text-cream bg-warm/10"
+                    : "text-cream-dim/35 hover:text-cream-dim/60 hover:bg-[rgba(154,171,126,0.04)]"
                 }`}
               >
                 <NavIcon name={item.icon} className="w-3.5 h-3.5 shrink-0" />
@@ -165,7 +145,7 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
           })}
           <Link
             href="/"
-            className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs text-olive/60 hover:text-olive no-underline transition-colors"
+            className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs text-cream-dim/25 hover:text-cream-dim/45 no-underline transition-colors"
           >
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
@@ -175,26 +155,26 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
         </div>
       </aside>
 
-      {/* Mobile top bar — cream bg matching sidebar */}
-      <nav className="md:hidden fixed top-0 inset-x-0 z-50 bg-cream/95 backdrop-blur-xl border-b border-olive/10">
+      {/* Mobile top bar */}
+      <nav className="md:hidden fixed top-0 inset-x-0 z-50 bg-[#171d11]/95 backdrop-blur-xl border-b border-[rgba(154,171,126,0.08)]">
         <div className="px-4 h-14 flex items-center justify-between">
-          <Link href="/aire" className="flex items-center gap-2 no-underline">
-            <div className="w-7 h-7 rounded-full bg-forest-deep flex items-center justify-center font-display text-xs italic text-cream">
+          <Link href="/aire" className="flex items-center gap-2.5 no-underline">
+            <div className="w-7 h-7 rounded-lg bg-warm/15 flex items-center justify-center font-display text-xs italic text-warm">
               A
             </div>
-            <span className="font-display text-base italic text-forest-deep">AIRE</span>
+            <span className="font-display text-base italic text-cream">AIRE</span>
           </Link>
           <div className="flex items-center gap-2">
             {overdueCount > 0 && (
-              <span className="text-[10px] px-2 py-1 rounded-full bg-[#c45c5c]/15 text-[#c45c5c]">
-                {overdueCount} overdue
+              <span className="text-[10px] px-2 py-1 rounded-full bg-[#c45c5c]/20 text-[#c45c5c] font-mono">
+                {overdueCount}
               </span>
             )}
             <button
               onClick={() => setVoiceOpen(!voiceOpen)}
-              className="w-8 h-8 rounded-full bg-forest-deep flex items-center justify-center"
+              className="w-9 h-9 rounded-xl bg-warm/10 flex items-center justify-center hover:bg-warm/20 transition-colors"
             >
-              <svg className="w-4 h-4 text-cream" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg className="w-4 h-4 text-warm/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" />
               </svg>
             </button>
@@ -202,9 +182,9 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
         </div>
       </nav>
 
-      {/* Mobile bottom tab bar — cream bg */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-cream/95 backdrop-blur-xl border-t border-olive/10 pb-[env(safe-area-inset-bottom)]">
-        <div className="grid grid-cols-5 h-16">
+      {/* Mobile bottom tab bar */}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-[#171d11]/95 backdrop-blur-xl border-t border-[rgba(154,171,126,0.08)] pb-[env(safe-area-inset-bottom)]">
+        <div className="grid grid-cols-6 h-16">
           {NAV_ITEMS.map((item) => {
             const isActive =
               item.href === "/aire"
@@ -219,14 +199,17 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
                 key={item.href}
                 href={item.href}
                 className={`relative flex flex-col items-center justify-center gap-1 no-underline transition-colors ${
-                  isActive ? "text-forest-deep" : "text-olive/40"
+                  isActive ? "text-warm" : "text-cream-dim/30"
                 }`}
               >
+                {isActive && (
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[2px] rounded-b bg-warm" />
+                )}
                 <NavIcon name={item.icon} className="w-5 h-5" />
                 <span className="text-[10px] tracking-wide">{item.label}</span>
                 {badge !== null && (
-                  <span className={`absolute top-1.5 right-[22%] text-[9px] px-1 py-0.5 rounded-full min-w-[14px] text-center ${
-                    item.href === "/aire" ? "bg-[#c45c5c] text-cream" : "bg-sage text-cream"
+                  <span className={`absolute top-1 right-[22%] text-[9px] px-1 py-0.5 rounded-full min-w-[14px] text-center font-mono ${
+                    item.href === "/aire" ? "bg-[#c45c5c] text-cream" : "bg-warm text-cream"
                   }`}>
                     {badge}
                   </span>
@@ -237,12 +220,32 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
         </div>
       </nav>
 
-      {/* Main content — dark bg, contrasts with cream sidebar */}
-      <main className="flex-1 md:ml-[220px] pt-14 md:pt-0 pb-20 md:pb-0 min-h-screen bg-forest-deep text-cream">
+      {/* Main content */}
+      <main className="flex-1 md:ml-[240px] pt-14 md:pt-[56px] pb-20 md:pb-0 min-h-screen bg-forest-deep text-cream">
+        {/* Ask AIRE — sticky top command bar */}
+        <div className="hidden md:block fixed top-0 right-0 left-[240px] z-30 bg-[#1e2416]/90 backdrop-blur-xl border-b border-[rgba(154,171,126,0.08)]">
+          <div className="max-w-3xl mx-auto px-6 py-2.5">
+            <button
+              onClick={() => setVoiceOpen(!voiceOpen)}
+              className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl bg-[rgba(154,171,126,0.06)] border border-[rgba(154,171,126,0.1)] text-sm transition-all duration-200 hover:bg-[rgba(154,171,126,0.12)] hover:border-[rgba(154,171,126,0.2)] hover:shadow-[0_0_20px_rgba(154,171,126,0.08)] group"
+            >
+              <svg className="w-4 h-4 text-warm/40 group-hover:text-warm/70 transition-colors shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" y1="19" x2="12" y2="23" /><line x1="8" y1="23" x2="16" y2="23" />
+              </svg>
+              <span className="text-cream-dim/40 text-[13px] flex-1 text-left">Ask AIRE anything... &quot;write a contract for 554 Avenue F&quot;</span>
+              <div className="flex items-center gap-2">
+                <kbd className="inline-flex items-center px-1.5 py-0.5 rounded bg-[rgba(154,171,126,0.08)] text-cream-dim/20 font-mono text-[10px] border border-[rgba(154,171,126,0.06)]">
+                  /
+                </kbd>
+                <span className="text-cream-dim/20 text-[10px]">voice or type</span>
+              </div>
+            </button>
+          </div>
+        </div>
         {children}
       </main>
 
-      {/* Voice command overlay — real, working voice/text interface */}
+      {/* Voice command overlay */}
       <VoiceOverlay open={voiceOpen} onClose={() => setVoiceOpen(false)} />
     </div>
   )

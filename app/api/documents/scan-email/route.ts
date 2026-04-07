@@ -51,7 +51,13 @@ export async function POST(req: NextRequest) {
     // Check token expiry
     if (emailAccount.tokenExpiry && emailAccount.tokenExpiry < new Date()) {
       // Attempt token refresh
-      const refreshed = await refreshGmailToken(emailAccount.id, emailAccount.refreshToken!);
+      if (!emailAccount.refreshToken) {
+        return NextResponse.json(
+          { error: "Gmail refresh token missing. Please reconnect your email account." },
+          { status: 401 }
+        );
+      }
+      const refreshed = await refreshGmailToken(emailAccount.id, emailAccount.refreshToken);
       if (!refreshed) {
         return NextResponse.json(
           { error: "Gmail token expired. Please reconnect your email account." },
@@ -193,7 +199,9 @@ export async function POST(req: NextRequest) {
             extractionMethod: "email_scan",
             extractedFields,
           });
-        } catch { /* non-critical */ }
+        } catch (memoryError) {
+          console.error(`[EmailScan] Memory logging failed for ${part.filename}:`, memoryError);
+        }
 
         documentsCreated++;
         processed.push({

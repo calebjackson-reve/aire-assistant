@@ -22,6 +22,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "firstName is required" }, { status: 400 });
     }
 
+    const validCategories = ["client", "lead", "vendor", "lender", "title", "inspector", "appraiser", "other"];
+    if (category && !validCategories.includes(category)) {
+      return NextResponse.json({ error: `category must be one of: ${validCategories.join(", ")}` }, { status: 400 });
+    }
+
     const contact = await prisma.contact.create({
       data: {
         agentId: user.id,

@@ -28,14 +28,14 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  DRAFT: "bg-[#6b7d52]/10 text-[#6b7d52]/60",
-  ACTIVE: "bg-[#9aab7e]/15 text-[#6b7d52]",
-  PENDING_INSPECTION: "bg-[#d4944c]/10 text-[#d4944c]",
-  PENDING_APPRAISAL: "bg-[#d4944c]/10 text-[#d4944c]",
-  PENDING_FINANCING: "bg-[#d4944c]/10 text-[#d4944c]",
-  CLOSING: "bg-[#9aab7e]/20 text-[#6b7d52]",
-  CLOSED: "bg-[#6b7d52]/15 text-[#6b7d52]",
-  CANCELLED: "bg-[#c45c5c]/10 text-[#c45c5c]",
+  DRAFT: "bg-cream-dim/10 text-cream-dim/50",
+  ACTIVE: "bg-warm/15 text-warm",
+  PENDING_INSPECTION: "bg-[#d4944c]/15 text-[#d4944c]",
+  PENDING_APPRAISAL: "bg-[#d4944c]/15 text-[#d4944c]",
+  PENDING_FINANCING: "bg-[#d4944c]/15 text-[#d4944c]",
+  CLOSING: "bg-warm/20 text-warm",
+  CLOSED: "bg-warm/10 text-warm/60",
+  CANCELLED: "bg-[#c45c5c]/15 text-[#c45c5c]",
 }
 
 const FILTER_OPTIONS = [
@@ -58,7 +58,6 @@ export function TransactionList({ transactions }: { transactions: TransactionIte
   const filtered = useMemo(() => {
     let list = transactions
 
-    // Filter by status
     if (filter === "active") {
       list = list.filter(t => !["CLOSED", "CANCELLED", "DRAFT"].includes(t.status))
     } else if (filter === "pending") {
@@ -67,7 +66,6 @@ export function TransactionList({ transactions }: { transactions: TransactionIte
       list = list.filter(t => t.status === "CLOSED")
     }
 
-    // Search
     if (search.trim()) {
       const q = search.toLowerCase()
       list = list.filter(t =>
@@ -78,7 +76,6 @@ export function TransactionList({ transactions }: { transactions: TransactionIte
       )
     }
 
-    // Sort
     if (sortBy === "closing") {
       list = [...list].sort((a, b) => {
         if (!a.closingDate) return 1
@@ -95,24 +92,29 @@ export function TransactionList({ transactions }: { transactions: TransactionIte
   return (
     <div>
       {/* Search + Filter Bar */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-4">
-        <input
-          type="text"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Search address, buyer, seller, MLS..."
-          className="flex-1 bg-white border border-[#9aab7e]/20 rounded-lg px-3 py-2 text-sm text-[#1e2416] focus:outline-none focus:border-[#9aab7e]/50 placeholder:text-[#6b7d52]/30"
-        />
+      <div className="flex flex-col sm:flex-row gap-3 mb-5">
+        <div className="flex-1 relative">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cream-dim/25" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search address, buyer, seller, MLS..."
+            className="w-full bg-forest-card border border-brown-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-cream placeholder:text-cream-dim/25 focus:outline-none focus:border-warm/30 transition-colors"
+          />
+        </div>
         <div className="flex gap-2">
-          <div className="flex rounded-lg border border-[#9aab7e]/20 overflow-hidden">
+          <div className="flex rounded-xl border border-brown-border overflow-hidden">
             {FILTER_OPTIONS.map(opt => (
               <button
                 key={opt.value}
                 onClick={() => setFilter(opt.value)}
-                className={`px-3 py-2 text-xs transition ${
+                className={`px-3 py-2.5 text-xs font-medium transition-colors ${
                   filter === opt.value
-                    ? "bg-[#6b7d52] text-[#f5f2ea]"
-                    : "bg-white text-[#6b7d52] hover:bg-[#9aab7e]/10"
+                    ? "bg-warm/15 text-warm"
+                    : "bg-forest-card text-cream-dim/40 hover:text-cream-dim/60"
                 }`}
               >
                 {opt.label}
@@ -122,24 +124,29 @@ export function TransactionList({ transactions }: { transactions: TransactionIte
           <select
             value={sortBy}
             onChange={e => setSortBy(e.target.value as SortKey)}
-            className="bg-white border border-[#9aab7e]/20 rounded-lg px-2 py-2 text-xs text-[#6b7d52] focus:outline-none"
+            className="bg-forest-card border border-brown-border rounded-xl px-3 py-2.5 text-xs text-cream-dim/50 focus:outline-none font-mono"
           >
             <option value="updated">Recent</option>
-            <option value="closing">Closing Date</option>
+            <option value="closing">Closing</option>
             <option value="price">Price</option>
           </select>
         </div>
       </div>
 
+      {/* Results count */}
+      <p className="font-mono text-[10px] text-cream-dim/25 tracking-wider uppercase mb-3">
+        {filtered.length} transaction{filtered.length !== 1 ? "s" : ""}
+      </p>
+
       {/* Results */}
       {filtered.length === 0 ? (
-        <div className="card-glass text-center py-16">
-          <p className="text-[#6b7d52]/50 text-sm">
+        <div className="bg-forest-card border border-brown-border rounded-xl text-center py-16">
+          <p className="text-cream-dim/40 text-sm">
             {search ? "No transactions match your search" : "No transactions in this view"}
           </p>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {filtered.map((txn) => {
             const urgentDeadlines = txn.deadlines.filter(d =>
               !d.completedAt && new Date(d.dueDate) <= threeDays
@@ -152,35 +159,35 @@ export function TransactionList({ transactions }: { transactions: TransactionIte
               <Link
                 key={txn.id}
                 href={`/aire/transactions/${txn.id}`}
-                className="block card-glass !p-4 !rounded-xl hover:border-[#9aab7e]/30 transition-colors"
+                className="block bg-forest-card border border-brown-border rounded-xl p-4 hover:border-warm/20 hover:bg-forest-card/80 transition-colors group"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="text-[#1e2416] text-sm font-medium truncate">
+                    <div className="flex items-center gap-2.5">
+                      <p className="text-cream text-sm font-medium truncate group-hover:text-warm transition-colors">
                         {txn.propertyAddress}
                       </p>
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full shrink-0 ${STATUS_COLORS[txn.status] || ""}`}>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full shrink-0 font-mono ${STATUS_COLORS[txn.status] || ""}`}>
                         {STATUS_LABELS[txn.status] || txn.status}
                       </span>
                       {urgentDeadlines.length > 0 && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#c45c5c]/10 text-[#c45c5c] shrink-0">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#c45c5c]/15 text-[#c45c5c] shrink-0 font-mono">
                           {urgentDeadlines.length} due
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[#6b7d52]/50 text-xs">
-                        {txn.buyerName || txn.sellerName || "—"}
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <span className="text-cream-dim/40 text-xs">
+                        {txn.buyerName || txn.sellerName || "\u2014"}
                       </span>
-                      <span className="text-[#6b7d52]/20 text-xs">·</span>
-                      <span className="text-[#6b7d52]/40 text-xs">
+                      <span className="text-cream-dim/15 text-xs">&middot;</span>
+                      <span className="font-mono text-cream-dim/25 text-[10px]">
                         {txn.documents.length} doc{txn.documents.length !== 1 ? "s" : ""}
                       </span>
                       {txn.mlsNumber && (
                         <>
-                          <span className="text-[#6b7d52]/20 text-xs">·</span>
-                          <span className="font-mono text-[#6b7d52]/30 text-[10px]">
+                          <span className="text-cream-dim/15 text-xs">&middot;</span>
+                          <span className="font-mono text-cream-dim/20 text-[10px]">
                             MLS {txn.mlsNumber}
                           </span>
                         </>
@@ -188,11 +195,11 @@ export function TransactionList({ transactions }: { transactions: TransactionIte
                     </div>
                   </div>
                   <div className="text-right shrink-0 ml-4">
-                    <p className="font-mono text-sm text-[#1e2416]">
+                    <p className="font-mono text-sm text-cream">
                       {txn.acceptedPrice ? `$${(txn.acceptedPrice / 1000).toFixed(0)}K` : "TBD"}
                     </p>
                     {daysToClose !== null && daysToClose >= 0 && (
-                      <p className="text-[#6b7d52]/40 text-[10px] mt-0.5">{daysToClose}d to close</p>
+                      <p className="font-mono text-[10px] text-cream-dim/30 mt-0.5">{daysToClose}d to close</p>
                     )}
                   </div>
                 </div>

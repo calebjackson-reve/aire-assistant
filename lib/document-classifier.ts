@@ -136,6 +136,54 @@ const DOCUMENT_PATTERNS: {
     category: "additional",
     patterns: [/waiver\s+of\s+warranty/i],
   },
+  {
+    type: "general_addendum",
+    category: "addendum",
+    patterns: [
+      /general\s+addendum/i,
+      /\bGA\b(?:\s*\(|\s*-|\s+\d)/, // GA (1), GA-2, GA 1
+    ],
+  },
+  {
+    type: "counter_offer",
+    category: "addendum",
+    patterns: [
+      /counter\s*[\-\s]?offer/i,
+      /\bCO\b(?:\s*\(|\s*-)/, // CO (1), CO-2
+    ],
+  },
+  {
+    type: "inspection_report",
+    category: "inspection",
+    patterns: [
+      /inspection\s+report/i,
+      /home\s+inspection/i,
+      /property\s+inspection(?!\s+response)/i,
+    ],
+  },
+  {
+    type: "appraisal",
+    category: "appraisal",
+    patterns: [
+      /appraisal\s+report/i,
+      /\bappraisal\b/i,
+    ],
+  },
+  {
+    type: "seller_disclosure",
+    category: "disclosure",
+    patterns: [
+      /seller\s*'?s?\s+disclosure/i,
+      /seller\s+property\s+disclosure/i,
+    ],
+  },
+  {
+    type: "lead_based_paint",
+    category: "disclosure",
+    patterns: [
+      /lead[\s\-]based\s+paint/i,
+    ],
+  },
 ];
 
 /**
@@ -195,9 +243,11 @@ function matchPatterns(
       }
     }
     if (matchedPatterns.length > 0) {
+      // Boost confidence if filename contains LRA or LREC prefix
+      const lraBoost = /\b(LRA|LREC)\b/i.test(text) ? 0.15 : 0;
       const confidence = Math.min(
         0.95,
-        baseConfidence + matchedPatterns.length * 0.15
+        baseConfidence + matchedPatterns.length * 0.15 + lraBoost
       );
       if (!bestMatch || confidence > bestMatch.confidence) {
         bestMatch = {
@@ -263,9 +313,9 @@ Filename: ${filename}
 First 3000 chars of content:
 ${extractedText.slice(0, 3000)}
 
-Valid types: purchase_agreement, property_disclosure, agency_disclosure, lead_paint, inspection_response, condominium_addendum, deposit_addendum, new_construction_addendum, historic_district_addendum, private_sewerage_addendum, buyer_option_flowchart, home_warranty, property_management, vacant_land, waiver_warranty, amendment, addendum, contract, other
+Valid types: purchase_agreement, property_disclosure, agency_disclosure, lead_paint, lead_based_paint, inspection_response, inspection_report, condominium_addendum, deposit_addendum, new_construction_addendum, historic_district_addendum, private_sewerage_addendum, buyer_option_flowchart, home_warranty, property_management, vacant_land, waiver_warranty, general_addendum, counter_offer, appraisal, seller_disclosure, amendment, addendum, contract, other
 
-Valid categories: mandatory, addendum, federal, additional, broker
+Valid categories: mandatory, addendum, federal, additional, broker, disclosure, inspection, appraisal
 
 Return: {"type": "...", "category": "...", "confidence": 0.0-1.0}`,
       },

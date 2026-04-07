@@ -34,6 +34,20 @@ interface Signer {
   role: string
 }
 
+interface AutoFillField {
+  id: string
+  label: string
+  section: string
+  type: "TEXT" | "DATE" | "CHECKBOX"
+  page: number
+  xPercent: number
+  yPercent: number
+  widthPercent: number
+  heightPercent: number
+  fieldKey: string
+  value: string
+}
+
 interface FieldPlacerProps {
   pdfUrl: string
   signers: Signer[]
@@ -41,6 +55,8 @@ interface FieldPlacerProps {
   onSave: (fields: PlacedField[]) => Promise<void>
   saving?: boolean
   formType?: string  // "lrec-101", "lrec-102", etc. for smart placement
+  envelopeId?: string // for auto-fill API
+  autoFillFields?: AutoFillField[] // pre-detected fields with values
 }
 
 const FIELD_DEFAULTS: Record<FieldType, { widthPercent: number; heightPercent: number; label: string }> = {
@@ -64,8 +80,11 @@ function newFieldId() {
   return `field_${Date.now()}_${++fieldIdCounter}`
 }
 
-export function FieldPlacer({ pdfUrl, signers, initialFields = [], onSave, saving = false, formType }: FieldPlacerProps) {
+export function FieldPlacer({ pdfUrl, signers, initialFields = [], onSave, saving = false, formType, envelopeId, autoFillFields }: FieldPlacerProps) {
   const [fields, setFields] = useState<PlacedField[]>(initialFields)
+  const [autoFilling, setAutoFilling] = useState(false)
+  const [pageSuggestions, setPageSuggestions] = useState<Array<{ type: string; label: string }>>([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
 
   // Sync local fields when parent passes fresh initialFields (e.g. after save + router.refresh()).
   // Compare by stable signature (ids + count) so user-in-progress placements aren't clobbered mid-edit.
@@ -88,6 +107,12 @@ export function FieldPlacer({ pdfUrl, signers, initialFields = [], onSave, savin
     setPageCount(count)
     setPageDims(dims)
   }, [])
+
+  // Refresh suggestions when page changes
+  useEffect(() => {
+    if (showSuggestions) loadPageSuggestions(currentPage)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage])
 
   // Escape key exits placement mode
   useEffect(() => {
@@ -208,6 +233,105 @@ export function FieldPlacer({ pdfUrl, signers, initialFields = [], onSave, savin
     setFields(prev => [...prev, ...newFields])
   }
 
+  // Auto-fill: fetch detected fields from API or use provided autoFillFields
+  async function handleAutoFill() {
+    if (autoFillFields && autoFillFields.length > 0) {
+      applyAutoFillFields(autoFillFields)
+      return
+    }
+    if (!envelopeId) return
+    setAutoFilling(true)
+    try {
+      const res = await fetch(`/api/airsign/envelopes/${envelopeId}/autofill`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ formType }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        if (data.detected && data.fields.length > 0) {
+          applyAutoFillFields(data.fields)
+        }
+      }
+    } catch { /* ignore */ }
+    finally { setAutoFilling(false) }
+  }
+
+  function applyAutoFillFields(detectedFields: AutoFillField[]) {
+    const newFields: PlacedField[] = detectedFields
+      .filter(f => f.value) // only place fields that have values
+      .map(f => ({
+        id: newFieldId(),
+        type: f.type as FieldType,
+        label: `${f.label}: ${f.value}`,
+        signerId: null, // text fill fields are not signer-assigned
+        required: false,
+        page: f.page,
+        xPercent: f.xPercent,
+        yPercent: f.yPercent,
+        widthPercent: f.widthPercent,
+        heightPercent: f.heightPercent,
+        _prefillValue: f.value, // carried through for seal-pdf
+      } as PlacedField))
+    setFields(prev => [...prev, ...newFields])
+  }
+
+  // Page-aware suggestions
+  function loadPageSuggestions(page: number) {
+    // Use imported FORM_REGISTRY for known forms, else generic suggestions
+    const formDef = formType ? FORM_REGISTRY[formType] : null
+    if (formDef) {
+      const pageFields = formDef.fields.filter(f => f.page === page)
+      setPageSuggestions(pageFields.map(f => ({
+        type: f.type === "signature" ? "SIGNATURE" : f.type === "date" ? "DATE" : f.type === "boolean" ? "CHECKBOX" : "TEXT",
+        label: f.label,
+      })))
+    } else {
+      // Generic suggestions based on page position
+      if (page === 1) {
+        setPageSuggestions([
+          { type: "TEXT", label: "Buyer Name" },
+          { type: "TEXT", label: "Seller Name" },
+          { type: "TEXT", label: "Property Address" },
+          { type: "TEXT", label: "Purchase Price" },
+        ])
+      } else if (page >= (pageCount - 1)) {
+        setPageSuggestions([
+          { type: "SIGNATURE", label: "Buyer Signature" },
+          { type: "SIGNATURE", label: "Seller Signature" },
+          { type: "DATE", label: "Date" },
+        ])
+      } else {
+        setPageSuggestions([
+          { type: "TEXT", label: "Text Field" },
+          { type: "DATE", label: "Date" },
+          { type: "CHECKBOX", label: "Checkbox" },
+        ])
+      }
+    }
+    setShowSuggestions(true)
+  }
+
+  // Place a suggested field at a default position
+  function placeSuggestion(suggestion: { type: string; label: string }) {
+    const type = suggestion.type as FieldType
+    const defaults = FIELD_DEFAULTS[type]
+    const field: PlacedField = {
+      id: newFieldId(),
+      type,
+      label: suggestion.label,
+      signerId: placingSigner,
+      required: true,
+      page: currentPage,
+      xPercent: 12,
+      yPercent: 30 + Math.random() * 20, // stagger vertically
+      widthPercent: defaults.widthPercent,
+      heightPercent: defaults.heightPercent,
+    }
+    setFields(prev => [...prev, field])
+    setSelectedId(field.id)
+  }
+
   function updateField(id: string, updates: Partial<PlacedField>) {
     setFields(prev => prev.map(f => f.id === id ? { ...f, ...updates } : f))
   }
@@ -240,6 +364,21 @@ export function FieldPlacer({ pdfUrl, signers, initialFields = [], onSave, savin
               Smart Place
             </button>
           )}
+          {(envelopeId || autoFillFields) && (
+            <button
+              onClick={handleAutoFill}
+              disabled={autoFilling}
+              className="text-xs px-2.5 py-1 rounded border border-[#6b7d52]/40 text-[#6b7d52] bg-[#6b7d52]/10 hover:bg-[#6b7d52]/20 transition disabled:opacity-40"
+            >
+              {autoFilling ? "Detecting..." : "Auto-Fill Form"}
+            </button>
+          )}
+          <button
+            onClick={() => showSuggestions ? setShowSuggestions(false) : loadPageSuggestions(currentPage)}
+            className="text-xs px-2.5 py-1 rounded border border-[#9aab7e]/20 text-[#6b7d52]/60 hover:border-[#9aab7e]/40 transition"
+          >
+            {showSuggestions ? "Hide Suggestions" : "Suggest Fields"}
+          </button>
           {placingType && (
             <span className="text-[#d4944c] text-xs animate-pulse">
               Placing {placingType.toLowerCase()}s — click anywhere on PDF · Esc to stop
@@ -415,6 +554,32 @@ export function FieldPlacer({ pdfUrl, signers, initialFields = [], onSave, savin
             </div>
           )}
         </div>
+
+        {/* Page suggestions */}
+        {showSuggestions && pageSuggestions.length > 0 && (
+          <div className="card-glass !rounded-xl !p-4">
+            <p className="text-[#6b7d52] text-[10px] font-medium tracking-[0.12em] uppercase mb-2">
+              Suggested for Page {currentPage}
+            </p>
+            <div className="space-y-1">
+              {pageSuggestions.map((s, i) => (
+                <button
+                  key={i}
+                  onClick={() => placeSuggestion(s)}
+                  className="w-full text-left flex items-center gap-2 px-2 py-1.5 rounded text-xs hover:bg-[#9aab7e]/10 transition"
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                    s.type === "SIGNATURE" ? "bg-blue-500" :
+                    s.type === "DATE" ? "bg-amber-500" :
+                    s.type === "CHECKBOX" ? "bg-zinc-400" : "bg-emerald-500"
+                  }`} />
+                  <span className="text-[#1e2416] truncate">{s.label}</span>
+                  <span className="text-[#6b7d52]/30 text-[9px] ml-auto">{s.type}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Selected field editor */}
         {selectedField && (

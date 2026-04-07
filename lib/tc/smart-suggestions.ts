@@ -169,13 +169,14 @@ export function getSmartSuggestions(transaction: Transaction): SmartSuggestion[]
     const hasIt = docTypes.some(t => t.includes(expected.replace(/_/g, " ")) || t.includes(expected))
     if (!hasIt) {
       const readable = expected.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())
+      const isInspection = expected.includes("inspection")
       suggestions.push({
         id: `missing-doc-${expected}`,
         priority: status === "CLOSING" ? "warning" : "info",
         title: `Missing: ${readable}`,
         description: `This document is typically needed at the ${STATUS_LABELS[status] || status} stage.`,
         actions: [
-          { label: "Upload Document", type: "link", href: "#documents" },
+          { label: isInspection ? "Upload Inspection" : "Upload Document", type: "link", href: "#documents" },
         ],
         category: "document",
       })

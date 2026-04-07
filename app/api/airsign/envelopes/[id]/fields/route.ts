@@ -16,6 +16,7 @@ interface FieldInput {
   yPercent: number
   widthPercent: number
   heightPercent: number
+  value?: string // pre-filled value for text/date fields (auto-fill)
 }
 
 async function verifyOwnership(envelopeId: string, clerkId: string) {
@@ -58,6 +59,7 @@ export async function POST(
       yPercent: f.yPercent,
       widthPercent: f.widthPercent,
       heightPercent: f.heightPercent,
+      ...(f.value ? { value: f.value, filledAt: new Date() } : {}),
     })),
   })
 

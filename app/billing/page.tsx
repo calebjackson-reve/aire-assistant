@@ -122,7 +122,7 @@ function BillingContent() {
         {/* Status banners */}
         {success && (
           <div className="mb-8 p-4 rounded-lg bg-[#9aab7e]/15 border border-[#9aab7e]/30 text-[#6b7d52] text-center text-sm">
-            Welcome to AIRE Pro! Your subscription is now active.
+            Welcome to AIRE! Your subscription is now active.
           </div>
         )}
         {canceled && (

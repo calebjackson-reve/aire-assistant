@@ -82,6 +82,48 @@ export function EnvelopeDetail({
   const [copied, setCopied] = useState<string | null>(null)
   const [resending, setResending] = useState<string | null>(null)
   const [confirmSend, setConfirmSend] = useState(false)
+  const [confirmVoid, setConfirmVoid] = useState(false)
+  const [voiding, setVoiding] = useState(false)
+
+  async function handleVoid() {
+    setVoiding(true)
+    setError(null)
+    try {
+      const res = await fetch(`/api/airsign/envelopes/${envelope.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "VOIDED" }),
+      })
+      if (res.ok) router.refresh()
+      else {
+        const err = await res.json()
+        setError(err.error || "Failed to void envelope")
+      }
+    } catch {
+      setError("Network error")
+    } finally {
+      setVoiding(false)
+      setConfirmVoid(false)
+    }
+  }
+
+  async function handleRevertToDraft() {
+    setError(null)
+    try {
+      const res = await fetch(`/api/airsign/envelopes/${envelope.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "DRAFT" }),
+      })
+      if (res.ok) router.refresh()
+      else {
+        const err = await res.json()
+        setError(err.error || "Failed to revert")
+      }
+    } catch {
+      setError("Network error")
+    }
+  }
 
   const handlePageLoad = useCallback((_pageCount: number, dims: PageDimensions) => {
     setPageDims(dims)
@@ -113,17 +155,23 @@ export function EnvelopeDetail({
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          fields: placedFields.map(f => ({
-            signerId: f.signerId,
-            type: f.type,
-            label: f.label,
-            required: f.required,
-            page: f.page,
-            xPercent: f.xPercent,
-            yPercent: f.yPercent,
-            widthPercent: f.widthPercent,
-            heightPercent: f.heightPercent,
-          })),
+          fields: placedFields.map(f => {
+            // Extract pre-fill value from label if it contains ": " pattern (auto-filled fields)
+            const colonIdx = f.label.indexOf(": ")
+            const hasPreFill = colonIdx > 0 && f.type === "TEXT" && !f.signerId
+            return {
+              signerId: f.signerId,
+              type: f.type,
+              label: hasPreFill ? f.label.slice(0, colonIdx) : f.label,
+              required: f.required,
+              page: f.page,
+              xPercent: f.xPercent,
+              yPercent: f.yPercent,
+              widthPercent: f.widthPercent,
+              heightPercent: f.heightPercent,
+              ...(hasPreFill ? { value: f.label.slice(colonIdx + 2) } : {}),
+            }
+          }),
         }),
       })
       if (res.ok) {
@@ -173,6 +221,79 @@ export function EnvelopeDetail({
         </span>
       </div>
 
+      {/* Actions toolbar — shown for SENT/IN_PROGRESS envelopes */}
+      {(envelope.status === "SENT" || envelope.status === "IN_PROGRESS") && (
+        <div className="flex flex-wrap items-center gap-2 mb-6 pb-4 border-b border-brown-border">
+          <button
+            onClick={handleRevertToDraft}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-brown-border text-cream-dim text-sm hover:border-warm/30 hover:text-cream transition min-h-[44px]"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+            </svg>
+            Edit & Re-place Fields
+          </button>
+          <button
+            onClick={() => setConfirmVoid(true)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-[#c45c5c]/30 text-[#c45c5c]/70 text-sm hover:border-[#c45c5c]/50 hover:text-[#c45c5c] transition min-h-[44px]"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" /><line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+            </svg>
+            Void Envelope
+          </button>
+          {envelope.documentUrl && (
+            <a
+              href={envelope.documentUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-brown-border text-cream-dim text-sm hover:border-warm/30 hover:text-cream transition min-h-[44px]"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Download PDF
+            </a>
+          )}
+          <a
+            href="/airsign/new"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-warm/10 border border-warm/20 text-warm text-sm hover:bg-warm/15 transition min-h-[44px] ml-auto"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            New Envelope
+          </a>
+        </div>
+      )}
+
+      {/* Void confirmation modal */}
+      {confirmVoid && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={() => setConfirmVoid(false)}>
+          <div className="bg-forest-deep border border-brown-border rounded-xl p-6 max-w-sm mx-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-cream text-lg font-medium mb-2">Void this envelope?</h3>
+            <p className="text-cream-dim text-sm mb-4">
+              This will cancel all pending signatures. Signers will no longer be able to sign. This cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmVoid(false)}
+                className="flex-1 border border-brown-border text-cream-dim py-2.5 rounded-lg text-sm hover:border-warm/30 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleVoid}
+                disabled={voiding}
+                className="flex-1 bg-[#c45c5c]/20 text-[#c45c5c] py-2.5 rounded-lg text-sm font-medium hover:bg-[#c45c5c]/30 disabled:opacity-50 transition"
+              >
+                {voiding ? "Voiding..." : "Void Envelope"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {error && (
         <div className="border border-red-500/30 rounded p-3 mb-4">
           <p className="text-red-400 text-sm">{error}</p>
@@ -200,6 +321,7 @@ export function EnvelopeDetail({
             }))}
             onSave={handleSaveFields}
             saving={savingFields}
+            envelopeId={envelope.id}
           />
         </div>
       )}

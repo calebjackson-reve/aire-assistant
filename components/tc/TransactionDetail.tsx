@@ -57,6 +57,96 @@ interface UploadResult {
   } | null
 }
 
+interface InspectionItem {
+  category: string
+  description: string
+  severity: "major" | "minor" | "cosmetic"
+  estimatedCost?: number
+}
+
+interface InspectionAnalysis {
+  items: InspectionItem[]
+  totalEstimatedCost: number
+  categories: Record<string, number>
+}
+
+const INSPECTION_CATEGORIES = ["structural", "electrical", "plumbing", "hvac", "roof", "cosmetic", "other"] as const
+
+function parseInspectionFields(fields: Record<string, unknown>): InspectionAnalysis {
+  const items: InspectionItem[] = []
+  const categories: Record<string, number> = {}
+
+  // Parse extracted fields into inspection items
+  // The extractor may return fields like "issues", "findings", "items", or individual category fields
+  const rawItems = (fields.issues || fields.findings || fields.items || fields.deficiencies || []) as Array<Record<string, unknown>>
+
+  if (Array.isArray(rawItems) && rawItems.length > 0) {
+    for (const item of rawItems) {
+      const category = categorizeItem(String(item.category || item.type || item.system || "other"))
+      const severity = parseSeverity(String(item.severity || item.priority || "minor"))
+      const cost = Number(item.estimatedCost || item.cost || item.estimate || 0)
+      items.push({
+        category,
+        description: String(item.description || item.finding || item.issue || item.name || ""),
+        severity,
+        estimatedCost: cost || undefined,
+      })
+      categories[category] = (categories[category] || 0) + 1
+    }
+  } else {
+    // Fallback: scan all fields for inspection-related content
+    for (const [key, value] of Object.entries(fields)) {
+      const lk = key.toLowerCase()
+      for (const cat of INSPECTION_CATEGORIES) {
+        if (lk.includes(cat)) {
+          const desc = typeof value === "string" ? value : JSON.stringify(value)
+          if (desc && desc !== "null" && desc !== "N/A" && desc !== "none") {
+            items.push({ category: cat, description: desc, severity: "minor" })
+            categories[cat] = (categories[cat] || 0) + 1
+          }
+        }
+      }
+    }
+    // If still nothing, count total extracted fields as a proxy
+    if (items.length === 0) {
+      const fieldCount = Object.keys(fields).length
+      if (fieldCount > 0) {
+        items.push({
+          category: "other",
+          description: `${fieldCount} field${fieldCount !== 1 ? "s" : ""} extracted from inspection report`,
+          severity: "minor",
+        })
+        categories["other"] = fieldCount
+      }
+    }
+  }
+
+  const totalEstimatedCost = items.reduce((sum, item) => sum + (item.estimatedCost || 0), 0)
+
+  return { items, totalEstimatedCost, categories }
+}
+
+function categorizeItem(raw: string): string {
+  const lower = raw.toLowerCase()
+  for (const cat of INSPECTION_CATEGORIES) {
+    if (lower.includes(cat)) return cat
+  }
+  if (lower.includes("electric") || lower.includes("wiring")) return "electrical"
+  if (lower.includes("pipe") || lower.includes("water") || lower.includes("drain")) return "plumbing"
+  if (lower.includes("heat") || lower.includes("cool") || lower.includes("air")) return "hvac"
+  if (lower.includes("foundation") || lower.includes("framing") || lower.includes("wall")) return "structural"
+  if (lower.includes("shingle") || lower.includes("gutter")) return "roof"
+  if (lower.includes("paint") || lower.includes("finish") || lower.includes("carpet")) return "cosmetic"
+  return "other"
+}
+
+function parseSeverity(raw: string): "major" | "minor" | "cosmetic" {
+  const lower = raw.toLowerCase()
+  if (lower.includes("major") || lower.includes("critical") || lower.includes("safety") || lower.includes("urgent")) return "major"
+  if (lower.includes("cosmetic") || lower.includes("minor cosmetic")) return "cosmetic"
+  return "minor"
+}
+
 interface Transaction {
   id: string
   propertyAddress: string
@@ -107,14 +197,32 @@ const STATUS_COLORS: Record<string, string> = {
   CANCELLED: "bg-[#c45c5c]/10 text-[#c45c5c]",
 }
 
-type Tab = "overview" | "deadlines" | "documents" | "communications" | "contracts"
+const DOC_FOLDERS = [
+  { key: "contracts", label: "Contracts", icon: "📄", types: ["purchase_agreement", "contract", "amendment"] },
+  { key: "disclosures", label: "Disclosures", icon: "📋", types: ["property_disclosure", "agency_disclosure", "lead_paint", "disclosure"] },
+  { key: "inspections", label: "Inspections", icon: "🔍", types: ["inspection_response", "inspection", "inspection_report"] },
+  { key: "addenda", label: "Addenda", icon: "📎", types: ["addendum"] },
+  { key: "closing", label: "Closing", icon: "🏠", types: ["closing", "settlement", "title", "deed"] },
+  { key: "other", label: "Other", icon: "📁", types: [] },
+] as const
+
+function getDocFolder(doc: Document): string {
+  const t = doc.type?.toLowerCase() ?? ""
+  const c = doc.category?.toLowerCase() ?? ""
+  for (const folder of DOC_FOLDERS) {
+    if (folder.key === "other") continue
+    if (folder.types.some(ft => t.includes(ft) || c.includes(ft) || c === folder.key)) return folder.key
+  }
+  return "other"
+}
+
+type Tab = "overview" | "deadlines" | "documents" | "communications"
 
 const TABS: { key: Tab; label: string }[] = [
   { key: "overview", label: "Overview" },
   { key: "deadlines", label: "Deadlines" },
   { key: "documents", label: "Documents" },
   { key: "communications", label: "Comms" },
-  { key: "contracts", label: "Contracts" },
 ]
 
 const COMM_TEMPLATES = [
@@ -153,6 +261,8 @@ export function TransactionDetail({ transaction: initial }: { transaction: Trans
   const [uploadError, setUploadError] = useState<string | null>(null)
   const [lastUploadResult, setLastUploadResult] = useState<UploadResult | null>(null)
   const [dragOver, setDragOver] = useState(false)
+  const [folderFilter, setFolderFilter] = useState<string>("all")
+  const [inspectionAnalysis, setInspectionAnalysis] = useState<InspectionAnalysis | null>(null)
 
   const now = new Date()
   const activeDeadlines = txn.deadlines.filter(d => !d.completedAt)
@@ -163,8 +273,6 @@ export function TransactionDetail({ transaction: initial }: { transaction: Trans
     const due = new Date(d.dueDate)
     return due > now && due.toDateString() !== now.toDateString()
   })
-  const generatedDocs = txn.documents.filter(d => d.category === "generated")
-
   // Smart suggestions
   const suggestions = getSmartSuggestions(txn)
   const urgentSuggestions = suggestions.filter(s => s.priority === "urgent")
@@ -255,6 +363,14 @@ export function TransactionDetail({ transaction: initial }: { transaction: Trans
 
       const result: UploadResult = await res.json()
       setLastUploadResult(result)
+
+      // If inspection report, parse and show analysis
+      const classType = result.classification.type.toLowerCase()
+      if (classType.includes("inspection") && result.extraction?.fields) {
+        setInspectionAnalysis(parseInspectionFields(result.extraction.fields))
+      } else {
+        setInspectionAnalysis(null)
+      }
 
       const refreshed = await fetch(`/api/transactions/${txn.id}`)
       if (refreshed.ok) setTxn(await refreshed.json())
@@ -460,21 +576,40 @@ export function TransactionDetail({ transaction: initial }: { transaction: Trans
           )}
 
           {activeTab === "documents" && (
-            <div className="card-glass !rounded-xl !p-5">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-[#6b7d52] text-[10px] font-medium tracking-[0.15em] uppercase">
-                  Documents ({txn.documents.length})
-                </p>
-                <label className="text-xs px-3 py-1.5 rounded border border-[#9aab7e]/20 text-[#6b7d52] hover:bg-[#9aab7e]/10 transition cursor-pointer min-h-[44px] flex items-center">
-                  {uploading ? (extracting ? "Classifying..." : "Uploading...") : "Upload File"}
-                  <input
-                    type="file"
-                    accept=".pdf,.png,.jpg,.jpeg"
-                    onChange={handleFileUpload}
-                    disabled={uploading}
-                    className="hidden"
-                  />
-                </label>
+            <div className="card-glass !rounded-xl !p-0 overflow-hidden">
+              {/* Header bar */}
+              <div className="flex items-center justify-between px-5 py-3 border-b border-[#9aab7e]/10">
+                <div className="flex items-center gap-3">
+                  <h3 className="text-[#1e2416] text-sm font-semibold">Documents</h3>
+                  <span className="text-[#6b7d52]/40 text-xs">{txn.documents.length} total</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <select
+                    value={folderFilter}
+                    onChange={e => setFolderFilter(e.target.value)}
+                    className="text-xs px-2.5 py-1.5 rounded-lg border border-[#9aab7e]/20 text-[#6b7d52] bg-[#f5f2ea]/50 min-h-[36px] cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#9aab7e]/30"
+                  >
+                    <option value="all">All Folders</option>
+                    {DOC_FOLDERS.map(f => (
+                      <option key={f.key} value={f.key}>{f.label}</option>
+                    ))}
+                  </select>
+                  <label className="text-xs px-3 py-1.5 rounded-lg bg-[#6b7d52] text-white hover:bg-[#5a6c44] transition cursor-pointer min-h-[36px] flex items-center font-medium">
+                    {uploading ? (extracting ? "Classifying..." : "Uploading...") : "Upload"}
+                    <input
+                      type="file"
+                      accept=".pdf,.png,.jpg,.jpeg"
+                      onChange={handleFileUpload}
+                      disabled={uploading}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+              </div>
+
+              {/* Subheader: privacy note like Dotloop */}
+              <div className="px-5 py-2 bg-[#f5f2ea]/30 border-b border-[#9aab7e]/5">
+                <p className="text-[#6b7d52]/40 text-[10px]">Anything you upload is private until shared.</p>
               </div>
 
               {/* Drag-and-drop zone */}
@@ -482,23 +617,23 @@ export function TransactionDetail({ transaction: initial }: { transaction: Trans
                 onDragOver={e => { e.preventDefault(); setDragOver(true) }}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={handleDrop}
-                className={`border-2 border-dashed rounded-xl p-6 mb-4 text-center transition ${
-                  dragOver ? "border-[#9aab7e] bg-[#9aab7e]/5" : "border-[#9aab7e]/15"
+                className={`mx-5 mt-3 mb-2 border-2 border-dashed rounded-lg p-4 text-center transition ${
+                  dragOver ? "border-[#9aab7e] bg-[#9aab7e]/5" : "border-[#9aab7e]/10"
                 }`}
               >
-                <p className="text-[#6b7d52]/40 text-sm">
-                  {dragOver ? "Drop file here" : "Drag and drop a PDF, PNG, or JPG here"}
+                <p className="text-[#6b7d52]/30 text-xs">
+                  {dragOver ? "Drop file here" : "Drag and drop a PDF, PNG, or JPG"}
                 </p>
               </div>
 
               {uploadError && (
-                <div className="mb-3 px-3 py-2 rounded-lg bg-[#c45c5c]/10 text-[#c45c5c] text-xs">
+                <div className="mx-5 mb-2 px-3 py-2 rounded-lg bg-[#c45c5c]/10 text-[#c45c5c] text-xs">
                   {uploadError}
                 </div>
               )}
 
               {lastUploadResult && (
-                <div className="mb-4 px-4 py-3 rounded-lg bg-[#9aab7e]/5 border border-[#9aab7e]/15">
+                <div className="mx-5 mb-3 px-4 py-3 rounded-lg bg-[#9aab7e]/5 border border-[#9aab7e]/15">
                   <p className="text-[#6b7d52] text-sm font-medium mb-1">Uploaded: {lastUploadResult.name}</p>
                   <div className="text-xs text-[#6b7d52]/60 space-y-0.5">
                     <p>Type: {lastUploadResult.classification.type.replace(/_/g, " ")}</p>
@@ -513,24 +648,151 @@ export function TransactionDetail({ transaction: initial }: { transaction: Trans
                 </div>
               )}
 
-              {txn.documents.length === 0 ? (
-                <p className="text-[#6b7d52]/40 text-sm">No documents uploaded yet</p>
-              ) : (
-                <div className="space-y-1.5">
-                  {txn.documents.map(doc => (
-                    <div key={doc.id} className="flex items-center gap-3 py-1.5">
-                      <span className="text-[#6b7d52]/30 text-xs">
-                        {doc.checklistStatus === "verified" ? "✓" : doc.checklistStatus === "missing" ? "○" : "◐"}
-                      </span>
-                      <p className="text-[#1e2416] text-sm flex-1 truncate">{doc.name}</p>
-                      <span className="text-[#6b7d52]/30 text-[10px]">{doc.type.replace(/_/g, " ")}</span>
-                      <span className="font-mono text-[10px] text-[#6b7d52]/20">
-                        {new Date(doc.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+              {/* Inspection Analysis Card */}
+              {inspectionAnalysis && lastUploadResult && (
+                <div className="mx-5 mb-3 px-4 py-4 rounded-lg bg-[#f5f2ea] border border-[#9aab7e]/20">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-[#1e2416] text-sm font-semibold">Inspection Analysis</p>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#d4944c]/10 text-[#d4944c] font-medium">
+                      {inspectionAnalysis.items.length} item{inspectionAnalysis.items.length !== 1 ? "s" : ""} flagged
+                    </span>
+                  </div>
+
+                  {/* Category breakdown */}
+                  {Object.keys(inspectionAnalysis.categories).length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-3">
+                      {Object.entries(inspectionAnalysis.categories).map(([cat, count]) => (
+                        <span key={cat} className="text-[10px] px-2 py-1 rounded-md bg-[#9aab7e]/10 text-[#6b7d52] font-medium capitalize">
+                          {cat} ({count})
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Items list */}
+                  {inspectionAnalysis.items.length > 0 && (
+                    <div className="space-y-1.5 mb-3">
+                      {inspectionAnalysis.items.slice(0, 8).map((item, i) => (
+                        <div key={i} className="flex items-start gap-2 text-xs">
+                          <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-1.5 ${
+                            item.severity === "major" ? "bg-[#c45c5c]" :
+                            item.severity === "cosmetic" ? "bg-[#9aab7e]" : "bg-[#d4944c]"
+                          }`} />
+                          <span className="text-[#1e2416]/80 flex-1">{item.description}</span>
+                          {item.estimatedCost ? (
+                            <span className="font-mono text-[#6b7d52]/60 shrink-0">${item.estimatedCost.toLocaleString()}</span>
+                          ) : null}
+                        </div>
+                      ))}
+                      {inspectionAnalysis.items.length > 8 && (
+                        <p className="text-[#6b7d52]/30 text-[10px] pl-3.5">
+                          +{inspectionAnalysis.items.length - 8} more items
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Estimated repair cost total */}
+                  {inspectionAnalysis.totalEstimatedCost > 0 && (
+                    <div className="flex items-center justify-between px-3 py-2 rounded-md bg-[#9aab7e]/5 mb-3">
+                      <span className="text-xs text-[#6b7d52]">Estimated Repair Cost</span>
+                      <span className="font-mono text-sm text-[#1e2416] font-medium">
+                        ${inspectionAnalysis.totalEstimatedCost.toLocaleString()}
                       </span>
                     </div>
-                  ))}
+                  )}
+
+                  {/* Send repair request action */}
+                  <button
+                    onClick={() => {
+                      setInspectionAnalysis(null)
+                      setActiveTab("communications")
+                      setSendPreview("repair_request")
+                    }}
+                    className="w-full text-xs px-3 py-2 rounded-lg bg-[#6b7d52] text-[#f5f2ea] hover:bg-[#5a6c44] transition font-medium"
+                  >
+                    Send repair request to seller
+                  </button>
                 </div>
               )}
+
+              {/* Folder list */}
+              {txn.documents.length === 0 ? (
+                <div className="px-5 py-8 text-center">
+                  <p className="text-[#6b7d52]/30 text-sm">No documents uploaded yet</p>
+                </div>
+              ) : (
+                <div>
+                  {DOC_FOLDERS
+                    .filter(folder => folderFilter === "all" || folderFilter === folder.key)
+                    .map(folder => {
+                      const folderDocs = txn.documents.filter(doc => getDocFolder(doc) === folder.key)
+                      if (folderDocs.length === 0 && folderFilter === "all") return null
+                      return (
+                        <div key={folder.key}>
+                          {/* Folder header row — Dotloop style */}
+                          <div className="flex items-center justify-between px-5 py-2.5 bg-[#f5f2ea]/50 border-y border-[#9aab7e]/8">
+                            <div className="flex items-center gap-2">
+                              <svg className="w-4 h-4 text-[#6b7d52]/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.06-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+                              </svg>
+                              <span className="text-[#6b7d52] text-xs font-semibold tracking-wide uppercase">{folder.label}</span>
+                            </div>
+                            <span className="text-[#6b7d52]/30 text-[10px] font-mono">{folderDocs.length} {folderDocs.length === 1 ? "doc" : "docs"}</span>
+                          </div>
+                          {/* Document rows */}
+                          {folderDocs.length === 0 ? (
+                            <div className="px-5 py-3">
+                              <p className="text-[#6b7d52]/25 text-xs pl-6">No documents in this folder</p>
+                            </div>
+                          ) : (
+                            <div>
+                              {folderDocs.map(doc => (
+                                <div key={doc.id} className="flex items-center gap-3 px-5 py-2.5 border-b border-[#9aab7e]/5 hover:bg-[#f5f2ea]/30 transition group">
+                                  {/* Status badge — Dotloop style */}
+                                  <span className={`text-[10px] font-bold tracking-wide uppercase shrink-0 w-20 text-center ${
+                                    doc.checklistStatus === "verified"
+                                      ? "text-[#6b7d52]"
+                                      : doc.checklistStatus === "missing"
+                                      ? "text-[#c45c5c]"
+                                      : "text-[#d4944c]"
+                                  }`}>
+                                    {doc.checklistStatus === "verified" ? "VERIFIED" : doc.checklistStatus === "missing" ? "REQUIRED" : "UPLOADED"}
+                                  </span>
+                                  {/* Doc name */}
+                                  <p className={`text-sm flex-1 truncate ${
+                                    doc.fileUrl ? "text-[#1e2416] font-medium" : "text-[#6b7d52]/50"
+                                  }`}>{doc.name}</p>
+                                  {/* Right side meta */}
+                                  <span className="font-mono text-[10px] text-[#6b7d52]/25">
+                                    {new Date(doc.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                                  </span>
+                                  {doc.fileUrl && (
+                                    <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer" className="text-[#6b7d52]/30 hover:text-[#6b7d52] transition opacity-0 group-hover:opacity-100">
+                                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                      </svg>
+                                    </a>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                </div>
+              )}
+
+              {/* AirSign CTA */}
+              <div className="px-5 py-3 border-t border-[#9aab7e]/8">
+                <Link
+                  href="/airsign/new"
+                  className="text-xs text-[#6b7d52] hover:text-[#1e2416] font-medium transition"
+                >
+                  Need signatures? Send via AirSign &rarr;
+                </Link>
+              </div>
             </div>
           )}
 
@@ -621,41 +883,6 @@ export function TransactionDetail({ transaction: initial }: { transaction: Trans
             </div>
           )}
 
-          {activeTab === "contracts" && (
-            <div className="space-y-4">
-              {generatedDocs.length > 0 ? (
-                <div className="card-glass !rounded-xl !p-5">
-                  <p className="text-[#6b7d52] text-[10px] font-medium tracking-[0.15em] uppercase mb-3">
-                    Generated Contracts ({generatedDocs.length})
-                  </p>
-                  <div className="space-y-2">
-                    {generatedDocs.map(doc => (
-                      <div key={doc.id} className="flex items-center gap-3 py-2 border-b border-[#9aab7e]/10 last:border-0">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[#1e2416] text-sm truncate">{doc.name}</p>
-                          <p className="text-[#6b7d52]/40 text-xs">{doc.type.replace(/_/g, " ")}</p>
-                        </div>
-                        <span className="font-mono text-[10px] text-[#6b7d52]/30">
-                          {new Date(doc.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="card-glass !rounded-xl !p-8 text-center">
-                  <p className="text-[#6b7d52]/40 text-sm mb-2">No contracts generated for this transaction</p>
-                </div>
-              )}
-              <Link
-                href="/aire/contracts/new"
-                className="block card-glass !rounded-xl !p-4 text-center hover:border-[#9aab7e]/30 transition-colors"
-              >
-                <p className="text-[#6b7d52] text-sm font-medium">Write New Contract</p>
-                <p className="text-[#6b7d52]/40 text-xs mt-0.5">Generate an LREC form for this deal</p>
-              </Link>
-            </div>
-          )}
         </div>
 
         {/* RIGHT — Sidebar */}
@@ -678,11 +905,8 @@ export function TransactionDetail({ transaction: initial }: { transaction: Trans
           <div className="card-glass !rounded-xl !p-4">
             <p className="text-[#6b7d52] text-[10px] font-medium tracking-[0.15em] uppercase mb-3">Quick Actions</p>
             <div className="space-y-2">
-              <Link href="/aire/contracts/new" className="block text-sm text-[#6b7d52] hover:text-[#1e2416] transition py-1">
-                Write a contract for this deal
-              </Link>
               <Link href="/airsign/new" className="block text-sm text-[#6b7d52] hover:text-[#1e2416] transition py-1">
-                Send documents for signatures
+                Create & send in AirSign
               </Link>
               <Link href="/aire/compliance" className="block text-sm text-[#6b7d52] hover:text-[#1e2416] transition py-1">
                 Run compliance scan

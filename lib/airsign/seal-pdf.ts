@@ -129,14 +129,45 @@ export async function sealPdf(
         break
       }
       case "TEXT": {
-        const fontSize = Math.min(fieldH * 0.55, 12)
-        page.drawText(field.value, {
-          x: x + 2,
-          y: y + fieldH * 0.3,
-          size: fontSize,
-          font: helvetica,
-          color: rgb(0, 0, 0),
-        })
+        const maxFontSize = Math.min(fieldH * 0.55, 12)
+        // Auto-size font to fit the field width
+        let fontSize = maxFontSize
+        const textWidth = helvetica.widthOfTextAtSize(field.value, fontSize)
+        if (textWidth > fieldW - 4) {
+          fontSize = Math.max(6, fontSize * ((fieldW - 4) / textWidth))
+        }
+        // For tall fields with long text, wrap lines
+        if (fieldH > 20 && field.value.length > 60) {
+          const lineHeight = fontSize * 1.3
+          const maxCharsPerLine = Math.floor((fieldW - 4) / (fontSize * 0.5))
+          const words = field.value.split(" ")
+          const lines: string[] = []
+          let currentLine = ""
+          for (const word of words) {
+            if ((currentLine + " " + word).trim().length > maxCharsPerLine && currentLine) {
+              lines.push(currentLine.trim())
+              currentLine = word
+            } else {
+              currentLine = currentLine ? currentLine + " " + word : word
+            }
+          }
+          if (currentLine) lines.push(currentLine.trim())
+          // Draw from top of field
+          let lineY = y + fieldH - fontSize - 2
+          for (const line of lines) {
+            if (lineY < y) break
+            page.drawText(line, { x: x + 2, y: lineY, size: fontSize, font: helvetica, color: rgb(0, 0, 0) })
+            lineY -= lineHeight
+          }
+        } else {
+          page.drawText(field.value, {
+            x: x + 2,
+            y: y + fieldH * 0.3,
+            size: fontSize,
+            font: helvetica,
+            color: rgb(0, 0, 0),
+          })
+        }
         break
       }
       case "CHECKBOX": {

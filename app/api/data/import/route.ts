@@ -60,7 +60,12 @@ export async function POST(request: Request) {
   let errored = 0
   const today = new Date().toISOString().split('T')[0]
 
-  for (const rec of records) {
+  for (const [i, rec] of records.entries()) {
+    if (!rec.address || typeof rec.address !== "string") {
+      console.error(`[Import] Record ${i}: missing or invalid address`)
+      errored++
+      continue
+    }
     try {
       const normalized = normalizeAddress(rec.address)
       if (!normalized) { skipped++; continue }
@@ -113,7 +118,8 @@ export async function POST(request: Request) {
       )
 
       imported++
-    } catch {
+    } catch (recError) {
+      console.error(`[Import] Record ${i} (${rec.address}) failed:`, recError)
       errored++
     }
   }

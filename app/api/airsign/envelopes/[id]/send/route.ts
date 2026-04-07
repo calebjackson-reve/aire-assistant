@@ -48,65 +48,75 @@ export async function POST(
     return NextResponse.json({ error: "Envelope not ready to send", details: errors }, { status: 422 })
   }
 
-  // Set expiration (30 days from now)
-  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+  try {
+    // Set expiration (30 days from now)
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
 
-  // Update status to SENT
-  await prisma.airSignEnvelope.update({
-    where: { id },
-    data: { status: "SENT", sentAt: new Date(), expiresAt },
-  })
-
-  // Log audit event
-  await prisma.airSignAuditEvent.create({
-    data: {
-      envelopeId: id,
-      action: "sent",
-      metadata: {
-        sentBy: user.id,
-        signerCount: envelope.signers.length,
-        fieldCount: envelope.fields.length,
-      },
-    },
-  })
-
-  // Sequential signing gate — only invite signers in the lowest order group
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-  const minOrder = Math.min(...envelope.signers.map((s) => s.order))
-  const firstBatch = envelope.signers.filter((s) => s.order === minOrder)
-  const waitingSigners = envelope.signers.filter((s) => s.order > minOrder)
-
-  const signingLinks = firstBatch.map((s) => ({
-    signerName: s.name,
-    signerEmail: s.email,
-    signingUrl: `${appUrl}/sign/${s.token}`,
-    order: s.order,
-  }))
-
-  for (const s of waitingSigners) {
-    console.log(`[AirSign] Signer ${s.name} (order ${s.order}) queued — will be invited after order ${minOrder} completes`)
-  }
-
-  // Send signing invitation emails via Resend (only to first-batch signers)
-  const emailResults: Array<{ signer: string; status: string; error?: string }> = []
-  for (const link of signingLinks) {
-    const result = await sendSigningInvitation({
-      signerName: link.signerName,
-      signerEmail: link.signerEmail,
-      envelopeName: envelope.name,
-      signingUrl: link.signingUrl,
-      expiresAt,
+    // Update status to SENT
+    await prisma.airSignEnvelope.update({
+      where: { id },
+      data: { status: "SENT", sentAt: new Date(), expiresAt },
     })
-    emailResults.push({ signer: link.signerName, status: result.status, error: result.error })
+
+    // Log audit event
+    await prisma.airSignAuditEvent.create({
+      data: {
+        envelopeId: id,
+        action: "sent",
+        metadata: {
+          sentBy: user.id,
+          signerCount: envelope.signers.length,
+          fieldCount: envelope.fields.length,
+        },
+      },
+    })
+
+    // Sequential signing gate — only invite signers in the lowest order group
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+    const minOrder = Math.min(...envelope.signers.map((s) => s.order))
+    const firstBatch = envelope.signers.filter((s) => s.order === minOrder)
+    const waitingSigners = envelope.signers.filter((s) => s.order > minOrder)
+
+    const signingLinks = firstBatch.map((s) => ({
+      signerName: s.name,
+      signerEmail: s.email,
+      signingUrl: `${appUrl}/sign/${s.token}`,
+      order: s.order,
+    }))
+
+    for (const s of waitingSigners) {
+      console.log(`[AirSign] Signer ${s.name} (order ${s.order}) queued — will be invited after order ${minOrder} completes`)
+    }
+
+    // Send signing invitation emails via Resend (only to first-batch signers)
+    const emailResults: Array<{ signer: string; status: string; error?: string }> = []
+    for (const link of signingLinks) {
+      try {
+        const result = await sendSigningInvitation({
+          signerName: link.signerName,
+          signerEmail: link.signerEmail,
+          envelopeName: envelope.name,
+          signingUrl: link.signingUrl,
+          expiresAt,
+        })
+        emailResults.push({ signer: link.signerName, status: result.status, error: result.error })
+      } catch (emailError) {
+        console.error(`[AirSign] Failed to send email to ${link.signerName}:`, emailError)
+        emailResults.push({ signer: link.signerName, status: "error", error: "Email send failed" })
+      }
+    }
+
+    console.log(`[AirSign] Envelope ${id} sent with ${signingLinks.length} signing links, ${emailResults.filter(e => e.status === "sent").length} emails delivered`)
+
+    return NextResponse.json({
+      success: true,
+      status: "SENT",
+      expiresAt: expiresAt.toISOString(),
+      signingLinks,
+      emailResults,
+    })
+  } catch (error) {
+    console.error(`[AirSign] Failed to send envelope ${id}:`, error)
+    return NextResponse.json({ error: "Failed to send envelope" }, { status: 500 })
   }
-
-  console.log(`[AirSign] Envelope ${id} sent with ${signingLinks.length} signing links, ${emailResults.filter(e => e.status === "sent").length} emails delivered`)
-
-  return NextResponse.json({
-    success: true,
-    status: "SENT",
-    expiresAt: expiresAt.toISOString(),
-    signingLinks,
-    emailResults,
-  })
 }

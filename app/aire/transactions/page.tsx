@@ -25,28 +25,34 @@ export default async function TransactionsPage() {
 
   const active = user.transactions.filter(t => !["CLOSED", "CANCELLED"].includes(t.status))
   const closed = user.transactions.filter(t => t.status === "CLOSED")
+  const pipelineValue = active.reduce((a, t) => a + (t.acceptedPrice || t.listPrice || 0), 0)
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <Link href="/aire" className="text-[#6b7d52] text-xs hover:underline mb-1 block">← Dashboard</Link>
-          <h1 className="font-[family-name:var(--font-cormorant)] italic text-[#1e2416] text-2xl">
+          <h1 className="font-[family-name:var(--font-cormorant)] italic text-cream text-2xl font-light">
             Transactions
           </h1>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="flex gap-3 text-xs">
-            <span className="text-[#6b7d52]">{active.length} active</span>
-            <span className="text-[#6b7d52]/40">{closed.length} closed</span>
+          <div className="flex items-center gap-4 mt-1.5">
+            <span className="font-mono text-[10px] text-warm/60 tracking-wider uppercase">{active.length} active</span>
+            <span className="font-mono text-[10px] text-cream-dim/30 tracking-wider uppercase">{closed.length} closed</span>
+            {pipelineValue > 0 && (
+              <>
+                <span className="text-cream-dim/10">&middot;</span>
+                <span className="font-mono text-[10px] text-cream-dim/30 tracking-wider uppercase">
+                  ${(pipelineValue / 1_000_000).toFixed(2)}M pipeline
+                </span>
+              </>
+            )}
           </div>
-          <Link
-            href="/aire/transactions/new"
-            className="bg-[#6b7d52] text-[#f5f2ea] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#6b7d52]/90 transition"
-          >
-            + New
-          </Link>
         </div>
+        <Link
+          href="/aire/transactions/new"
+          className="bg-warm/15 text-warm px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-warm/25 transition-colors"
+        >
+          + New
+        </Link>
       </div>
 
       <TransactionList transactions={JSON.parse(JSON.stringify(user.transactions))} />

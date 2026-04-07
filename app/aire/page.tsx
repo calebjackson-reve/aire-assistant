@@ -47,25 +47,30 @@ export default async function AirePage() {
       .map((d) => ({ ...d, address: txn.propertyAddress }))
   ).sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
 
+  const timeGreeting = now.getHours() < 12 ? "Good morning" : now.getHours() < 17 ? "Good afternoon" : "Good evening"
+
   return (
-    <div className="max-w-6xl mx-auto px-6 py-10">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
       {/* Header */}
       <div className="flex items-start justify-between mb-8">
         <div>
-          <p className="text-[#6b7d52] text-xs tracking-[0.15em] uppercase">{dateStr}</p>
-          <h1 className="font-[family-name:var(--font-cormorant)] italic text-[#1e2416] text-3xl mt-1">
-            Good morning, {firstName}.
+          <p className="font-mono text-[10px] text-cream-dim/50 tracking-[0.2em] uppercase">{dateStr}</p>
+          <h1 className="font-[family-name:var(--font-cormorant)] italic text-cream text-2xl sm:text-3xl mt-1 font-light">
+            {timeGreeting}, {firstName}.
           </h1>
           {urgentCount > 0 && (
-            <p className="text-[#c45c5c] text-sm mt-1 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#c45c5c] animate-pulse-dot" />
-              {urgentCount} deadline{urgentCount > 1 ? "s" : ""} due within 3 days
+            <p className="text-[#c45c5c] text-sm mt-2 flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#c45c5c] opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#c45c5c]" />
+              </span>
+              {urgentCount} deadline{urgentCount > 1 ? "s" : ""} need attention
             </p>
           )}
         </div>
         <div className="text-right shrink-0 ml-4">
-          <p className="text-[#6b7d52]/50 text-[10px] tracking-wider uppercase">Pipeline Value</p>
-          <p className="font-mono text-2xl text-[#1e2416] mt-0.5">
+          <p className="font-mono text-[10px] text-cream-dim/40 tracking-wider uppercase">Pipeline</p>
+          <p className="font-mono text-2xl sm:text-3xl text-cream font-light tracking-tight mt-0.5">
             ${pipelineValue >= 1_000_000
               ? `${(pipelineValue / 1_000_000).toFixed(2)}M`
               : `${(pipelineValue / 1000).toFixed(0)}K`}
@@ -73,84 +78,83 @@ export default async function AirePage() {
         </div>
       </div>
 
-      {/* Two column grid — collapses on mobile */}
+      {/* Stats Row */}
+      <div className="grid grid-cols-3 gap-3 mb-6">
+        <StatCard label="Active Deals" value={String(user.transactions.length)} icon="folder" />
+        <StatCard label="Urgent" value={String(urgentCount)} highlight={urgentCount > 0} icon="alert" />
+        <StatCard label="Avg Value" value={user.transactions.length > 0 ? `$${Math.round(pipelineValue / user.transactions.length / 1000)}K` : "$0"} icon="dollar" />
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-8">
+        <QuickAction href="/aire/transactions/new" label="New Transaction" shortcut="T" />
+        <QuickAction href="/aire/contracts/new" label="Write Contract" shortcut="C" />
+        <QuickAction href="/airsign/new" label="Send for Signing" shortcut="S" />
+        <QuickAction href="/aire/compliance" label="Compliance Scan" shortcut="R" />
+      </div>
+
+      {/* Two column grid */}
       <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6">
         {/* LEFT COLUMN */}
         <div className="space-y-4">
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-2">
-            <StatCard label="Active" value={String(user.transactions.length)} />
-            <StatCard label="Urgent" value={String(urgentCount)} highlight={urgentCount > 0} />
-            <StatCard label="Pipeline" value={`$${(pipelineValue / 1000).toFixed(0)}K`} />
-          </div>
-
-          {/* Quick Actions */}
-          <div className="grid grid-cols-2 gap-2">
-            <Link href="/aire/transactions/new" className="card-glass !p-3 !rounded-xl text-center hover:border-[#9aab7e]/30 transition-colors">
-              <p className="text-[#6b7d52] text-xs font-medium">+ Transaction</p>
-            </Link>
-            <Link href="/aire/contracts/new" className="card-glass !p-3 !rounded-xl text-center hover:border-[#9aab7e]/30 transition-colors">
-              <p className="text-[#6b7d52] text-xs font-medium">Write Contract</p>
-            </Link>
-            <Link href="/airsign/new" className="card-glass !p-3 !rounded-xl text-center hover:border-[#9aab7e]/30 transition-colors">
-              <p className="text-[#6b7d52] text-xs font-medium">New Envelope</p>
-            </Link>
-            <Link href="/aire/compliance" className="card-glass !p-3 !rounded-xl text-center hover:border-[#9aab7e]/30 transition-colors">
-              <p className="text-[#6b7d52] text-xs font-medium">Run Compliance</p>
-            </Link>
-          </div>
-
           {/* Morning brief */}
           {brief && (
-            <Link href="/aire/morning-brief" className="block card-sage !rounded-xl group">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#9aab7e] animate-pulse-dot" />
-                  <span className="text-[#6b7d52] text-xs font-medium tracking-wider uppercase">
-                    Morning Brief
+            <Link href="/aire/morning-brief" className="block group">
+              <div className="bg-forest-card border border-brown-border rounded-xl p-5 hover:border-warm/25 transition-colors">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-warm opacity-50" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-warm" />
+                    </span>
+                    <span className="font-mono text-[10px] text-cream-dim/60 tracking-[0.15em] uppercase">
+                      Morning Brief
+                    </span>
+                  </div>
+                  <span className={`font-mono text-[10px] px-2 py-0.5 rounded-full ${
+                    brief.status === "pending"
+                      ? "bg-[#d4944c]/15 text-[#d4944c]"
+                      : "bg-warm/10 text-warm/60"
+                  }`}>
+                    {brief.status}
                   </span>
                 </div>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full ${
-                  brief.status === "pending"
-                    ? "bg-[#9aab7e]/15 text-[#6b7d52]"
-                    : "bg-[#6b7d52]/10 text-[#6b7d52]/60"
-                }`}>
-                  {brief.status}
-                </span>
+                <p className="text-cream/70 text-sm leading-relaxed line-clamp-3">
+                  {brief.summary || "Brief ready for review."}
+                </p>
+                <p className="text-warm text-xs mt-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                  Read full brief
+                </p>
               </div>
-              <p className="text-[#1e2416]/70 text-sm leading-relaxed line-clamp-4">
-                {brief.summary || "Brief ready for review."}
-              </p>
-              <p className="text-[#9aab7e] text-xs mt-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                View full brief →
-              </p>
             </Link>
           )}
 
-          {/* Urgent deadlines sidebar */}
+          {/* Urgent deadlines */}
           {allUrgentDeadlines.length > 0 && (
-            <div className="card-glass !rounded-xl">
-              <p className="text-[#6b7d52] text-[10px] font-medium tracking-[0.15em] uppercase mb-3">
+            <div className="bg-forest-card border border-brown-border rounded-xl p-5">
+              <p className="font-mono text-[10px] text-cream-dim/50 tracking-[0.15em] uppercase mb-4">
                 Upcoming Deadlines
               </p>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {allUrgentDeadlines.slice(0, 6).map((d, i) => {
                   const due = new Date(d.dueDate)
                   const isOverdue = due < now
                   const isToday = due.toDateString() === now.toDateString()
                   return (
-                    <div key={i} className="flex items-start gap-3">
-                      <div className="shrink-0 mt-1">
+                    <div key={i} className="flex items-start gap-3 group/item">
+                      <div className="shrink-0 mt-1.5">
                         <span className={`w-2 h-2 rounded-full block ${
-                          isOverdue ? "bg-[#c45c5c]" : isToday ? "bg-[#d4944c]" : "bg-[#9aab7e]"
+                          isOverdue ? "bg-[#c45c5c]" : isToday ? "bg-[#d4944c]" : "bg-warm"
                         }`} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[#1e2416] text-sm truncate">{d.name}</p>
-                        <p className="text-[#6b7d52]/50 text-xs truncate">{d.address}</p>
+                        <p className="text-cream text-sm truncate">{d.name}</p>
+                        <p className="text-cream-dim/40 text-xs truncate">{d.address}</p>
                       </div>
-                      <span className="font-mono text-[11px] text-[#1e2416]/50 shrink-0">
-                        {due.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      <span className={`font-mono text-[11px] shrink-0 ${
+                        isOverdue ? "text-[#c45c5c]" : isToday ? "text-[#d4944c]" : "text-cream-dim/50"
+                      }`}>
+                        {isOverdue ? "Overdue" : isToday ? "Today" : due.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                       </span>
                     </div>
                   )
@@ -158,25 +162,45 @@ export default async function AirePage() {
               </div>
             </div>
           )}
+
+          {/* No deadlines? Show system status */}
+          {allUrgentDeadlines.length === 0 && (
+            <div className="bg-forest-card border border-brown-border rounded-xl p-5 text-center">
+              <p className="text-warm/60 text-sm">No urgent deadlines</p>
+              <p className="text-cream-dim/30 text-xs mt-1">All clear for the next 3 days</p>
+            </div>
+          )}
         </div>
 
         {/* RIGHT COLUMN — Transactions */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-[#1e2416] text-sm font-semibold" style={{ fontStyle: "normal" }}>
+            <h2 className="text-cream text-sm font-medium tracking-wide" style={{ fontFamily: "var(--font-body)", fontStyle: "normal" }}>
               Active Transactions
             </h2>
-            <Link href="/aire/transactions" className="text-[#6b7d52] text-xs font-medium hover:underline">
+            <Link href="/aire/transactions" className="font-mono text-[10px] text-warm/60 tracking-wider uppercase hover:text-warm transition-colors">
               View all
             </Link>
           </div>
 
           {user.transactions.length === 0 ? (
-            <div className="card-glass text-center py-16">
-              <p className="text-[#6b7d52]/50 text-sm">No active transactions</p>
+            <div className="bg-forest-card border border-brown-border rounded-xl p-12 text-center">
+              <div className="w-12 h-12 rounded-full bg-warm/10 flex items-center justify-center mx-auto mb-4">
+                <svg className="w-5 h-5 text-warm/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                </svg>
+              </div>
+              <p className="text-cream/60 text-sm mb-1">No active transactions</p>
+              <p className="text-cream-dim/30 text-xs">Create your first deal to get started</p>
+              <Link
+                href="/aire/transactions/new"
+                className="inline-block mt-5 bg-warm/15 text-warm text-xs font-medium px-4 py-2 rounded-lg hover:bg-warm/25 transition-colors"
+              >
+                + New Transaction
+              </Link>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {user.transactions.slice(0, 8).map((txn) => {
                 const urgent = txn.deadlines.filter((d) => new Date(d.dueDate) <= threeDays)
                 const daysToClose = txn.closingDate
@@ -184,37 +208,43 @@ export default async function AirePage() {
                   : null
 
                 return (
-                  <div key={txn.id} className="card-glass !p-4 !rounded-xl flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="text-[#1e2416] text-sm font-medium truncate">
-                          {txn.propertyAddress}
-                        </p>
-                        {urgent.length > 0 && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#c45c5c]/10 text-[#c45c5c] shrink-0">
-                            {urgent.length} due
+                  <Link
+                    key={txn.id}
+                    href={`/aire/transactions/${txn.id}`}
+                    className="block bg-forest-card border border-brown-border rounded-xl p-4 hover:border-warm/20 hover:bg-forest-card/80 transition-colors group/txn"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="text-cream text-sm font-medium truncate group-hover/txn:text-warm transition-colors">
+                            {txn.propertyAddress}
+                          </p>
+                          {urgent.length > 0 && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#c45c5c]/15 text-[#c45c5c] shrink-0 font-mono">
+                              {urgent.length} due
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-cream-dim/40 text-xs">
+                            {txn.buyerName || txn.sellerName || "\u2014"}
                           </span>
+                          <span className="text-cream-dim/15 text-xs">&middot;</span>
+                          <span className="font-mono text-[10px] text-cream-dim/30 uppercase tracking-wider">
+                            {txn.status.replace(/_/g, " ").toLowerCase()}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0 ml-4">
+                        <p className="font-mono text-sm text-cream">
+                          {txn.acceptedPrice ? `$${(txn.acceptedPrice / 1000).toFixed(0)}K` : "TBD"}
+                        </p>
+                        {daysToClose !== null && daysToClose >= 0 && (
+                          <p className="font-mono text-[10px] text-cream-dim/30 mt-0.5">{daysToClose}d to close</p>
                         )}
                       </div>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[#6b7d52]/50 text-xs">
-                          {txn.buyerName || txn.sellerName || "—"}
-                        </span>
-                        <span className="text-[#e8e4d8] text-xs">·</span>
-                        <span className="text-[10px] text-[#6b7d52]/40">
-                          {txn.status.replace(/_/g, " ").toLowerCase()}
-                        </span>
-                      </div>
                     </div>
-                    <div className="text-right shrink-0 ml-4">
-                      <p className="font-mono text-sm text-[#1e2416]">
-                        {txn.acceptedPrice ? `$${(txn.acceptedPrice / 1000).toFixed(0)}K` : "TBD"}
-                      </p>
-                      {daysToClose !== null && daysToClose >= 0 && (
-                        <p className="text-[#6b7d52]/40 text-[10px] mt-0.5">{daysToClose}d to close</p>
-                      )}
-                    </div>
-                  </div>
+                  </Link>
                 )
               })}
             </div>
@@ -225,13 +255,42 @@ export default async function AirePage() {
   )
 }
 
-function StatCard({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+function StatCard({ label, value, highlight, icon }: { label: string; value: string; highlight?: boolean; icon: string }) {
   return (
-    <div className="card-glass !p-3 !rounded-xl text-center">
-      <p className="text-[#6b7d52]/60 text-[10px] tracking-wider uppercase">{label}</p>
-      <p className={`text-xl font-light mt-0.5 ${highlight ? "text-[#c45c5c]" : "text-[#1e2416]"}`}>
+    <div className="bg-forest-card border border-brown-border rounded-xl p-4 hover:border-warm/15 transition-colors">
+      <div className="flex items-center gap-2 mb-2">
+        {icon === "folder" && (
+          <svg className="w-3.5 h-3.5 text-warm/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+          </svg>
+        )}
+        {icon === "alert" && (
+          <svg className="w-3.5 h-3.5 text-warm/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        )}
+        {icon === "dollar" && (
+          <svg className="w-3.5 h-3.5 text-warm/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+          </svg>
+        )}
+        <p className="font-mono text-[10px] text-cream-dim/40 tracking-wider uppercase">{label}</p>
+      </div>
+      <p className={`font-mono text-2xl font-light tracking-tight ${highlight ? "text-[#c45c5c]" : "text-cream"}`}>
         {value}
       </p>
     </div>
+  )
+}
+
+function QuickAction({ href, label, shortcut }: { href: string; label: string; shortcut: string }) {
+  return (
+    <Link
+      href={href}
+      className="group bg-forest-card border border-brown-border rounded-xl p-3 text-center hover:border-warm/25 hover:bg-forest-card/80 transition-colors"
+    >
+      <p className="text-cream/80 text-xs font-medium group-hover:text-warm transition-colors">{label}</p>
+      <p className="font-mono text-[9px] text-cream-dim/25 mt-0.5 tracking-wider">{shortcut}</p>
+    </Link>
   )
 }

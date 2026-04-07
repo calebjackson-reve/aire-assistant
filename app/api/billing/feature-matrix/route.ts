@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { getUserTier, getFeatureMatrix, checkFeatureAccess, type Feature } from "@/lib/auth/subscription-gate";
 
 /**
@@ -6,6 +7,11 @@ import { getUserTier, getFeatureMatrix, checkFeatureAccess, type Feature } from 
  * Returns the feature matrix with the user's current access status for each feature.
  */
 export async function GET() {
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const userInfo = await getUserTier();
   const matrix = getFeatureMatrix();
 

@@ -12,6 +12,9 @@ export async function POST(request: NextRequest) {
   const { logId, action } = (await request.json()) as { logId: string; action: "handled" | "link" }
 
   if (!logId) return NextResponse.json({ error: "logId required" }, { status: 400 })
+  if (!action || !["handled", "link"].includes(action)) {
+    return NextResponse.json({ error: "action must be 'handled' or 'link'" }, { status: 400 })
+  }
 
   const log = await prisma.communicationLog.findFirst({
     where: { id: logId, userId: user.id },

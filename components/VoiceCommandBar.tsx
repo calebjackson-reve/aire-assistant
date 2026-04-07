@@ -35,8 +35,11 @@ export default function VoiceCommandBar() {
   const [executionResult, setExecutionResult] = useState<ExecutionResult | null>(null);
   const [executing, setExecuting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [inputMode, setInputMode] = useState<"idle" | "voice" | "text">("idle");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
+  const finalTranscriptRef = useRef<string>("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const startListening = useCallback(() => {
     if (!("webkitSpeechRecognition" in window) && !("SpeechRecognition" in window)) {
@@ -54,9 +57,11 @@ export default function VoiceCommandBar() {
 
     recognition.onstart = () => {
       setIsListening(true);
+      setInputMode("voice");
       setResult(null);
       setError(null);
       setTranscript("");
+      finalTranscriptRef.current = "";
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -73,14 +78,17 @@ export default function VoiceCommandBar() {
         }
       }
 
-      setTranscript(final || interim);
+      const display = final || interim;
+      setTranscript(display);
+      if (final) finalTranscriptRef.current = final;
     };
 
     recognition.onend = () => {
       setIsListening(false);
-      // Auto-submit if we got a final transcript
-      if (transcript.trim()) {
-        processCommand(transcript);
+      // Auto-submit using ref to avoid stale closure
+      const finalText = finalTranscriptRef.current.trim();
+      if (finalText) {
+        processCommand(finalText);
       }
     };
 
@@ -216,8 +224,21 @@ export default function VoiceCommandBar() {
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter" && transcript.trim()) {
+      e.preventDefault();
       processCommand(transcript);
     }
+    // Escape clears the bar
+    if (e.key === "Escape") {
+      setTranscript("");
+      setResult(null);
+      setExecutionResult(null);
+      setError(null);
+      inputRef.current?.blur();
+    }
+  }
+
+  function handleInputFocus() {
+    if (!isListening) setInputMode("text");
   }
 
   const showPreview =
@@ -257,7 +278,7 @@ export default function VoiceCommandBar() {
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center gap-2">
-                  <p className="text-xs text-blue-400 font-semibold uppercase tracking-wider">
+                  <p className="text-xs text-[#9aab7e] font-semibold uppercase tracking-wider">
                     {result.intent}
                   </p>
                   {result.timing && (
@@ -305,7 +326,7 @@ export default function VoiceCommandBar() {
                   <button
                     onClick={() => executeVoiceAction(false)}
                     disabled={executing}
-                    className="mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
+                    className="mt-3 px-4 py-2 bg-[#6b7d52] hover:bg-[#5a6b45] rounded-lg text-sm font-semibold transition-colors disabled:opacity-50"
                   >
                     {executing ? "Executing..." : `Confirm: ${result.action}`}
                   </button>
@@ -340,7 +361,7 @@ export default function VoiceCommandBar() {
             className={`p-3 rounded-full transition-all ${
               isListening
                 ? "bg-red-600 animate-pulse shadow-lg shadow-red-600/30"
-                : "bg-blue-600 hover:bg-blue-700"
+                : "bg-[#6b7d52] hover:bg-[#5a6b45]"
             } disabled:opacity-50`}
           >
             <svg
@@ -360,20 +381,22 @@ export default function VoiceCommandBar() {
 
           <div className="flex-1 relative">
             <input
+              ref={inputRef}
               type="text"
               value={transcript}
-              onChange={(e) => setTranscript(e.target.value)}
+              onChange={(e) => { setTranscript(e.target.value); setInputMode("text"); }}
               onKeyDown={handleKeyDown}
+              onFocus={handleInputFocus}
               placeholder={
                 isListening
                   ? "Listening..."
-                  : 'Say or type a command... "Create addendum for 123 Main St"'
+                  : 'Ask AIRE anything... "write a contract for 554 Avenue F, buyer Gavin Shaw, $295K"'
               }
-              className="w-full bg-zinc-800 rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="w-full bg-zinc-800 rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#6b7d52]"
             />
             {processing && (
               <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-[#9aab7e] border-t-transparent rounded-full animate-spin" />
               </div>
             )}
           </div>

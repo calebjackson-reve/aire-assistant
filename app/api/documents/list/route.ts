@@ -32,6 +32,14 @@ export async function GET(req: NextRequest) {
 
     // Scope to user's transactions
     if (transactionId) {
+      // Verify user owns this transaction before returning its documents
+      const txn = await prisma.transaction.findFirst({
+        where: { id: transactionId, userId: user.id },
+        select: { id: true },
+      });
+      if (!txn) {
+        return NextResponse.json({ error: "Transaction not found" }, { status: 404 });
+      }
       conditions.push({ transactionId });
     } else {
       // Include docs from user's transactions AND unfiled docs

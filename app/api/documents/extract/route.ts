@@ -33,8 +33,15 @@ function countRealWords(text: string): number {
 
 export async function POST(req: NextRequest) {
   try {
-    // Auth is optional for test mode
-    try { await auth(); } catch { /* proceed without user */ }
+    const { userId: clerkId } = await auth();
+    if (!clerkId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const authUser = await prisma.user.findUnique({ where: { clerkId } });
+    if (!authUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
 
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
@@ -100,7 +107,9 @@ export async function POST(req: NextRequest) {
                   const radio = form.getRadioGroup(name);
                   const selected = radio.getSelected();
                   if (selected) acroFormData[name] = selected;
-                } catch { /* unsupported field type */ }
+                } catch (fieldError) {
+                  console.log(`[AcroForm] Skipping unsupported field "${name}":`, fieldError);
+                }
               }
             }
           }
@@ -187,27 +196,16 @@ export async function POST(req: NextRequest) {
 
     if (!transactionId) {
       try {
-        let fileUserId: string | null = null;
-        try {
-          const session = await auth();
-          if (session.userId) {
-            const user = await prisma.user.findUnique({ where: { clerkId: session.userId } });
-            if (user) fileUserId = user.id;
-          }
-        } catch { /* no auth */ }
-
-        if (fileUserId) {
-          autoFileResult = await autoFileDocument({
-            userId: fileUserId,
-            extractedFields: extractionResult.fields as Record<string, string | number | boolean | null>,
-            filename: file.name,
-          });
-          if (autoFileResult && autoFileResult.confidence >= 0.5) {
-            resolvedTransactionId = autoFileResult.transactionId;
-            console.log(`📁 [AutoFile] Filed to "${autoFileResult.propertyAddress}" (${(autoFileResult.confidence * 100).toFixed(0)}% via ${autoFileResult.matchedOn.join(",")})`);
-          } else if (autoFileResult) {
-            console.log(`📁 [AutoFile] Low-confidence match: "${autoFileResult.propertyAddress}" (${(autoFileResult.confidence * 100).toFixed(0)}%) — not auto-filing`);
-          }
+        autoFileResult = await autoFileDocument({
+          userId: authUser.id,
+          extractedFields: extractionResult.fields as Record<string, string | number | boolean | null>,
+          filename: file.name,
+        });
+        if (autoFileResult && autoFileResult.confidence >= 0.5) {
+          resolvedTransactionId = autoFileResult.transactionId;
+          console.log(`📁 [AutoFile] Filed to "${autoFileResult.propertyAddress}" (${(autoFileResult.confidence * 100).toFixed(0)}% via ${autoFileResult.matchedOn.join(",")})`);
+        } else if (autoFileResult) {
+          console.log(`📁 [AutoFile] Low-confidence match: "${autoFileResult.propertyAddress}" (${(autoFileResult.confidence * 100).toFixed(0)}%) — not auto-filing`);
         }
       } catch (autoFileError) {
         console.error("[AutoFile] Error:", autoFileError);
@@ -233,19 +231,10 @@ export async function POST(req: NextRequest) {
     // ── Step 7: Trigger workflow auto-advance if document was filed to a transaction ──
     if (resolvedTransactionId) {
       try {
-        let triggerUserId: string | undefined;
-        try {
-          const session = await auth();
-          if (session.userId) {
-            const user = await prisma.user.findUnique({ where: { clerkId: session.userId } });
-            if (user) triggerUserId = user.id;
-          }
-        } catch { /* no auth */ }
-
         const advanceResult = await onDocumentUploaded(
           resolvedTransactionId,
           classification.type,
-          triggerUserId
+          authUser.id
         );
         if (advanceResult?.success) {
           console.log(`[Workflow] Auto-advanced ${advanceResult.fromStatus} → ${advanceResult.toStatus} via document "${classification.type}"`);
@@ -257,31 +246,19 @@ export async function POST(req: NextRequest) {
 
     // Log to document memory (non-blocking)
     try {
-      // Get user ID if authenticated
-      let memoryUserId = "anonymous";
-      try {
-        const session = await auth();
-        if (session.userId) {
-          const user = await prisma.user.findUnique({ where: { clerkId: session.userId } });
-          if (user) memoryUserId = user.id;
-        }
-      } catch { /* no auth */ }
-
-      if (memoryUserId !== "anonymous") {
-        await logDocumentMemory({
-          userId: memoryUserId,
-          transactionId: transactionId || undefined,
-          fileBuffer: buffer,
-          fileName: file.name,
-          pageCount,
-          classifiedType: classification.type,
-          confidence: classification.confidence,
-          formNumber: classification.lrecFormNumber,
-          extractionMethod,
-          extractedFields: extractionResult.fields as Record<string, unknown>,
-        });
-        console.log(`🧠 [Memory] Logged document "${file.name}" — ${classification.type} (${(classification.confidence * 100).toFixed(0)}%)`);
-      }
+      await logDocumentMemory({
+        userId: authUser.id,
+        transactionId: transactionId || undefined,
+        fileBuffer: buffer,
+        fileName: file.name,
+        pageCount,
+        classifiedType: classification.type,
+        confidence: classification.confidence,
+        formNumber: classification.lrecFormNumber,
+        extractionMethod,
+        extractedFields: extractionResult.fields as Record<string, unknown>,
+      });
+      console.log(`🧠 [Memory] Logged document "${file.name}" — ${classification.type} (${(classification.confidence * 100).toFixed(0)}%)`);
     } catch (memoryError) {
       console.error("[DocumentMemory] Failed to log:", memoryError);
     }

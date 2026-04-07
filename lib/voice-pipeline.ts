@@ -130,7 +130,7 @@ const FAST_MATCHERS: FastMatch[] = [
     intent: "create_transaction",
     extractEntities: () => ({}),
   },
-  // ── WRITE CONTRACT (3 patterns) ──
+  // ── WRITE CONTRACT (4 patterns) ──
   {
     pattern: /^(?:write|draft|create) (?:a )?(?:purchase agreement|PA|contract) (?:for|at|on) (.+?)(?:\s+(?:at|for) \$?([\d,.]+[kK]?))?$/i,
     intent: "write_contract",
@@ -149,6 +149,38 @@ const FAST_MATCHERS: FastMatch[] = [
     pattern: /^(?:make|prepare) (?:a )?(?:PA|purchase agreement) (?:for|at) (.+)$/i,
     intent: "write_contract",
     extractEntities: (m) => ({ address: m[1].trim() }),
+  },
+  // Complex contract command with inline fields — fast-path to avoid Claude call
+  // "write a contract for 554 Avenue F, buyer is Gavin Shaw, price is $295,000"
+  {
+    pattern: /^(?:write|draft|create) (?:a )?(?:purchase agreement|PA|contract) (?:for|at|on) (.+?)(?:,|\s+and\s+)/i,
+    intent: "write_contract",
+    extractEntities: (m) => {
+      const full = m.input || ""
+      const e: Record<string, string> = {}
+      // Address is first capture group but may include trailing fields — clean it
+      const addrRaw = m[1].trim()
+      // Stop address at first comma or "buyer/seller/price" keyword
+      const addrClean = addrRaw.split(/\s*,\s*/)[0].replace(/\s+(buyer|seller|price|earnest|closing|at \$).*/i, "").trim()
+      e.address = addrClean
+
+      const buyerMatch = full.match(/buyer\s+(?:is\s+)?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/i)
+      if (buyerMatch) e.buyer_name = buyerMatch[1].trim()
+
+      const sellerMatch = full.match(/seller\s+(?:is\s+)?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/i)
+      if (sellerMatch) e.seller_name = sellerMatch[1].trim()
+
+      const priceMatch = full.match(/price\s+(?:is\s+)?\$?([\d,.]+[kK]?)/i)
+      if (priceMatch) e.price = priceMatch[1].replace(/[kK]$/, "000").replace(/,/g, "")
+
+      const earnestMatch = full.match(/earnest\s+(?:money\s+)?(?:is\s+)?\$?([\d,.]+[kK]?)/i)
+      if (earnestMatch) e.earnest_money = earnestMatch[1].replace(/[kK]$/, "000").replace(/,/g, "")
+
+      const closingMatch = full.match(/closing\s+(?:on\s+|date\s+(?:is\s+)?)?(.+?)(?:,|$)/i)
+      if (closingMatch) e.closing_date = closingMatch[1].trim()
+
+      return e
+    },
   },
   // ── COMPLIANCE (3 patterns) ──
   {
@@ -385,8 +417,15 @@ schedule_closing, send_document, run_compliance, write_contract, needs_clarifica
 write_contract: user wants to write/create/draft a purchase agreement, PA, or contract.
 Examples: "write PA for 123 Main", "draft purchase agreement", "write contract for the Smith deal"
 
-ENTITY KEYS: address, city, price, date, buyer_name, seller_name,
-document_type, status, description, mls_number, rent, repair_items, addendum_text
+ENTITY KEYS: address, city, price, date, buyer_name, buyer_email, buyer_phone,
+seller_name, seller_email, seller_phone, document_type, status, description,
+mls_number, rent, repair_items, addendum_text, earnest_money, financing_type,
+inspection_days, closing_date, title_company, parish, zip
+
+For write_contract, extract ALL deal fields mentioned: address, buyer_name, seller_name,
+price, earnest_money, closing_date, financing_type, inspection_days, title_company, parish.
+Example: "write a contract for 554 Avenue F, buyer is Gavin Shaw, price is 295000" →
+entities: {address: "554 Avenue F", buyer_name: "Gavin Shaw", price: "295000"}
 
 MULTI-TURN: If context mentions "Last discussed: [address]" and the user's command
 references "it", "that deal", "this one", "the same property", or omits an address
@@ -517,14 +556,32 @@ export async function runVoicePipeline(input: PipelineInput): Promise<PipelineRe
   }
 
   // Step 4b: Multi-turn implicit entity resolution
-  // If the intent needs an address but none was provided, try to inherit from last command
-  if (ADDRESS_INTENTS.has(intent) && !entities.address) {
+  // If the intent needs an address but none was provided, try to inherit from last command.
+  // Also merge entities from the previous command when they share the same intent
+  // (e.g., "write a contract" → "the address is 554 Avenue F" → "buyer is Gavin Shaw").
+  if (ADDRESS_INTENTS.has(intent)) {
     const lastCmd = await prisma.voiceCommand.findFirst({
-      where: { userId: input.userId, transactionId: { not: null } },
+      where: { userId: input.userId, status: { in: ["completed", "executed"] } },
       orderBy: { createdAt: "desc" },
-      select: { transactionId: true },
+      select: { transactionId: true, parsedIntent: true, parsedEntities: true },
     })
-    if (lastCmd?.transactionId) {
+
+    // Merge entities from previous command if same intent and within session window
+    if (lastCmd?.parsedIntent === intent && lastCmd.parsedEntities) {
+      const prevEntities = lastCmd.parsedEntities as Record<string, string>
+      // Previous entities fill gaps — current command takes priority
+      for (const [key, value] of Object.entries(prevEntities)) {
+        if (!entities[key] && value) {
+          entities[key] = value
+        }
+      }
+      if (!entities.address && prevEntities.address) {
+        response = response.replace(/\.$/, ` (using ${prevEntities.address}).`)
+      }
+    }
+
+    // If still no address, inherit from last command's transaction
+    if (!entities.address && lastCmd?.transactionId) {
       const txn = await prisma.transaction.findUnique({
         where: { id: lastCmd.transactionId },
         select: { propertyAddress: true },
