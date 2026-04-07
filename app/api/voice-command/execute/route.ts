@@ -10,6 +10,10 @@ import { executeAction, requiresApproval } from "@/lib/voice-action-executor";
  */
 export async function POST(req: NextRequest) {
   try {
+    const { requireFeature } = await import("@/lib/auth/subscription-gate");
+    const gate = await requireFeature("voice_commands");
+    if (gate) return gate;
+
     const { userId: clerkId } = await auth();
     if (!clerkId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

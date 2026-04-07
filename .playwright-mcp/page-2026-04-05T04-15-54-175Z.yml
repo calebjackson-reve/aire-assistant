@@ -1,0 +1,67 @@
+- generic [ref=e1]:
+  - generic [ref=e6] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e7]:
+      - img [ref=e8]
+    - generic [ref=e11]:
+      - button "Open issues overlay" [ref=e12]:
+        - generic [ref=e13]:
+          - generic [ref=e14]: "0"
+          - generic [ref=e15]: "1"
+        - generic [ref=e16]: Issue
+      - button "Collapse issues badge" [ref=e17]:
+        - img [ref=e18]
+  - generic [ref=e21]:
+    - generic [ref=e22]:
+      - generic [ref=e24]: A
+      - generic [ref=e25]:
+        - paragraph [ref=e26]: AirSign
+        - paragraph [ref=e27]: Secure Electronic Signatures
+    - generic [ref=e28]:
+      - generic [ref=e29]:
+        - heading "Purchase Agreement — 5834 Guice Dr" [level=1] [ref=e39]
+        - paragraph [ref=e40]: "Signing as: Caleb Jackson (caleb.jackson@reverealtors.com)"
+      - generic [ref=e43]: 1/3 fields
+      - generic [ref=e33]:
+        - generic:
+          - button "Buyer Name" [ref=e46] [cursor=pointer]:
+            - generic [ref=e47]: Buyer Name
+          - button "Buyer Signature" [ref=e48] [cursor=pointer]:
+            - generic [ref=e49]: Buyer Signature
+          - button "✓" [ref=e50] [cursor=pointer]:
+            - generic [ref=e51]: ✓
+      - paragraph [ref=e52]: Complete 2 remaining required fields to sign
+      - generic [ref=e53]:
+        - button "Sign document" [disabled] [ref=e54]
+        - button "Decline" [ref=e55]
+      - generic [ref=e57]:
+        - generic [ref=e58]:
+          - heading "Add Your Signature" [level=3] [ref=e59]
+          - paragraph [ref=e60]: Choose how you'd like to sign
+        - generic [ref=e61]:
+          - button "Type" [ref=e62]
+          - button "Draw" [ref=e63]
+        - generic [ref=e65]:
+          - textbox "Your full name" [ref=e66]: Caleb Jackson
+          - generic [ref=e67]:
+            - button "Caleb Jackson Allura" [ref=e68]:
+              - generic [ref=e69]: Caleb Jackson
+              - text: Allura
+            - button "Caleb Jackson Dancing Script" [ref=e70]:
+              - generic [ref=e71]: Caleb Jackson
+              - text: Dancing Script
+            - button "Caleb Jackson Great Vibes" [active] [ref=e72]:
+              - generic [ref=e73]: Caleb Jackson
+              - text: Great Vibes
+            - button "Caleb Jackson Sacramento" [ref=e74]:
+              - generic [ref=e75]: Caleb Jackson
+              - text: Sacramento
+            - button "Caleb Jackson Parisienne" [ref=e76]:
+              - generic [ref=e77]: Caleb Jackson
+              - text: Parisienne
+            - button "Caleb Jackson Caveat" [ref=e78]:
+              - generic [ref=e79]: Caleb Jackson
+              - text: Caveat
+        - generic [ref=e80]:
+          - button "Cancel" [ref=e81]
+          - button "Apply Signature" [ref=e82]
+  - alert [ref=e38]

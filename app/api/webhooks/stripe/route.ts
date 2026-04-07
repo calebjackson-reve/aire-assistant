@@ -40,15 +40,26 @@ export async function POST(req: NextRequest) {
       const subscriptionId = session.subscription as string;
 
       if (userId && customerId && subscriptionId) {
+        // Retrieve subscription to get the price ID and set tier immediately
+        const stripe = (await import("@/lib/stripe")).getStripe();
+        const sub = await stripe.subscriptions.retrieve(subscriptionId);
+        const priceId = sub.items.data[0]?.price.id;
+        if (!priceId) {
+          console.error(`⚠️ No priceId found on subscription ${subscriptionId}`);
+          break;
+        }
+        const tier = priceIdToTier(priceId);
+
         await prisma.user.update({
           where: { id: userId },
           data: {
             stripeCustomerId: customerId,
             subscriptionId: subscriptionId,
             subscriptionStatus: "active",
+            tier,
           },
         });
-        console.log(`✅ Checkout completed for user: ${userId}`);
+        console.log(`✅ Checkout completed for user: ${userId} → ${tier}`);
       }
       break;
     }

@@ -22,22 +22,24 @@ export default async function EmailPage(props: {
   const googleConfigured = !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET)
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10">
+    <div className="max-w-6xl mx-auto px-6 py-10">
+      {/* Header */}
       <div className="mb-8">
-        <h1 className="font-[family-name:var(--font-newsreader)] italic text-cream text-3xl">
+        <p className="text-cream-dark text-xs tracking-[0.15em] uppercase">Communications</p>
+        <h1 className="font-[family-name:var(--font-cormorant)] italic text-cream text-3xl mt-1">
           Email Intelligence
         </h1>
         <p className="text-cream-dim text-sm mt-1">
-          Gmail connection · Transaction email scanning · AI classification
+          Inbox triage · Missed responses · AI draft replies
         </p>
       </div>
 
       {error && (
-        <div className="border border-status-red/30 bg-status-red/5 rounded-lg p-4 mb-6">
+        <div className="card-earth !p-4 mb-6 border-status-red/30">
           <p className="text-status-red text-sm font-medium">Connection failed</p>
           <p className="text-cream-dim text-xs mt-1">
             {error === "denied" && "Gmail access was denied. Please try again and grant permissions."}
-            {error === "config" && "Google OAuth is not configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET."}
+            {error === "config" && "Google OAuth not configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET."}
             {error === "token_exchange" && "Failed to exchange authorization code. Try again."}
             {error === "missing_code" && "No authorization code received from Google."}
             {error === "server" && "Server error during OAuth. Check logs."}
@@ -47,8 +49,8 @@ export default async function EmailPage(props: {
       )}
 
       {justConnected && (
-        <div className="border border-status-green/30 bg-status-green/5 rounded-lg p-4 mb-6">
-          <p className="text-status-green text-sm font-medium">Gmail connected</p>
+        <div className="card-sage !p-4 mb-6">
+          <p className="text-cream text-sm font-medium">Gmail connected</p>
           {connectedEmail && (
             <p className="text-cream-dim text-xs mt-1">Connected as {connectedEmail}</p>
           )}

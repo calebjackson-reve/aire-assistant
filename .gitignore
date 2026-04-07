@@ -42,3 +42,7 @@ next-env.d.ts
 AIRE-KEY-SETUP-GUIDE.html
 
 .vercel
+
+# Claude Code settings (local only)
+.claude/
+.env*.local

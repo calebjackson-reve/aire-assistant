@@ -7,6 +7,10 @@
 
 import prisma from "@/lib/prisma";
 import { classifyByPatterns, classifyWithAI } from "@/lib/document-classifier";
+import { extractDocumentFields } from "@/lib/document-extractor";
+import { multiPassExtract } from "@/lib/multi-pass-extractor";
+import { autoFileDocument } from "@/lib/document-autofiler";
+import { classifyEmail, type ClassifierContext } from "@/lib/comms/email-classifier";
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || "";
@@ -73,6 +77,12 @@ export interface ScanResult {
   attachmentsFound: number;
   documentsCreated: number;
   errors: string[];
+  /** Agent 4 — 3-tier classification tallies across scanned messages. */
+  classifications?: {
+    deal_related: number;
+    work_related: number;
+    personal: number;
+  };
 }
 
 /**
@@ -270,7 +280,26 @@ export async function scanEmailAccount(accountId: string): Promise<ScanResult> {
     attachmentsFound: 0,
     documentsCreated: 0,
     errors: [],
+    classifications: { deal_related: 0, work_related: 0, personal: 0 },
   };
+
+  // Load classifier context once per scan (active transactions for this user)
+  const activeTransactions = await prisma.transaction.findMany({
+    where: { userId: account.userId, status: { notIn: ["CLOSED", "CANCELLED"] } },
+    select: {
+      id: true,
+      propertyAddress: true,
+      propertyCity: true,
+      mlsNumber: true,
+      buyerName: true,
+      buyerEmail: true,
+      sellerName: true,
+      sellerEmail: true,
+      lenderName: true,
+      titleCompany: true,
+    },
+  });
+  const classifierCtx: ClassifierContext = { activeTransactions, vendorEmails: [] };
 
   // Create scan record
   const scan = await prisma.emailScan.create({
@@ -298,6 +327,24 @@ export async function scanEmailAccount(accountId: string): Promise<ScanResult> {
         if (!detail) continue;
 
         const { subject, from } = parseHeaders(detail.payload.headers);
+
+        // Agent 4 — 3-tier classification of the email itself (not its attachments).
+        // Pure function; we just tally the bucket and log. DB persistence of the
+        // classification lives on CommunicationLog via runCommsScan — this scanner
+        // is attachment-focused so we only record counts here.
+        try {
+          const cls = await classifyEmail(
+            { from, subject, body: detail.snippet || "" },
+            classifierCtx
+          );
+          if (result.classifications) result.classifications[cls.category]++;
+          console.log(
+            `[EmailScanner] Email "${subject}" → ${cls.category} (t${cls.tier}, ${(cls.confidence * 100).toFixed(0)}%) — ${cls.reason}`
+          );
+        } catch (clsErr) {
+          console.error(`[EmailScanner] Classification error:`, clsErr);
+        }
+
         const pdfParts = extractPdfParts(detail.payload.parts);
 
         for (const part of pdfParts) {
@@ -356,18 +403,53 @@ export async function scanEmailAccount(accountId: string): Promise<ScanResult> {
             }
           }
 
-          // Create Document record
+          // Run extraction on the PDF buffer
+          let extractedFields: Record<string, unknown> = {};
+          let extractedText = "";
+          let pageCount: number | undefined;
+          try {
+            // Try text-based extraction first, fall back to Vision
+            const multiResult = await multiPassExtract(pdfBuffer, classification.type, part.filename);
+            extractedFields = multiResult.fields;
+            pageCount = multiResult.pageCount;
+            console.log(`[EmailScanner] Extracted ${Object.keys(extractedFields).length} fields from "${part.filename}"`);
+          } catch (extractErr) {
+            console.error(`[EmailScanner] Extraction failed for "${part.filename}":`, extractErr);
+          }
+
+          // Create Document record with extracted data
           const doc = await prisma.document.create({
             data: {
               name: part.filename,
               type: classification.type,
               category: classification.category,
               classification: JSON.parse(JSON.stringify(classification)),
+              filledData: Object.keys(extractedFields).length > 0 ? JSON.parse(JSON.stringify(extractedFields)) : null,
+              extractedText: extractedText.slice(0, 50000) || null,
               fileSize: pdfBuffer.length,
+              pageCount: pageCount ?? null,
               signatureStatus: "draft",
-              checklistStatus: "uploaded",
+              checklistStatus: Object.keys(extractedFields).length > 0 ? "extracted" : "uploaded",
             },
           });
+
+          // Auto-file to a transaction
+          try {
+            const autoFile = await autoFileDocument({
+              userId: account.userId,
+              extractedFields: extractedFields as Record<string, string | number | boolean | null>,
+              filename: part.filename,
+            });
+            if (autoFile && autoFile.confidence >= 0.5) {
+              await prisma.document.update({
+                where: { id: doc.id },
+                data: { transactionId: autoFile.transactionId },
+              });
+              console.log(`[EmailScanner] Auto-filed "${part.filename}" to "${autoFile.propertyAddress}"`);
+            }
+          } catch (autoFileErr) {
+            console.error(`[EmailScanner] Auto-file failed:`, autoFileErr);
+          }
 
           // Link attachment to document
           await prisma.emailAttachment.update({

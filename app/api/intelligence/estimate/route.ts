@@ -4,6 +4,11 @@ import { NextRequest, NextResponse } from "next/server"
 const AIRE_INTEL_API = process.env.AIRE_INTELLIGENCE_API_URL || "https://aireintel.org"
 
 export async function POST(request: NextRequest) {
+  // Tier gate: INVESTOR only
+  const { requireFeature } = await import("@/lib/auth/subscription-gate");
+  const gateResponse = await requireFeature("cma_engine");
+  if (gateResponse) return gateResponse;
+
   const { userId } = await auth()
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 

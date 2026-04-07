@@ -5,6 +5,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
 import { sealPdf, type SealField, type AuditEntry } from "@/lib/airsign/seal-pdf"
+import { sendSigningInvitation, sendDeclineNotification } from "@/lib/airsign/email"
 
 // GET — Load envelope for signing
 export async function GET(
@@ -37,10 +38,16 @@ export async function GET(
   if (signer.envelope.status === "VOIDED") {
     return NextResponse.json({ error: "This envelope has been voided" }, { status: 410 })
   }
+  if (signer.envelope.status === "DECLINED") {
+    return NextResponse.json({ error: "Signing has been paused — another signer declined this document" }, { status: 410 })
+  }
   if (signer.envelope.status === "COMPLETED") {
     return NextResponse.json({ error: "This envelope is already completed" }, { status: 410 })
   }
   if (signer.envelope.expiresAt && new Date() > signer.envelope.expiresAt) {
+    return NextResponse.json({ error: "This signing link has expired" }, { status: 410 })
+  }
+  if (signer.tokenExpiresAt && new Date() > signer.tokenExpiresAt) {
     return NextResponse.json({ error: "This signing link has expired" }, { status: 410 })
   }
   if (signer.signedAt) {
@@ -130,33 +137,69 @@ export async function POST(
   if (signer.signedAt) return NextResponse.json({ error: "Already signed" }, { status: 410 })
   if (signer.declinedAt) return NextResponse.json({ error: "Already declined" }, { status: 410 })
   if (signer.envelope.status === "VOIDED") return NextResponse.json({ error: "Envelope voided" }, { status: 410 })
+  if (signer.envelope.status === "DECLINED") return NextResponse.json({ error: "Signing paused — another signer declined" }, { status: 410 })
   if (signer.envelope.status === "COMPLETED") return NextResponse.json({ error: "Envelope completed" }, { status: 410 })
   if (signer.envelope.expiresAt && new Date() > signer.envelope.expiresAt) {
     return NextResponse.json({ error: "Expired" }, { status: 410 })
+  }
+  if (signer.tokenExpiresAt && new Date() > signer.tokenExpiresAt) {
+    return NextResponse.json({ error: "This signing link has expired" }, { status: 410 })
   }
 
   const body = await req.json() as {
     action: "sign" | "decline"
     fieldValues?: Record<string, string> // fieldId → value
+    signatureImages?: Record<string, string> // fieldId → PNG data URL
     declineReason?: string
   }
 
   // Handle decline
   if (body.action === "decline") {
-    await prisma.airSignSigner.update({
-      where: { id: signer.id },
-      data: { declinedAt: new Date(), declineReason: body.declineReason ?? "Declined by signer", ipAddress: ip, userAgent: ua },
-    })
-    await prisma.airSignAuditEvent.create({
-      data: {
-        envelopeId: signer.envelope.id,
-        signerId: signer.id,
-        action: "declined",
-        ipAddress: ip,
-        userAgent: ua,
-        metadata: { reason: body.declineReason },
-      },
-    })
+    const reason = (body.declineReason ?? "").trim()
+    if (reason.length < 10) {
+      return NextResponse.json({ error: "A decline reason of at least 10 characters is required" }, { status: 400 })
+    }
+
+    // Mark signer declined + set envelope status to DECLINED (blocks all other signers)
+    await prisma.$transaction([
+      prisma.airSignSigner.update({
+        where: { id: signer.id },
+        data: { declinedAt: new Date(), declineReason: reason, ipAddress: ip, userAgent: ua },
+      }),
+      prisma.airSignEnvelope.update({
+        where: { id: signer.envelope.id },
+        data: { status: "DECLINED" },
+      }),
+      prisma.airSignAuditEvent.create({
+        data: {
+          envelopeId: signer.envelope.id,
+          signerId: signer.id,
+          action: "declined",
+          ipAddress: ip,
+          userAgent: ua,
+          metadata: { reason },
+        },
+      }),
+    ])
+
+    // Notify the envelope creator via Resend (best-effort; don't fail the decline if email fails)
+    try {
+      const creator = await prisma.user.findUnique({ where: { id: signer.envelope.userId } })
+      if (creator?.email) {
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+        await sendDeclineNotification({
+          creatorName: [creator.firstName, creator.lastName].filter(Boolean).join(" ") || creator.email,
+          creatorEmail: creator.email,
+          signerName: signer.name,
+          envelopeName: signer.envelope.name,
+          reason,
+          envelopeUrl: `${appUrl}/airsign/${signer.envelope.id}`,
+        })
+      }
+    } catch (err) {
+      console.error("[AirSign] Decline notification email failed:", err)
+    }
+
     return NextResponse.json({ success: true, action: "declined" })
   }
 
@@ -199,29 +242,65 @@ export async function POST(
       action: "signed",
       ipAddress: ip,
       userAgent: ua,
-      metadata: { fieldsCompleted: Object.keys(body.fieldValues).length },
+      metadata: JSON.parse(JSON.stringify({
+        fieldsCompleted: Object.keys(body.fieldValues).length,
+        signatureImages: body.signatureImages ?? {},
+      })),
     },
   })
 
-  // Check if all signers have now signed → seal the PDF
+  // Check if current order group is done; if yes, either seal or invite the next group
   const allSigners = signer.envelope.signers
-  const otherSigners = allSigners.filter((s) => s.id !== signer.id)
-  const allOthersSigned = otherSigners.every((s) => s.signedAt)
+  const currentOrder = signer.order
+  const currentGroup = allSigners.filter((s) => s.order === currentOrder)
+  const currentGroupDone = currentGroup.every(
+    (s) => s.id === signer.id ? true : (!!s.signedAt || !!s.declinedAt)
+  )
 
-  if (allOthersSigned) {
-    // All signed — seal the envelope
-    try {
-      await sealEnvelope(signer.envelope.id)
-    } catch (err) {
-      console.error("[AirSign] Seal failed:", err)
-      // Don't fail the signing — seal can be retried
+  let allComplete = false
+  if (currentGroupDone) {
+    // Find next order group (not yet signed, not declined)
+    const remaining = allSigners.filter((s) => s.order > currentOrder && !s.signedAt && !s.declinedAt)
+    if (remaining.length > 0) {
+      const nextOrder = Math.min(...remaining.map((s) => s.order))
+      const nextGroup = remaining.filter((s) => s.order === nextOrder)
+
+      // Send invitations to the next batch
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+      const expiresAt = signer.envelope.expiresAt ?? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      for (const nextSigner of nextGroup) {
+        await sendSigningInvitation({
+          signerName: nextSigner.name,
+          signerEmail: nextSigner.email,
+          envelopeName: signer.envelope.name,
+          signingUrl: `${appUrl}/sign/${nextSigner.token}`,
+          expiresAt,
+        })
+        await prisma.airSignAuditEvent.create({
+          data: {
+            envelopeId: signer.envelope.id,
+            signerId: nextSigner.id,
+            action: "invited",
+            metadata: { order: nextSigner.order, reason: "sequential_advance" },
+          },
+        })
+      }
+      console.log(`[AirSign] Order ${currentOrder} done — invited ${nextGroup.length} signer(s) at order ${nextOrder}`)
+    } else {
+      // No more signers — all done, seal
+      allComplete = true
+      try {
+        await sealEnvelope(signer.envelope.id)
+      } catch (err) {
+        console.error("[AirSign] Seal failed:", err)
+      }
     }
   }
 
   return NextResponse.json({
     success: true,
     action: "signed",
-    allComplete: allOthersSigned,
+    allComplete,
   })
 }
 
@@ -241,7 +320,17 @@ async function sealEnvelope(envelopeId: string) {
   if (!pdfRes.ok) throw new Error(`Failed to fetch PDF: ${pdfRes.status}`)
   const pdfBytes = new Uint8Array(await pdfRes.arrayBuffer())
 
-  // Build seal fields from all filled fields
+  // Collect signature images from all signers' audit events
+  const sigImages: Record<string, string> = {}
+  for (const event of envelope.auditEvents) {
+    if (event.action === "signed" && event.metadata) {
+      const meta = event.metadata as Record<string, unknown>
+      const images = meta.signatureImages as Record<string, string> | undefined
+      if (images) Object.assign(sigImages, images)
+    }
+  }
+  // Signature images are already captured in audit events above
+
   const sealFields: SealField[] = envelope.fields
     .filter((f) => f.value && f.filledAt)
     .map((f) => ({
@@ -252,6 +341,7 @@ async function sealEnvelope(envelopeId: string) {
       widthPercent: f.widthPercent,
       heightPercent: f.heightPercent,
       value: f.value!,
+      imageDataUrl: sigImages[f.id] || undefined,
       signerName: f.signer?.name,
     }))
 
@@ -300,4 +390,25 @@ async function sealEnvelope(envelopeId: string) {
   })
 
   console.log(`[AirSign] Envelope ${envelopeId} sealed and completed`)
+
+  // Fire internal webhook for transaction integration
+  try {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+    const secret = process.env.AIRSIGN_INTERNAL_SECRET
+    await fetch(`${appUrl}/api/airsign/webhook`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(secret ? { Authorization: `Bearer ${secret}` } : {}),
+      },
+      body: JSON.stringify({
+        event: "envelope.completed",
+        envelopeId,
+        sealedUrl,
+      }),
+    })
+  } catch (err) {
+    // Non-fatal — webhook is best-effort
+    console.warn("[AirSign] Webhook dispatch failed:", err)
+  }
 }

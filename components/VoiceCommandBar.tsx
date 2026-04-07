@@ -1,16 +1,22 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import VoicePreview from "@/components/voice/VoicePreview";
 
 interface VoiceResult {
-  id: string;
+  voiceCommandId: string;
+  id?: string; // backward compat
   intent: string;
   entities: Record<string, string>;
   response: string;
-  action?: string;
+  action?: string | null;
   confidence: number;
   needsClarification?: boolean;
   clarification_options?: string[];
+  clarificationOptions?: string[];
+  englishPreview?: string | null;
+  requiresConfirmation?: boolean;
+  timing?: { totalMs: number; classifyMs: number };
 }
 
 interface ExecutionResult {
@@ -98,9 +104,10 @@ export default function VoiceCommandBar() {
 
     setProcessing(true);
     setError(null);
+    setExecutionResult(null);
 
     try {
-      const res = await fetch("/api/voice-command", {
+      const res = await fetch("/api/voice-command/v2/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ transcript: command }),
@@ -110,9 +117,55 @@ export default function VoiceCommandBar() {
         throw new Error("Voice command processing failed");
       }
 
-      const data = await res.json();
-      setResult(data);
-    } catch (err) {
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error("No response body");
+
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        let currentEvent = "";
+        for (const line of lines) {
+          if (line.startsWith("event: ")) {
+            currentEvent = line.slice(7);
+          } else if (line.startsWith("data: ") && currentEvent) {
+            try {
+              const data = JSON.parse(line.slice(6));
+              if (currentEvent === "intent") {
+                // Show intent immediately for perceived speed
+                setResult((prev) => ({
+                  voiceCommandId: prev?.voiceCommandId || "",
+                  intent: data.intent,
+                  entities: prev?.entities || {},
+                  response: "Processing...",
+                  confidence: data.confidence,
+                  needsClarification: data.needsClarification,
+                }));
+              } else if (currentEvent === "response") {
+                setResult((prev) => prev ? {
+                  ...prev,
+                  response: data.response,
+                  action: data.action,
+                  clarificationOptions: data.clarificationOptions,
+                } : null);
+              } else if (currentEvent === "complete") {
+                setResult(data);
+              } else if (currentEvent === "error") {
+                setError(data.message);
+              }
+            } catch { /* skip malformed events */ }
+            currentEvent = "";
+          }
+        }
+      }
+    } catch {
       setError("Failed to process voice command. Please try again.");
     } finally {
       setProcessing(false);
@@ -129,7 +182,7 @@ export default function VoiceCommandBar() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          voiceCommandId: result.id,
+          voiceCommandId: result.voiceCommandId || result.id,
           intent: result.intent,
           entities: result.entities,
           confirmed,
@@ -167,21 +220,56 @@ export default function VoiceCommandBar() {
     }
   }
 
+  const showPreview =
+    !!result &&
+    result.requiresConfirmation === true &&
+    !!result.englishPreview &&
+    !executionResult;
+
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50">
-      {/* Result Card */}
-      {result && (
+      {/* English Preview Card — shown for mutating intents before execution */}
+      {showPreview && result && (
+        <div className="max-w-3xl mx-auto px-6 mb-2">
+          <VoicePreview
+            intent={result.intent}
+            preview={result.englishPreview as string}
+            executing={executing}
+            onAccept={() => executeVoiceAction(true)}
+            onEdit={() => {
+              // Let the user re-speak or edit. Keep the transcript in the box.
+              setResult(null);
+              setExecutionResult(null);
+            }}
+            onCancel={() => {
+              setResult(null);
+              setExecutionResult(null);
+              setTranscript("");
+            }}
+          />
+        </div>
+      )}
+
+      {/* Result Card (for non-preview intents or post-execution messages) */}
+      {result && !showPreview && (
         <div className="max-w-7xl mx-auto px-6 mb-2">
           <div className="bg-zinc-800 border border-zinc-700 rounded-xl p-4 shadow-2xl">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-xs text-blue-400 font-semibold uppercase tracking-wider">
-                  {result.intent}
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className="text-xs text-blue-400 font-semibold uppercase tracking-wider">
+                    {result.intent}
+                  </p>
+                  {result.timing && (
+                    <span className="text-[10px] text-zinc-500 font-mono">
+                      {(result.timing.totalMs / 1000).toFixed(1)}s
+                    </span>
+                  )}
+                </div>
                 <p className="text-white mt-1">{result.response}</p>
-                {result.needsClarification && result.clarification_options && (
+                {result.needsClarification && (result.clarification_options || result.clarificationOptions) && (
                   <div className="mt-2 flex flex-wrap gap-2">
-                    {result.clarification_options.map((opt, i) => (
+                    {(result.clarificationOptions || result.clarification_options || []).map((opt, i) => (
                       <button
                         key={i}
                         onClick={() => {

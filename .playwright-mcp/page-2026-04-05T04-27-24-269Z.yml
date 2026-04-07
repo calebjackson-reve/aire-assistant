@@ -1,0 +1,120 @@
+- generic [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e133] [cursor=pointer]:
+    - img [ref=e134]
+  - alert [ref=e137]
+  - generic [ref=e138]:
+    - complementary [ref=e139]:
+      - link "A AIRE" [ref=e141] [cursor=pointer]:
+        - /url: /aire
+        - generic [ref=e142]: A
+        - generic [ref=e143]: AIRE
+      - navigation [ref=e144]:
+        - link "Dashboard" [ref=e145] [cursor=pointer]:
+          - /url: /aire
+          - img [ref=e146]
+          - text: Dashboard
+        - link "Transactions" [ref=e151] [cursor=pointer]:
+          - /url: /aire/transactions
+          - img [ref=e152]
+          - text: Transactions
+        - link "Contracts" [ref=e154] [cursor=pointer]:
+          - /url: /aire/contracts
+          - img [ref=e155]
+          - text: Contracts
+        - link "AirSign" [ref=e158] [cursor=pointer]:
+          - /url: /airsign
+          - img [ref=e159]
+          - text: AirSign
+        - link "Brief" [ref=e161] [cursor=pointer]:
+          - /url: /aire/morning-brief
+          - img [ref=e162]
+          - text: Brief
+        - link "Compliance" [ref=e168] [cursor=pointer]:
+          - /url: /aire/compliance
+          - img [ref=e169]
+          - text: Compliance
+        - link "Intelligence" [ref=e171] [cursor=pointer]:
+          - /url: /aire/intelligence
+          - img [ref=e172]
+          - text: Intelligence
+        - link "Contacts" [ref=e173] [cursor=pointer]:
+          - /url: /aire/relationships
+          - img [ref=e174]
+          - text: Contacts
+        - link "Comms" [ref=e179] [cursor=pointer]:
+          - /url: /aire/communications
+          - img [ref=e180]
+          - text: Comms
+        - link "Email" [ref=e182] [cursor=pointer]:
+          - /url: /aire/email
+          - img [ref=e183]
+          - text: Email
+        - link "Monitor" [ref=e186] [cursor=pointer]:
+          - /url: /aire/monitoring
+          - img [ref=e187]
+          - text: Monitor
+        - link "Voice" [ref=e189] [cursor=pointer]:
+          - /url: /aire/voice-analytics
+          - img [ref=e190]
+          - text: Voice
+        - link "Data" [ref=e193] [cursor=pointer]:
+          - /url: /aire/data-health
+          - img [ref=e194]
+          - text: Data
+        - link "Settings" [ref=e198] [cursor=pointer]:
+          - /url: /aire/settings
+          - img [ref=e199]
+          - text: Settings
+        - link "Billing" [ref=e202] [cursor=pointer]:
+          - /url: /billing
+          - img [ref=e203]
+          - text: Billing
+      - link "Back to site" [ref=e206] [cursor=pointer]:
+        - /url: /
+        - img [ref=e207]
+        - text: Back to site
+    - main [ref=e209]:
+      - generic [ref=e211]:
+        - generic [ref=e212]:
+          - generic [ref=e213]:
+            - paragraph [ref=e214]: AirSign
+            - heading "554" [level=1] [ref=e215]
+          - generic [ref=e216]: DRAFT
+        - generic [ref=e217]:
+          - paragraph [ref=e218]: Place signature fields on the document
+          - generic [ref=e219]:
+            - generic [ref=e220]:
+              - generic [ref=e221]:
+                - generic [ref=e222]: "Place Field:"
+                - button "Signature" [active] [ref=e223]
+                - button "Initials" [ref=e224]
+                - button "Date" [ref=e225]
+                - button "Text" [ref=e226]
+                - button "Checkbox" [ref=e227]
+                - generic [ref=e282]: Click on PDF to place
+              - generic [ref=e228]:
+                - generic [ref=e229]: "Assign to:"
+                - button "ccaleb jackson" [ref=e230]
+              - generic [ref=e270]:
+                - button "← Prev" [disabled] [ref=e271]
+                - generic [ref=e272]: Page 1 / 11
+                - button "Next →" [ref=e273]
+            - generic [ref=e237]:
+              - generic [ref=e238]:
+                - paragraph [ref=e239]: Fields (0)
+                - paragraph [ref=e240]: No fields placed yet. Select a type above and click on the PDF.
+              - button "Save 0 Fields" [disabled] [ref=e241]
+        - generic [ref=e244]:
+          - button "Send for signing" [ref=e245]
+          - generic [ref=e246]:
+            - paragraph [ref=e247]: Signers
+            - generic [ref=e249]:
+              - paragraph [ref=e251]: ccaleb jackson
+              - paragraph [ref=e252]: cjjfrancis96@gmail.com · SIGNER
+          - generic [ref=e253]:
+            - paragraph [ref=e254]: Fields
+            - paragraph [ref=e255]: 0 total
+            - paragraph [ref=e256]: 0 completed · 0 pending
+          - generic [ref=e257]:
+            - paragraph [ref=e258]: Audit trail
+            - generic [ref=e260]: createdApr 4, 10:38 PM

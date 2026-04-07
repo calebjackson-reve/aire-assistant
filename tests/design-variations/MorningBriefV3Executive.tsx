@@ -90,7 +90,7 @@ export function MorningBriefV3({ brief, dateStr }: { brief: BriefData | null; da
             <p className="text-[#6b7d52] text-[10px] font-medium tracking-[0.25em] uppercase">
               AIRE Intelligence
             </p>
-            <h1 className="font-[family-name:var(--font-newsreader)] italic text-[#1e2416] text-3xl mt-1">
+            <h1 className="font-[family-name:var(--font-cormorant)] italic text-[#1e2416] text-3xl mt-1">
               Morning Brief
             </h1>
           </div>

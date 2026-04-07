@@ -1,0 +1,454 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - navigation [ref=e4]:
+        - generic [ref=e6]:
+          - link "AIRE" [ref=e8] [cursor=pointer]:
+            - /url: /
+            - img [ref=e10]
+            - generic [ref=e18]: AIRE
+          - generic:
+            - link "Suite" [ref=e19] [cursor=pointer]:
+              - /url: "#suite"
+              - generic [ref=e20]: Suite
+            - link "Platform" [ref=e21] [cursor=pointer]:
+              - /url: "#platform"
+              - generic [ref=e22]: Platform
+            - link "AirSign" [ref=e23] [cursor=pointer]:
+              - /url: /airsign
+              - generic [ref=e24]: AirSign
+            - link "Pricing" [ref=e25] [cursor=pointer]:
+              - /url: "#pricing"
+              - generic [ref=e26]: Pricing
+          - link "Get Started" [ref=e28] [cursor=pointer]:
+            - /url: /sign-up
+            - generic [ref=e29]: Get Started
+      - generic [ref=e30]:
+        - generic [ref=e31]:
+          - heading "AIRE" [level=1] [ref=e32]
+          - paragraph [ref=e33]: Every deadline, document, and decision — automated with intelligence built for Louisiana real estate.
+          - link "S t a r t E x p e r i e n c e" [ref=e35] [cursor=pointer]:
+            - /url: /sign-up
+            - generic [ref=e36]:
+              - generic [ref=e37]: S
+              - generic [ref=e38]: t
+              - generic [ref=e39]: a
+              - generic [ref=e40]: r
+              - generic [ref=e41]: t
+              - generic [ref=e43]: E
+              - generic [ref=e44]: x
+              - generic [ref=e45]: p
+              - generic [ref=e46]: e
+              - generic [ref=e47]: r
+              - generic [ref=e48]: i
+              - generic [ref=e49]: e
+              - generic [ref=e50]: "n"
+              - generic [ref=e51]: c
+              - generic [ref=e52]: e
+            - img [ref=e53]
+        - generic [ref=e55]:
+          - generic [ref=e56]: Interact
+          - img [ref=e58]
+      - generic [ref=e65]:
+        - generic [ref=e66]:
+          - generic [ref=e67]:
+            - img [ref=e69]
+            - generic [ref=e77]: Morning Brief — 789 Live Oak Blvd
+          - generic [ref=e79]: complete
+        - generic [ref=e81]:
+          - generic [ref=e82]:
+            - generic [ref=e83]:
+              - paragraph [ref=e84]: Tasks
+              - generic [ref=e85]: 2/8
+            - generic [ref=e88]:
+              - button "Contract Executed Mar 28" [ref=e90] [cursor=pointer]:
+                - img [ref=e91]
+                - generic [ref=e93]: Contract Executed
+                - generic [ref=e94]: Mar 28
+              - button "Earnest Money Deposited Mar 29" [ref=e96] [cursor=pointer]:
+                - img [ref=e97]
+                - generic [ref=e99]: Earnest Money Deposited
+                - generic [ref=e100]: Mar 29
+              - button "Home Inspection Apr 1" [ref=e102] [cursor=pointer]:
+                - img [ref=e103]
+                - generic [ref=e105]: Home Inspection
+                - generic [ref=e106]: Apr 1
+              - generic [ref=e107]:
+                - button "DDI Deadline Apr 2" [ref=e108] [cursor=pointer]:
+                  - img [ref=e109]
+                  - generic [ref=e111]: DDI Deadline
+                  - generic [ref=e112]: Apr 2
+                - paragraph [ref=e115]: Buyer must submit objections or waive. La. R.S. 9:3198.
+              - button "Appraisal Ordered Apr 5" [ref=e117] [cursor=pointer]:
+                - img [ref=e118]
+                - generic [ref=e120]: Appraisal Ordered
+                - generic [ref=e121]: Apr 5
+              - button "Title Search Apr 10" [ref=e123] [cursor=pointer]:
+                - img [ref=e124]
+                - generic [ref=e126]: Title Search
+                - generic [ref=e127]: Apr 10
+              - button "Final Walkthrough May 13" [ref=e129] [cursor=pointer]:
+                - img [ref=e130]
+                - generic [ref=e132]: Final Walkthrough
+                - generic [ref=e133]: May 13
+              - button "Act of Sale May 15" [ref=e135] [cursor=pointer]:
+                - img [ref=e136]
+                - generic [ref=e138]: Act of Sale
+                - generic [ref=e139]: May 15
+          - generic [ref=e140]:
+            - generic [ref=e141]:
+              - paragraph [ref=e142]: Contract Files
+              - generic [ref=e143]: 5 docs
+            - generic [ref=e144]:
+              - generic [ref=e145] [cursor=pointer]:
+                - generic [ref=e146]:
+                  - img [ref=e147]
+                  - generic [ref=e150]:
+                    - generic [ref=e151]: Purchase Agreement
+                    - generic [ref=e152]: LREC — Mar 28
+                  - generic [ref=e153]: Extracted
+                - generic [ref=e155]:
+                  - paragraph [ref=e156]: Extracted Fields
+                  - generic [ref=e157]:
+                    - generic [ref=e158]: Property
+                    - generic [ref=e159]: 789 Live Oak Blvd
+                  - generic [ref=e160]:
+                    - generic [ref=e161]: Price
+                    - generic [ref=e162]: $425,000
+                  - generic [ref=e163]:
+                    - generic [ref=e164]: Buyer
+                    - generic [ref=e165]: Marcus Williams
+                  - generic [ref=e166]:
+                    - generic [ref=e167]: Closing
+                    - generic [ref=e168]: May 15, 2026
+                  - generic [ref=e169]:
+                    - generic [ref=e170]: Confidence
+                    - generic [ref=e171]: 97%
+              - generic [ref=e173] [cursor=pointer]:
+                - img [ref=e174]
+                - generic [ref=e177]:
+                  - generic [ref=e178]: Property Disclosure
+                  - generic [ref=e179]: LREC — Mar 28
+                - generic [ref=e180]: Extracted
+              - generic [ref=e182] [cursor=pointer]:
+                - img [ref=e183]
+                - generic [ref=e186]:
+                  - generic [ref=e187]: Lead Paint Addendum
+                  - generic [ref=e188]: Federal — Mar 28
+                - generic [ref=e189]: Signed
+              - generic [ref=e191] [cursor=pointer]:
+                - img [ref=e192]
+                - generic [ref=e195]:
+                  - generic [ref=e196]: Inspection Report
+                  - generic [ref=e197]: Third Party — Apr 1
+                - generic [ref=e198]: Pending
+              - generic [ref=e200] [cursor=pointer]:
+                - img [ref=e201]
+                - generic [ref=e204]:
+                  - generic [ref=e205]: Appraisal Report
+                  - generic [ref=e206]: Lender — Apr 5
+                - generic [ref=e207]: Pending
+          - generic [ref=e208]:
+            - generic [ref=e209]:
+              - paragraph [ref=e210]: April 2026
+              - generic [ref=e211]:
+                - generic [ref=e213]: S
+                - generic [ref=e215]: M
+                - generic [ref=e217]: T
+                - generic [ref=e219]: W
+                - generic [ref=e221]: T
+                - generic [ref=e223]: F
+                - generic [ref=e225]: S
+                - generic [ref=e230]: "1"
+                - generic [ref=e232]: "2"
+                - generic [ref=e234]: "3"
+                - generic [ref=e236]: "4"
+                - generic [ref=e238]: "5"
+                - generic [ref=e240]: "6"
+                - generic [ref=e242]: "7"
+                - generic [ref=e244]: "8"
+                - generic [ref=e246]: "9"
+                - generic [ref=e248]: "10"
+                - generic [ref=e250]: "11"
+                - generic [ref=e252]: "12"
+                - generic [ref=e254]: "13"
+                - generic [ref=e256]: "14"
+                - generic [ref=e258]: "15"
+                - generic [ref=e260]: "16"
+                - generic [ref=e262]: "17"
+                - generic [ref=e264]: "18"
+                - generic [ref=e266]: "19"
+                - generic [ref=e268]: "20"
+                - generic [ref=e270]: "21"
+                - generic [ref=e272]: "22"
+                - generic [ref=e274]: "23"
+                - generic [ref=e276]: "24"
+                - generic [ref=e278]: "25"
+                - generic [ref=e280]: "26"
+                - generic [ref=e282]: "27"
+                - generic [ref=e284]: "28"
+                - generic [ref=e286]: "29"
+                - generic [ref=e288]: "30"
+            - generic [ref=e290]:
+              - generic [ref=e291]:
+                - paragraph [ref=e292]: Inbox
+                - generic [ref=e293]: "2"
+              - generic [ref=e294]:
+                - button "Gulf Title 2:15 PM Commitment ready" [ref=e296] [cursor=pointer]:
+                  - generic [ref=e297]:
+                    - generic [ref=e299]: Gulf Title
+                    - generic [ref=e300]: 2:15 PM
+                  - paragraph [ref=e301]: Commitment ready
+                - button "M. Williams 1:42 PM Counter at $418K" [ref=e303] [cursor=pointer]:
+                  - generic [ref=e304]:
+                    - generic [ref=e306]: M. Williams
+                    - generic [ref=e307]: 1:42 PM
+                  - paragraph [ref=e308]: Counter at $418K
+                - button "Bayou Lending 11:30 AM Appraisal 4/5" [ref=e310] [cursor=pointer]:
+                  - generic [ref=e311]:
+                    - generic [ref=e312]: Bayou Lending
+                    - generic [ref=e313]: 11:30 AM
+                  - paragraph [ref=e314]: Appraisal 4/5
+        - generic [ref=e315]:
+          - generic [ref=e316]:
+            - generic [ref=e317]: 8 Tasks
+            - generic [ref=e318]: 5 Documents
+            - generic [ref=e319]: 3 Emails
+          - generic [ref=e320]: Click any row to explore
+      - generic [ref=e324]:
+        - generic [ref=e325]:
+          - generic [ref=e328]: The AIRE Suite
+          - generic [ref=e329]:
+            - heading "Six tools. One platform." [level=2] [ref=e330]:
+              - text: Six tools.
+              - text: One platform.
+            - link "S e e A l l T o o l s" [ref=e331] [cursor=pointer]:
+              - /url: "#platform"
+              - generic [ref=e332]:
+                - img [ref=e333]
+                - generic [ref=e336]:
+                  - generic [ref=e337]: S
+                  - generic [ref=e338]: e
+                  - generic [ref=e339]: e
+                  - generic [ref=e341]: A
+                  - generic [ref=e342]: l
+                  - generic [ref=e343]: l
+                  - generic [ref=e345]: T
+                  - generic [ref=e346]: o
+                  - generic [ref=e347]: o
+                  - generic [ref=e348]: l
+                  - generic [ref=e349]: s
+        - generic [ref=e350]:
+          - 'link "AIRE Brief Know what to do before you open your laptop. Daily AI briefing: pipeline value, deadlines, relationship hit list, and one-click action items. Explore" [ref=e352] [cursor=pointer]':
+            - /url: /aire/morning-brief
+            - generic [ref=e381]:
+              - generic [ref=e382]:
+                - img [ref=e384]
+                - heading "AIRE Brief" [level=3] [ref=e389]
+              - paragraph [ref=e390]: Know what to do before you open your laptop.
+              - paragraph [ref=e391]: "Daily AI briefing: pipeline value, deadlines, relationship hit list, and one-click action items."
+              - generic [ref=e392]:
+                - generic [ref=e395]:
+                  - generic [ref=e396]: Explore
+                  - generic [ref=e397]: Explore
+                - img [ref=e398]
+          - link "AIRE Sign PDF to signed contract in under 60 seconds. Upload a contract — 34 fields extracted instantly. Then route for e-signatures with LREC forms pre-loaded. Explore" [ref=e401] [cursor=pointer]:
+            - /url: /airsign
+            - generic [ref=e418]:
+              - generic [ref=e419]:
+                - img [ref=e421]
+                - heading "AIRE Sign" [level=3] [ref=e426]
+              - paragraph [ref=e427]: PDF to signed contract in under 60 seconds.
+              - paragraph [ref=e428]: Upload a contract — 34 fields extracted instantly. Then route for e-signatures with LREC forms pre-loaded.
+              - generic [ref=e429]:
+                - generic [ref=e432]:
+                  - generic [ref=e433]: Explore
+                  - generic [ref=e434]: Explore
+                - img [ref=e435]
+          - link "AIRE Assist A TC that never misses a deadline. Ever. Automated deadline enforcement, party coordination, compliance checks from contract to Act of Sale. Explore" [ref=e438] [cursor=pointer]:
+            - /url: /aire
+            - generic [ref=e443]:
+              - generic [ref=e444]:
+                - img [ref=e446]
+                - heading "AIRE Assist" [level=3] [ref=e449]
+              - paragraph [ref=e450]: A TC that never misses a deadline. Ever.
+              - paragraph [ref=e451]: Automated deadline enforcement, party coordination, compliance checks from contract to Act of Sale.
+              - generic [ref=e452]:
+                - generic [ref=e455]:
+                  - generic [ref=e456]: Explore
+                  - generic [ref=e457]: Explore
+                - img [ref=e458]
+          - link "AIRE Insight Baton Rouge market data you can actually use. Hyper-local intelligence — median prices, DOM trends, inventory — updated daily for East Baton Rouge Parish. Explore" [ref=e461] [cursor=pointer]:
+            - /url: /aire/intelligence
+            - generic [ref=e466]:
+              - generic [ref=e467]:
+                - img [ref=e469]
+                - heading "AIRE Insight" [level=3] [ref=e471]
+              - paragraph [ref=e472]: Baton Rouge market data you can actually use.
+              - paragraph [ref=e473]: Hyper-local intelligence — median prices, DOM trends, inventory — updated daily for East Baton Rouge Parish.
+              - generic [ref=e474]:
+                - generic [ref=e477]:
+                  - generic [ref=e478]: Explore
+                  - generic [ref=e479]: Explore
+                - img [ref=e480]
+          - link "$312K +4.2% AIRE CMA Run comps that win listings. CMA reports powered by real MLS data. Buyers see fair value. Sellers see pricing strategy. Explore" [ref=e483] [cursor=pointer]:
+            - /url: /tools
+            - generic [ref=e485]:
+              - generic [ref=e488]:
+                - text: $312K
+                - generic [ref=e489]:
+                  - img [ref=e490]
+                  - generic [ref=e493]: +4.2%
+              - generic [ref=e494]:
+                - generic [ref=e495]:
+                  - img [ref=e497]
+                  - heading "AIRE CMA" [level=3] [ref=e499]
+                - paragraph [ref=e500]: Run comps that win listings.
+                - paragraph [ref=e501]: CMA reports powered by real MLS data. Buyers see fair value. Sellers see pricing strategy.
+                - generic [ref=e502]:
+                  - generic [ref=e505]:
+                    - generic [ref=e506]: Explore
+                    - generic [ref=e507]: Explore
+                  - img [ref=e508]
+          - link "AIRE Toolkit Calculators your clients will actually bookmark. Mortgage estimator, ROI projector, rent vs. buy, closing costs, affordability — all embedded on your site. Explore" [ref=e511] [cursor=pointer]:
+            - /url: /tools
+            - generic [ref=e528]:
+              - generic [ref=e529]:
+                - img [ref=e531]
+                - heading "AIRE Toolkit" [level=3] [ref=e533]
+              - paragraph [ref=e534]: Calculators your clients will actually bookmark.
+              - paragraph [ref=e535]: Mortgage estimator, ROI projector, rent vs. buy, closing costs, affordability — all embedded on your site.
+              - generic [ref=e536]:
+                - generic [ref=e539]:
+                  - generic [ref=e540]: Explore
+                  - generic [ref=e541]: Explore
+                - img [ref=e542]
+      - generic [ref=e547]:
+        - generic [ref=e549]:
+          - generic [ref=e552]: AIRE Sign
+          - heading "From PDF to signed. 34 fields. 60 seconds." [level=2] [ref=e553]
+          - paragraph [ref=e554]: Upload a purchase agreement. AIRE extracts every party, date, price, and deadline — then routes it for e-signatures with LREC forms pre-loaded. No manual entry. No missed fields.
+          - link "T r y A I R E S i g n" [ref=e555] [cursor=pointer]:
+            - /url: /airsign
+            - generic [ref=e556]:
+              - img [ref=e557]
+              - generic [ref=e560]:
+                - generic [ref=e561]: T
+                - generic [ref=e562]: r
+                - generic [ref=e563]: "y"
+                - generic [ref=e565]: A
+                - generic [ref=e566]: I
+                - generic [ref=e567]: R
+                - generic [ref=e568]: E
+                - generic [ref=e570]: S
+                - generic [ref=e571]: i
+                - generic [ref=e572]: g
+                - generic [ref=e573]: "n"
+        - generic [ref=e582]: aire sign.aire.app
+      - generic [ref=e589]:
+        - generic [ref=e591]:
+          - paragraph [ref=e592]: Pricing
+          - heading "Simple, transparent pricing" [level=2] [ref=e593]
+          - paragraph [ref=e594]: Start free. Upgrade when you're ready. No contracts, cancel anytime.
+        - generic [ref=e596]:
+          - generic [ref=e597]:
+            - generic [ref=e598]:
+              - heading "Select a Plan" [level=2] [ref=e599]
+              - paragraph [ref=e600]: A TC costs $3,000+/month. AIRE never sleeps — for less than a closing gift.
+            - generic [ref=e601]:
+              - button "Monthly" [ref=e602] [cursor=pointer]: Monthly
+              - button "Yearly 20% off" [ref=e604] [cursor=pointer]:
+                - generic [ref=e605]: Yearly
+                - generic [ref=e606]: 20% off
+          - generic [ref=e607]:
+            - generic [ref=e611] [cursor=pointer]:
+              - generic [ref=e615]:
+                - heading "Free" [level=3] [ref=e616]
+                - paragraph [ref=e617]: try it out
+              - generic [ref=e618]:
+                - generic [ref=e619]: $0
+                - generic [ref=e620]: / mo
+            - generic [ref=e623] [cursor=pointer]:
+              - generic [ref=e624]:
+                - generic [ref=e629]:
+                  - heading "Pro" [level=3] [ref=e630]
+                  - paragraph [ref=e631]: solo agent
+                - generic [ref=e632]:
+                  - generic [ref=e634]:
+                    - generic [ref=e637]: $
+                    - generic [ref=e640]:
+                      - generic [ref=e642]: "9"
+                      - generic [ref=e644]: "7"
+                  - generic [ref=e645]: / mo
+              - generic [ref=e647]:
+                - generic [ref=e648]:
+                  - generic [ref=e649]:
+                    - img [ref=e650]
+                    - generic [ref=e652]: Unlimited transactions
+                  - generic [ref=e653]:
+                    - img [ref=e654]
+                    - generic [ref=e656]: AIRE Sign + e-signatures
+                  - generic [ref=e657]:
+                    - img [ref=e658]
+                    - generic [ref=e660]: AIRE Assist TC automation
+                  - generic [ref=e661]:
+                    - img [ref=e662]
+                    - generic [ref=e664]: AIRE Brief every morning
+                  - generic [ref=e665]:
+                    - img [ref=e666]
+                    - generic [ref=e668]: AIRE Insight market data
+                  - generic [ref=e669]:
+                    - img [ref=e670]
+                    - generic [ref=e672]: AIRE CMA reports
+                  - generic [ref=e673]:
+                    - img [ref=e674]
+                    - generic [ref=e676]: Priority support
+                - link "G o P r o" [ref=e678]:
+                  - /url: /sign-up
+                  - generic [ref=e679]:
+                    - generic [ref=e680]: G
+                    - generic [ref=e681]: o
+                    - generic [ref=e683]: P
+                    - generic [ref=e684]: r
+                    - generic [ref=e685]: o
+            - generic [ref=e689] [cursor=pointer]:
+              - generic [ref=e693]:
+                - heading "Investor" [level=3] [ref=e694]
+                - paragraph [ref=e695]: teams & portfolios
+              - generic [ref=e696]:
+                - generic [ref=e698]:
+                  - generic [ref=e701]: $
+                  - generic [ref=e704]:
+                    - generic [ref=e706]: "1"
+                    - generic [ref=e708]: "9"
+                    - generic [ref=e710]: "7"
+                - generic [ref=e711]: / mo
+      - generic [ref=e713]:
+        - generic [ref=e714]:
+          - generic [ref=e715]: LREC
+          - generic [ref=e716]: GBRAR
+          - generic [ref=e717]: MLS
+          - generic [ref=e718]: DocuSign
+          - generic [ref=e719]: Dotloop
+          - generic [ref=e720]: Louisiana R.S.
+        - generic [ref=e721]:
+          - generic [ref=e722]:
+            - generic [ref=e723]:
+              - img [ref=e725]
+              - generic [ref=e733]: AIRE
+            - paragraph [ref=e734]: AI-powered transaction intelligence for Louisiana real estate professionals.
+          - generic [ref=e735]:
+            - link "Suite" [ref=e736] [cursor=pointer]:
+              - /url: "#suite"
+            - link "AIRE Sign" [ref=e737] [cursor=pointer]:
+              - /url: /airsign
+            - link "Pricing" [ref=e738] [cursor=pointer]:
+              - /url: "#pricing"
+            - link "Demo" [ref=e739] [cursor=pointer]:
+              - /url: /demo
+            - link "Sign In" [ref=e740] [cursor=pointer]:
+              - /url: /sign-in
+        - generic [ref=e741]:
+          - paragraph [ref=e742]: © 2026 AIRE Intelligence. Baton Rouge, LA.
+          - paragraph [ref=e743]: Built for agents who close.
+  - alert [ref=e744]

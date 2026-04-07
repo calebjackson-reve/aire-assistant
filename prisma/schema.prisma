@@ -39,6 +39,19 @@ model User {
   stripeCustomerId String?  @unique
   subscriptionId  String?
   subscriptionStatus String?
+
+  // Onboarding (Day One)
+  onboarded               Boolean   @default(false)
+  onboardedAt             DateTime?
+  onboardingData          Json?
+  avatarUrl               String?
+  brokerageName           String?
+  licenseNumber           String?
+  defaultCommissionSplit  Decimal?
+  preferredTitleCompany   String?
+  signatureData           String?   @db.Text
+  voiceProfile            Json?     // extracted writing-style profile for AI reply tone matching
+
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -51,6 +64,8 @@ model User {
   morningBriefs   MorningBrief[]
   airSignEnvelopes AirSignEnvelope[]
   emailAccounts   EmailAccount[]
+  communicationLogs CommunicationLog[]
+  missedCallLogs  MissedCallLog[]
 }
 
 // ============== PHASE 2: Transaction Core ==============
@@ -371,6 +386,7 @@ enum EnvelopeStatus {
   SENT
   IN_PROGRESS
   COMPLETED
+  DECLINED
   VOIDED
   EXPIRED
 }
@@ -425,6 +441,7 @@ model AirSignSigner {
 
   // Signing state
   token           String         @unique @default(cuid()) // unique link token for /sign/[token]
+  tokenExpiresAt  DateTime?      // per-signer token expiration (default +14d on create)
   viewedAt        DateTime?
   signedAt        DateTime?
   declinedAt      DateTime?
@@ -545,4 +562,77 @@ model EmailAttachment {
 
   @@index([scanId])
   @@index([emailId])
+}
+
+// ============== MONITORING SYSTEM ==============
+
+model AgentActivity {
+  id        String   @id @default(cuid())
+  agent     String   // "agent-1" | "agent-2" | "agent-3" | "agent-4"
+  action    String   // "phase_complete" | "error" | "blocker" | "metric" | "started" | "idle"
+  phase     Int?
+  message   String   @db.Text
+  metadata  Json?
+  severity  String   @default("info") // "info" | "warn" | "error" | "critical"
+  createdAt DateTime @default(now())
+
+  @@index([agent, createdAt])
+  @@index([severity, createdAt])
+}
+
+model BuildMetric {
+  id        String   @id @default(cuid())
+  name      String   // "api_routes" | "type_errors" | "build_time" | "phase_progress"
+  value     Float
+  agent     String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([name, createdAt])
+}
+
+// ============== COMMUNICATION MONITOR ==============
+
+model CommunicationLog {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  contactId       String?
+  channel         String    // "email" | "sms" | "call"
+  direction       String    // "inbound" | "outbound"
+  externalId      String?   // Gmail message ID, Twilio SID, etc.
+  threadId        String?   // Gmail thread ID for grouping
+  fromAddress     String    // email, phone number
+  toAddress       String
+  subject         String?
+  bodyPreview     String?   @db.Text
+  sentAt          DateTime
+  status          String    @default("delivered") // "delivered" | "read" | "replied" | "missed" | "unanswered"
+  respondedAt     DateTime?
+  responseLogId   String?   // ID of the reply CommunicationLog
+  draftReply      String?   @db.Text
+  metadata        Json?
+  createdAt       DateTime  @default(now())
+
+  @@unique([externalId])
+  @@index([userId, status, sentAt])
+  @@index([userId, contactId, sentAt])
+  @@index([threadId])
+  @@index([userId, channel, direction, sentAt])
+}
+
+model MissedCallLog {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  callerPhone String
+  callerName  String?
+  contactId   String?
+  callTime    DateTime
+  duration    Int      @default(0) // seconds, 0 = missed
+  returned    Boolean  @default(false)
+  returnedAt  DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([userId, returned, callTime])
 }

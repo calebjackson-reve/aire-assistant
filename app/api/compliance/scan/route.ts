@@ -29,6 +29,10 @@ export interface ComplianceScanResult {
 }
 
 export async function GET() {
+  const { requireFeature } = await import("@/lib/auth/subscription-gate")
+  const gate = await requireFeature("compliance_scan")
+  if (gate) return gate
+
   const { userId } = await auth()
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 

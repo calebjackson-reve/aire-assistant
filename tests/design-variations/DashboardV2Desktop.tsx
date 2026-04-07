@@ -51,7 +51,7 @@ export function DashboardV2Desktop({
       {/* Header — spans full width */}
       <div className="mb-8">
         <p className="text-[#6b7d52] text-xs tracking-[0.15em] uppercase">{dateStr}</p>
-        <h1 className="font-[family-name:var(--font-newsreader)] italic text-[#1e2416] text-3xl mt-1">
+        <h1 className="font-[family-name:var(--font-cormorant)] italic text-[#1e2416] text-3xl mt-1">
           Good morning, {firstName}.
         </h1>
       </div>

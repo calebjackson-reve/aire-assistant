@@ -43,7 +43,7 @@ export function DashboardV1Mobile({
       {/* Greeting — compact, warm */}
       <div>
         <p className="text-[#6b7d52] text-xs tracking-[0.15em] uppercase">{dateStr}</p>
-        <h1 className="font-[family-name:var(--font-newsreader)] italic text-[#1e2416] text-2xl mt-1">
+        <h1 className="font-[family-name:var(--font-cormorant)] italic text-[#1e2416] text-2xl mt-1">
           Good morning, {firstName}.
         </h1>
         {urgentCount > 0 && (

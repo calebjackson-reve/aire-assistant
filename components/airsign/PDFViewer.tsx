@@ -1,10 +1,6 @@
 "use client"
 
 import { useEffect, useRef, useState, useCallback } from "react"
-import * as pdfjsLib from "pdfjs-dist"
-
-// Use local worker (copied from node_modules/pdfjs-dist/build/)
-pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs"
 
 export interface PageDimensions {
   width: number
@@ -19,6 +15,19 @@ interface PDFViewerProps {
   className?: string
 }
 
+// Lazy-load pdfjs-dist only on client (avoids DOMMatrix SSR error)
+let pdfjsPromise: Promise<typeof import("pdfjs-dist")> | null = null
+function getPdfjs() {
+  if (!pdfjsPromise) {
+    pdfjsPromise = import("pdfjs-dist").then((mod) => {
+      // Use unpkg which reliably mirrors npm versions (cdnjs may lag behind)
+      mod.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${mod.version}/build/pdf.worker.min.mjs`
+      return mod
+    })
+  }
+  return pdfjsPromise
+}
+
 export function PDFViewer({
   pdfUrl,
   currentPage,
@@ -30,7 +39,8 @@ export function PDFViewer({
   const [pageCount, setPageCount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const pdfDocRef = useRef<pdfjsLib.PDFDocumentProxy | null>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const pdfDocRef = useRef<any>(null)
 
   // Load the PDF document once
   useEffect(() => {
@@ -40,6 +50,7 @@ export function PDFViewer({
       try {
         setLoading(true)
         setError(null)
+        const pdfjsLib = await getPdfjs()
         const doc = await pdfjsLib.getDocument({
           url: pdfUrl,
           withCredentials: false,

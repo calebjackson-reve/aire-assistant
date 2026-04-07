@@ -2,7 +2,7 @@
 
 ## Palette & Typography (Locked)
 All variations use: Sage #9aab7e · Olive #6b7d52 · Cream #f5f2ea · Linen #e8e4d8 · Deep Forest #1e2416
-Fonts: Playfair Display (headlines via --font-newsreader) · Space Grotesk (body) · IBM Plex Mono (data)
+Fonts: Playfair Display (headlines via --font-cormorant) · Space Grotesk (body) · IBM Plex Mono (data)
 
 ---
 

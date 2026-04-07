@@ -1,0 +1,71 @@
+[     249ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[    1072ms] [LOG] [Fast Refresh] done in 930ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[    1214ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[    1750ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[    1826ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[    2299ms] [WARNING] Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[    3580ms] [WARNING] Warning: TT: undefined function: 21 @ https://unpkg.com/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs:24
+[    3612ms] [WARNING] Warning: TT: undefined function: 21 @ https://unpkg.com/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs:24
+[    3625ms] [WARNING] Warning: TT: invalid function id: 136 @ https://unpkg.com/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs:24
+[    3656ms] [WARNING] Warning: TT: undefined function: 21 @ https://unpkg.com/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs:24
+[    3699ms] [WARNING] Warning: UnknownErrorException: Ensure that the `standardFontDataUrl` API parameter is provided. @ https://unpkg.com/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs:24
+[    3704ms] [WARNING] Warning: Cannot load system font: ZapfDingbats, installing it could help to improve PDF rendering. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[    3885ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[    4206ms] [LOG] [Fast Refresh] done in 436ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   52182ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   54365ms] [LOG] [Fast Refresh] done in 2291ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   57480ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   57896ms] [LOG] [Fast Refresh] done in 518ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   59458ms] [WARNING] Warning: TT: undefined function: 21 @ https://unpkg.com/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs:24
+[   59510ms] [WARNING] Warning: TT: undefined function: 21 @ https://unpkg.com/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs:24
+[   59533ms] [WARNING] Warning: TT: invalid function id: 136 @ https://unpkg.com/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs:24
+[   59608ms] [WARNING] Warning: TT: undefined function: 21 @ https://unpkg.com/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs:24
+[   59693ms] [WARNING] Warning: UnknownErrorException: Ensure that the `standardFontDataUrl` API parameter is provided. @ https://unpkg.com/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs:24
+[   59721ms] [WARNING] Warning: Cannot load system font: ZapfDingbats, installing it could help to improve PDF rendering. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  157588ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  157684ms] [LOG] [Fast Refresh] done in 208ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  307689ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  309023ms] [LOG] [Fast Refresh] done in 1439ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  369732ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  370771ms] [LOG] [Fast Refresh] done in 1149ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  399942ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  400072ms] [LOG] [Fast Refresh] done in 243ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  418588ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  418781ms] [LOG] [Fast Refresh] done in 302ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  420181ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  420184ms] [LOG] [Fast Refresh] done in 108ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  484155ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  484340ms] [LOG] [Fast Refresh] done in 288ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  507626ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  508046ms] [LOG] [Fast Refresh] done in 527ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  516060ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  516157ms] [LOG] [Fast Refresh] done in 203ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  569371ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  572406ms] [LOG] [Fast Refresh] done in 3149ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  572538ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  654255ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/airsign/cmnl7pfvi0001u1ecgrrr6et4?_rsc=1t1lx:0
+[  654888ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/airsign/cmnl7pfvi0001u1ecgrrr6et4?_rsc=1t1lx:0
+[  654896ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/airsign/cmnl7pfvi0001u1ecgrrr6et4?_rsc=1t1lx:0
+[  654902ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/airsign/cmnl7pfvi0001u1ecgrrr6et4?_rsc=1t1lx:0
+[  654909ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/airsign/cmnl7pfvi0001u1ecgrrr6et4?_rsc=1t1lx:0
+[  654965ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/airsign/cmnl7pfvi0001u1ecgrrr6et4?_rsc=1t1lx:0
+[  656467ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/airsign/cmnl7pfvi0001u1ecgrrr6et4?_rsc=1t1lx:0
+[  656579ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/airsign/cmnl7pfvi0001u1ecgrrr6et4?_rsc=1t1lx:0
+[  656657ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/airsign/cmnl7pfvi0001u1ecgrrr6et4?_rsc=1t1lx:0
+[  656767ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/airsign/cmnl7pfvi0001u1ecgrrr6et4?_rsc=1t1lx:0
+[  656925ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/airsign/cmnl7pfvi0001u1ecgrrr6et4?_rsc=1t1lx:0
+[  657733ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/airsign/cmnl7pfvi0001u1ecgrrr6et4?_rsc=1t1lx:0
+[  658923ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/airsign/cmnl7pfvi0001u1ecgrrr6et4?_rsc=1t1lx:0
+[  659791ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/airsign/cmnl7pfvi0001u1ecgrrr6et4?_rsc=1t1lx:0
+[  661382ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/airsign/cmnl7pfvi0001u1ecgrrr6et4?_rsc=1t1lx:0
+[  662174ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/airsign/cmnl7pfvi0001u1ecgrrr6et4?_rsc=1t1lx:0
+[  662302ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/airsign/cmnl7pfvi0001u1ecgrrr6et4?_rsc=1t1lx:0
+[  666170ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  666405ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  666957ms] [WARNING] Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  669445ms] [WARNING] Warning: TT: undefined function: 21 @ https://unpkg.com/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs:24
+[  669580ms] [WARNING] Warning: TT: undefined function: 21 @ https://unpkg.com/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs:24
+[  669653ms] [WARNING] Warning: TT: invalid function id: 136 @ https://unpkg.com/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs:24
+[  669986ms] [WARNING] Warning: TT: undefined function: 21 @ https://unpkg.com/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs:24
+[  670308ms] [WARNING] Warning: UnknownErrorException: Ensure that the `standardFontDataUrl` API parameter is provided. @ https://unpkg.com/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs:24
+[  670350ms] [WARNING] Warning: Cannot load system font: ZapfDingbats, installing it could help to improve PDF rendering. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431

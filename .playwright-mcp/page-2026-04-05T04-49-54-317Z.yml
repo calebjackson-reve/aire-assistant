@@ -1,0 +1,114 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - link "A AIRE" [ref=e5] [cursor=pointer]:
+      - /url: /aire
+      - generic [ref=e6]: A
+      - generic [ref=e7]: AIRE
+    - navigation [ref=e8]:
+      - link "Dashboard" [ref=e9] [cursor=pointer]:
+        - /url: /aire
+        - img [ref=e10]
+        - text: Dashboard
+      - link "Transactions" [ref=e15] [cursor=pointer]:
+        - /url: /aire/transactions
+        - img [ref=e16]
+        - text: Transactions
+      - link "Contracts" [ref=e18] [cursor=pointer]:
+        - /url: /aire/contracts
+        - img [ref=e19]
+        - text: Contracts
+      - link "AirSign" [ref=e22] [cursor=pointer]:
+        - /url: /airsign
+        - img [ref=e23]
+        - text: AirSign
+      - link "Brief" [ref=e25] [cursor=pointer]:
+        - /url: /aire/morning-brief
+        - img [ref=e26]
+        - text: Brief
+      - link "Compliance" [ref=e32] [cursor=pointer]:
+        - /url: /aire/compliance
+        - img [ref=e33]
+        - text: Compliance
+      - link "Intelligence" [ref=e35] [cursor=pointer]:
+        - /url: /aire/intelligence
+        - img [ref=e36]
+        - text: Intelligence
+      - link "Contacts" [ref=e37] [cursor=pointer]:
+        - /url: /aire/relationships
+        - img [ref=e38]
+        - text: Contacts
+      - link "Comms" [ref=e43] [cursor=pointer]:
+        - /url: /aire/communications
+        - img [ref=e44]
+        - text: Comms
+      - link "Email" [ref=e46] [cursor=pointer]:
+        - /url: /aire/email
+        - img [ref=e47]
+        - text: Email
+      - link "Monitor" [ref=e50] [cursor=pointer]:
+        - /url: /aire/monitoring
+        - img [ref=e51]
+        - text: Monitor
+      - link "Voice" [ref=e53] [cursor=pointer]:
+        - /url: /aire/voice-analytics
+        - img [ref=e54]
+        - text: Voice
+      - link "Data" [ref=e57] [cursor=pointer]:
+        - /url: /aire/data-health
+        - img [ref=e58]
+        - text: Data
+      - link "Settings" [ref=e62] [cursor=pointer]:
+        - /url: /aire/settings
+        - img [ref=e63]
+        - text: Settings
+      - link "Billing" [ref=e66] [cursor=pointer]:
+        - /url: /billing
+        - img [ref=e67]
+        - text: Billing
+    - link "Back to site" [ref=e70] [cursor=pointer]:
+      - /url: /
+      - img [ref=e71]
+      - text: Back to site
+  - main [ref=e73]:
+    - generic [ref=e75]:
+      - generic [ref=e76]:
+        - generic [ref=e77]:
+          - paragraph [ref=e78]: AirSign
+          - heading "554" [level=1] [ref=e79]
+        - generic [ref=e80]: SENT
+      - generic [ref=e81]:
+        - generic [ref=e83]:
+          - paragraph [ref=e86]: Loading page 1...
+          - generic:
+            - button "Text" [ref=e88] [cursor=pointer]:
+              - generic [ref=e89]: Text
+            - button "Signature" [ref=e90] [cursor=pointer]:
+              - generic [ref=e91]: Signature
+            - button "Date" [ref=e92] [cursor=pointer]:
+              - generic [ref=e93]: Date
+        - generic [ref=e94]:
+          - generic [ref=e96]:
+            - paragraph [ref=e97]: Progress
+            - generic [ref=e98]: 0 / 1 signed
+          - generic [ref=e100]:
+            - paragraph [ref=e101]: Signers
+            - generic [ref=e103]:
+              - generic [ref=e104]:
+                - paragraph [ref=e105]: ccaleb jackson
+                - generic [ref=e106]: Pending
+              - paragraph [ref=e107]: cjjfrancis96@gmail.com · SIGNER
+              - generic [ref=e108]:
+                - button "Copy signing link" [ref=e109]
+                - button "Resend email" [ref=e110]
+          - generic [ref=e111]:
+            - paragraph [ref=e112]: Fields
+            - paragraph [ref=e113]: 3 total
+            - paragraph [ref=e114]: 0 completed · 3 pending
+          - generic [ref=e115]:
+            - paragraph [ref=e116]: Audit trail
+            - generic [ref=e117]:
+              - generic [ref=e118]: sentApr 4, 11:38 PM
+              - generic [ref=e119]: createdApr 4, 10:38 PM
+          - generic [ref=e120]:
+            - paragraph [ref=e121]: "Sent: 4/4/2026"
+            - paragraph [ref=e122]: "Expires: 5/4/2026"

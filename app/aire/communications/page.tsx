@@ -49,7 +49,7 @@ export default async function CommunicationsPage() {
   return (
     <div className="max-w-5xl mx-auto px-6 py-10">
       <div className="mb-8">
-        <h1 className="font-[family-name:var(--font-newsreader)] italic text-cream text-3xl">
+        <h1 className="font-[family-name:var(--font-cormorant)] italic text-cream text-3xl">
           Communications
         </h1>
         <p className="text-cream-dim text-sm mt-1">

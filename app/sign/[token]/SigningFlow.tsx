@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { PDFViewer, type PageDimensions } from "@/components/airsign/PDFViewer"
 import { FieldOverlay, type OverlayField } from "@/components/airsign/FieldOverlay"
+import { SignatureModal, type SignatureResult } from "@/components/airsign/SignatureModal"
 
 interface SigningField {
   id: string
@@ -35,6 +36,10 @@ export function SigningFlow({ token }: { token: string }) {
   const [submitting, setSubmitting] = useState(false)
   const [complete, setComplete] = useState(false)
   const [declined, setDeclined] = useState(false)
+  const [signatureModal, setSignatureModal] = useState<{ fieldId: string; mode: "signature" | "initials" } | null>(null)
+  const [signatureImages, setSignatureImages] = useState<Record<string, string>>({}) // fieldId → dataUrl
+  const [confirmAction, setConfirmAction] = useState<"sign" | "decline" | null>(null)
+  const [declineReason, setDeclineReason] = useState("")
 
   useEffect(() => {
     fetch(`/api/airsign/sign/${token}`)
@@ -72,17 +77,26 @@ export function SigningFlow({ token }: { token: string }) {
     setActiveField(fieldId)
 
     if (field.type === "SIGNATURE") {
-      // Auto-fill with signer name as typed signature
-      setFieldValues((prev) => ({ ...prev, [fieldId]: data?.signer.name ?? "" }))
+      // Open signature modal
+      setSignatureModal({ fieldId, mode: "signature" })
     } else if (field.type === "INITIALS") {
-      const name = data?.signer.name ?? ""
-      const initials = name.split(" ").map((w) => w[0]).join("").toUpperCase()
-      setFieldValues((prev) => ({ ...prev, [fieldId]: initials }))
+      // Open initials modal
+      setSignatureModal({ fieldId, mode: "initials" })
     } else if (field.type === "CHECKBOX") {
       setFieldValues((prev) => ({ ...prev, [fieldId]: prev[fieldId] === "true" ? "false" : "true" }))
     } else if (field.type === "DATE") {
       setFieldValues((prev) => ({ ...prev, [fieldId]: new Date().toLocaleDateString("en-US") }))
     }
+  }
+
+  function handleSignatureComplete(result: SignatureResult) {
+    if (!signatureModal) return
+    const { fieldId } = signatureModal
+    // Store text value for the API + image for visual display
+    const textValue = result.text || data?.signer.name || "Signed"
+    setFieldValues((prev) => ({ ...prev, [fieldId]: textValue }))
+    setSignatureImages((prev) => ({ ...prev, [fieldId]: result.dataUrl }))
+    setSignatureModal(null)
   }
 
   async function handleSign() {
@@ -101,7 +115,7 @@ export function SigningFlow({ token }: { token: string }) {
       const res = await fetch(`/api/airsign/sign/${token}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "sign", fieldValues }),
+        body: JSON.stringify({ action: "sign", fieldValues, signatureImages }),
       })
 
       if (res.ok) {
@@ -118,15 +132,22 @@ export function SigningFlow({ token }: { token: string }) {
   }
 
   async function handleDecline() {
+    if (declineReason.trim().length < 10) {
+      setError("Please provide a reason (at least 10 characters)")
+      return
+    }
     setSubmitting(true)
     try {
       const res = await fetch(`/api/airsign/sign/${token}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "decline", declineReason: "Signer declined" }),
+        body: JSON.stringify({ action: "decline", declineReason: declineReason.trim() }),
       })
       if (res.ok) setDeclined(true)
-      else setError("Failed to decline")
+      else {
+        const err = await res.json()
+        setError(err.error ?? "Failed to decline")
+      }
     } catch {
       setError("Network error")
     } finally {
@@ -136,8 +157,19 @@ export function SigningFlow({ token }: { token: string }) {
 
   if (loading) {
     return (
-      <div className="border border-[#9aab7e]/20 rounded-lg p-12 text-center">
-        <p className="text-[#e8e4d8]/50 text-sm">Loading document...</p>
+      <div className="space-y-4 animate-pulse">
+        <div className="border border-[#9aab7e]/20 rounded-lg p-4">
+          <div className="h-5 bg-[#e8e4d8]/10 rounded w-2/3 mb-2" />
+          <div className="h-3 bg-[#e8e4d8]/5 rounded w-1/3" />
+        </div>
+        <div className="h-1.5 bg-[#e8e4d8]/10 rounded-full" />
+        <div className="border border-[#9aab7e]/10 rounded-lg aspect-[8.5/11] bg-[#e8e4d8]/5 flex items-center justify-center">
+          <p className="text-[#e8e4d8]/30 text-sm">Loading document...</p>
+        </div>
+        <div className="flex gap-3">
+          <div className="flex-1 h-12 bg-[#9aab7e]/20 rounded-lg" />
+          <div className="w-24 h-12 bg-[#e8e4d8]/5 rounded-lg" />
+        </div>
       </div>
     )
   }
@@ -193,8 +225,26 @@ export function SigningFlow({ token }: { token: string }) {
   const totalRequired = data.fields.filter((f) => f.required).length
   const completedRequired = data.fields.filter((f) => f.required && fieldValues[f.id]).length
 
+  // Find the next unfilled required field
+  const nextUnfilledField = data.fields.find((f) => f.required && !fieldValues[f.id])
+
+  function goToNextField() {
+    if (!nextUnfilledField) return
+    if (nextUnfilledField.page !== currentPage) {
+      setCurrentPage(nextUnfilledField.page)
+    }
+    handleFieldClick(nextUnfilledField.id)
+  }
+
   return (
-    <div>
+    <div className="pb-24">
+      {/* Electronic signature consent */}
+      <div className="bg-[#9aab7e]/10 border border-[#9aab7e]/20 rounded-lg p-3 mb-4">
+        <p className="text-[#e8e4d8]/70 text-xs leading-relaxed">
+          By proceeding, you consent to using electronic signatures, which are legally binding under the ESIGN Act and UETA.
+        </p>
+      </div>
+
       {/* Header */}
       <div className="border border-[#9aab7e]/20 rounded-lg p-4 mb-4">
         <h1 className="text-[#e8e4d8] text-lg font-medium">{data.envelope.name}</h1>
@@ -204,7 +254,7 @@ export function SigningFlow({ token }: { token: string }) {
         {error && <p className="text-red-400 text-xs mt-2">{error}</p>}
       </div>
 
-      {/* Progress */}
+      {/* Progress + Next button */}
       <div className="flex items-center gap-3 mb-4">
         <div className="flex-1 h-1.5 bg-[#e8e4d8]/10 rounded-full overflow-hidden">
           <div
@@ -212,7 +262,15 @@ export function SigningFlow({ token }: { token: string }) {
             style={{ width: `${totalRequired > 0 ? (completedRequired / totalRequired) * 100 : 0}%` }}
           />
         </div>
-        <span className="text-[#e8e4d8]/50 text-xs">{completedRequired}/{totalRequired} fields</span>
+        <span className="text-[#e8e4d8]/50 text-xs shrink-0">{completedRequired}/{totalRequired} fields</span>
+        {nextUnfilledField && (
+          <button
+            onClick={goToNextField}
+            className="shrink-0 bg-[#9aab7e] text-[#1e2416] text-xs font-semibold px-4 py-1.5 rounded-full hover:brightness-110 transition animate-pulse"
+          >
+            Next →
+          </button>
+        )}
       </div>
 
       {/* PDF + Fields */}
@@ -252,44 +310,133 @@ export function SigningFlow({ token }: { token: string }) {
 
       {/* Page nav */}
       {data.envelope.pageCount > 1 && (
-        <div className="flex items-center justify-center gap-4 mb-4">
+        <div className="flex items-center justify-center gap-3 mb-4">
           <button
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="text-[#e8e4d8]/50 text-sm disabled:opacity-30"
+            className="px-3 py-1.5 text-sm border border-[#9aab7e]/20 rounded-lg text-[#e8e4d8]/60 hover:border-[#9aab7e]/40 hover:text-[#e8e4d8] disabled:opacity-20 disabled:cursor-not-allowed transition focus:outline-none focus:ring-2 focus:ring-[#9aab7e]/30"
           >
             ← Prev
           </button>
-          <span className="text-[#e8e4d8]/50 text-xs">
-            Page {currentPage} of {data.envelope.pageCount}
+          <span className="text-[#e8e4d8]/50 text-xs font-mono">
+            {currentPage} / {data.envelope.pageCount}
           </span>
           <button
             onClick={() => setCurrentPage((p) => Math.min(data.envelope.pageCount, p + 1))}
             disabled={currentPage === data.envelope.pageCount}
-            className="text-[#e8e4d8]/50 text-sm disabled:opacity-30"
+            className="px-3 py-1.5 text-sm border border-[#9aab7e]/20 rounded-lg text-[#e8e4d8]/60 hover:border-[#9aab7e]/40 hover:text-[#e8e4d8] disabled:opacity-20 disabled:cursor-not-allowed transition focus:outline-none focus:ring-2 focus:ring-[#9aab7e]/30"
           >
             Next →
           </button>
         </div>
       )}
 
-      {/* Actions */}
-      <div className="flex gap-3">
+      {/* Actions — sticky bottom bar */}
+      <div className="fixed bottom-0 left-0 right-0 bg-[#1e2416]/95 backdrop-blur-sm border-t border-[#9aab7e]/10 px-4 py-3 z-40">
+      <div className="max-w-3xl mx-auto flex gap-3">
         <button
-          onClick={handleSign}
+          onClick={() => setConfirmAction("sign")}
           disabled={submitting || completedRequired < totalRequired}
-          className="flex-1 bg-[#9aab7e] text-[#1e2416] font-medium py-3 rounded-lg text-sm hover:brightness-110 disabled:opacity-50 transition"
+          className="flex-1 bg-[#9aab7e] text-[#1e2416] font-medium py-3 rounded-lg text-sm hover:brightness-110 disabled:opacity-30 disabled:cursor-not-allowed transition focus:outline-none focus:ring-2 focus:ring-[#9aab7e]/50"
         >
           {submitting ? "Signing..." : "Sign document"}
         </button>
         <button
-          onClick={handleDecline}
+          onClick={() => setConfirmAction("decline")}
           disabled={submitting}
-          className="border border-[#e8e4d8]/10 text-[#e8e4d8]/50 px-6 py-3 rounded-lg text-sm hover:text-[#e8e4d8] hover:border-[#e8e4d8]/20 disabled:opacity-50 transition"
+          className="border border-[#e8e4d8]/20 text-[#e8e4d8]/60 px-6 py-3 rounded-lg text-sm hover:text-[#e8e4d8] hover:border-[#e8e4d8]/40 disabled:opacity-50 transition focus:outline-none focus:ring-2 focus:ring-[#e8e4d8]/30"
         >
           Decline
         </button>
       </div>
+      </div>
+
+      {/* Confirmation modal */}
+      {confirmAction && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={() => { setConfirmAction(null); setDeclineReason("") }}>
+          <div className="bg-[#1e2416] border border-[#9aab7e]/20 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-[#e8e4d8] text-lg font-medium mb-2">
+              {confirmAction === "sign" ? "Confirm Signature" : "Decline Document"}
+            </h3>
+            <p className="text-[#e8e4d8]/50 text-sm mb-4">
+              {confirmAction === "sign"
+                ? "By signing, you agree to the terms in this document. This action cannot be undone."
+                : "The sender will be notified and signing will be paused for all other signers."}
+            </p>
+
+            {confirmAction === "decline" && (
+              <div className="mb-4">
+                <label className="text-[#e8e4d8]/60 text-xs block mb-2">Reason for declining (required, min 10 characters)</label>
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {[
+                    "I need to make changes to the document",
+                    "I'm not the right person to sign this",
+                    "I don't agree with the terms",
+                    "The information in this document is incorrect",
+                  ].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setDeclineReason(preset)}
+                      className="text-[10px] px-2 py-1 border border-[#9aab7e]/20 rounded-full text-[#e8e4d8]/60 hover:border-[#9aab7e]/40 hover:text-[#e8e4d8] transition"
+                    >
+                      {preset}
+                    </button>
+                  ))}
+                </div>
+                <textarea
+                  value={declineReason}
+                  onChange={(e) => setDeclineReason(e.target.value)}
+                  rows={3}
+                  placeholder="Please explain why you are declining to sign..."
+                  style={{ fontSize: 16 }}
+                  className="w-full bg-[#0f1208] border border-[#9aab7e]/20 rounded px-3 py-2 text-[#e8e4d8] focus:outline-none focus:border-[#9aab7e]/50 resize-none"
+                />
+                <p className="text-[#e8e4d8]/30 text-[10px] mt-1">
+                  {declineReason.trim().length}/10 characters minimum
+                </p>
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setConfirmAction(null); setDeclineReason(""); setError(null) }}
+                className="flex-1 border border-[#e8e4d8]/20 text-[#e8e4d8]/60 py-2.5 rounded-lg text-sm hover:border-[#e8e4d8]/40 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (confirmAction === "sign") { setConfirmAction(null); handleSign() }
+                  else {
+                    if (declineReason.trim().length < 10) return
+                    setConfirmAction(null)
+                    handleDecline()
+                  }
+                }}
+                disabled={confirmAction === "decline" && declineReason.trim().length < 10}
+                className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition disabled:opacity-30 disabled:cursor-not-allowed ${
+                  confirmAction === "sign"
+                    ? "bg-[#9aab7e] text-[#1e2416] hover:brightness-110"
+                    : "bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                }`}
+              >
+                {confirmAction === "sign" ? "Sign Now" : "Yes, Decline"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Signature capture modal */}
+      {signatureModal && data && (
+        <SignatureModal
+          signerName={data.signer.name}
+          mode={signatureModal.mode}
+          onComplete={handleSignatureComplete}
+          onCancel={() => setSignatureModal(null)}
+        />
+      )}
     </div>
   )
 }

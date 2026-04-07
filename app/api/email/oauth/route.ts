@@ -2,9 +2,11 @@ import { auth } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || ""
+// Use the SAME redirect URI as the onboarding flow — avoids needing two
+// separate URIs registered in Google Cloud Console.
 const GOOGLE_REDIRECT_URI = process.env.NEXT_PUBLIC_APP_URL
-  ? `${process.env.NEXT_PUBLIC_APP_URL}/api/email/callback`
-  : "http://localhost:3000/api/email/callback"
+  ? `${process.env.NEXT_PUBLIC_APP_URL}/api/oauth/gmail/callback`
+  : "http://localhost:3000/api/oauth/gmail/callback"
 
 const SCOPES = [
   "https://www.googleapis.com/auth/gmail.readonly",

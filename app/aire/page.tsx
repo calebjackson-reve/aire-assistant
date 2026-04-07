@@ -50,17 +50,27 @@ export default async function AirePage() {
   return (
     <div className="max-w-6xl mx-auto px-6 py-10">
       {/* Header */}
-      <div className="mb-8">
-        <p className="text-[#6b7d52] text-xs tracking-[0.15em] uppercase">{dateStr}</p>
-        <h1 className="font-[family-name:var(--font-newsreader)] italic text-[#1e2416] text-3xl mt-1">
-          Good morning, {firstName}.
-        </h1>
-        {urgentCount > 0 && (
-          <p className="text-[#c45c5c] text-sm mt-1 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#c45c5c] animate-pulse-dot" />
-            {urgentCount} deadline{urgentCount > 1 ? "s" : ""} due within 3 days
+      <div className="flex items-start justify-between mb-8">
+        <div>
+          <p className="text-[#6b7d52] text-xs tracking-[0.15em] uppercase">{dateStr}</p>
+          <h1 className="font-[family-name:var(--font-cormorant)] italic text-[#1e2416] text-3xl mt-1">
+            Good morning, {firstName}.
+          </h1>
+          {urgentCount > 0 && (
+            <p className="text-[#c45c5c] text-sm mt-1 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#c45c5c] animate-pulse-dot" />
+              {urgentCount} deadline{urgentCount > 1 ? "s" : ""} due within 3 days
+            </p>
+          )}
+        </div>
+        <div className="text-right shrink-0 ml-4">
+          <p className="text-[#6b7d52]/50 text-[10px] tracking-wider uppercase">Pipeline Value</p>
+          <p className="font-mono text-2xl text-[#1e2416] mt-0.5">
+            ${pipelineValue >= 1_000_000
+              ? `${(pipelineValue / 1_000_000).toFixed(2)}M`
+              : `${(pipelineValue / 1000).toFixed(0)}K`}
           </p>
-        )}
+        </div>
       </div>
 
       {/* Two column grid — collapses on mobile */}
@@ -72,6 +82,22 @@ export default async function AirePage() {
             <StatCard label="Active" value={String(user.transactions.length)} />
             <StatCard label="Urgent" value={String(urgentCount)} highlight={urgentCount > 0} />
             <StatCard label="Pipeline" value={`$${(pipelineValue / 1000).toFixed(0)}K`} />
+          </div>
+
+          {/* Quick Actions */}
+          <div className="grid grid-cols-2 gap-2">
+            <Link href="/aire/transactions/new" className="card-glass !p-3 !rounded-xl text-center hover:border-[#9aab7e]/30 transition-colors">
+              <p className="text-[#6b7d52] text-xs font-medium">+ Transaction</p>
+            </Link>
+            <Link href="/aire/contracts/new" className="card-glass !p-3 !rounded-xl text-center hover:border-[#9aab7e]/30 transition-colors">
+              <p className="text-[#6b7d52] text-xs font-medium">Write Contract</p>
+            </Link>
+            <Link href="/airsign/new" className="card-glass !p-3 !rounded-xl text-center hover:border-[#9aab7e]/30 transition-colors">
+              <p className="text-[#6b7d52] text-xs font-medium">New Envelope</p>
+            </Link>
+            <Link href="/aire/compliance" className="card-glass !p-3 !rounded-xl text-center hover:border-[#9aab7e]/30 transition-colors">
+              <p className="text-[#6b7d52] text-xs font-medium">Run Compliance</p>
+            </Link>
           </div>
 
           {/* Morning brief */}
@@ -140,7 +166,7 @@ export default async function AirePage() {
             <h2 className="text-[#1e2416] text-sm font-semibold" style={{ fontStyle: "normal" }}>
               Active Transactions
             </h2>
-            <Link href="/dashboard/transactions" className="text-[#6b7d52] text-xs font-medium hover:underline">
+            <Link href="/aire/transactions" className="text-[#6b7d52] text-xs font-medium hover:underline">
               View all
             </Link>
           </div>

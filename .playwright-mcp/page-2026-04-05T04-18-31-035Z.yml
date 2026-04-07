@@ -1,0 +1,44 @@
+- generic [ref=e1]:
+  - generic [ref=e6] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e7]:
+      - img [ref=e8]
+    - generic [ref=e11]:
+      - button "Open issues overlay" [ref=e12]:
+        - generic [ref=e13]:
+          - generic [ref=e14]: "0"
+          - generic [ref=e15]: "1"
+        - generic [ref=e16]: Issue
+      - button "Collapse issues badge" [ref=e17]:
+        - img [ref=e18]
+  - generic [ref=e21]:
+    - generic [ref=e22]:
+      - generic [ref=e24]: A
+      - generic [ref=e25]:
+        - paragraph [ref=e26]: AirSign
+        - paragraph [ref=e27]: Secure Electronic Signatures
+    - generic [ref=e28]:
+      - generic [ref=e29]:
+        - heading "Purchase Agreement — 5834 Guice Dr" [level=1] [ref=e39]
+        - paragraph [ref=e40]: "Signing as: Caleb Jackson (caleb.jackson@reverealtors.com)"
+      - generic [ref=e43]: 3/3 fields
+      - generic [ref=e33]:
+        - generic:
+          - button "✓" [ref=e88] [cursor=pointer]:
+            - generic [ref=e89]: ✓
+          - button "✓" [ref=e83] [cursor=pointer]:
+            - generic [ref=e84]: ✓
+          - button "✓" [ref=e50] [cursor=pointer]:
+            - generic [ref=e51]: ✓
+      - generic [ref=e85]:
+        - generic [ref=e86]: Buyer Name
+        - textbox [ref=e87]: Caleb Jackson
+      - generic [ref=e53]:
+        - button "Sign document" [active] [ref=e54]
+        - button "Decline" [ref=e55]
+      - generic [ref=e91]:
+        - heading "Confirm Signature" [level=3] [ref=e92]
+        - paragraph [ref=e93]: By signing, you agree to the terms in this document. This action cannot be undone.
+        - generic [ref=e94]:
+          - button "Cancel" [ref=e95]
+          - button "Sign Now" [ref=e96]
+  - alert [ref=e38]

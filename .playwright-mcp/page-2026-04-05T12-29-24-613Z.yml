@@ -1,0 +1,107 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link "A AIRE" [ref=e5] [cursor=pointer]:
+        - /url: /aire
+        - generic [ref=e6]: A
+        - generic [ref=e7]: AIRE
+      - navigation [ref=e8]:
+        - link "Dashboard" [ref=e9] [cursor=pointer]:
+          - /url: /aire
+          - img [ref=e10]
+          - text: Dashboard
+        - link "Transactions" [ref=e15] [cursor=pointer]:
+          - /url: /aire/transactions
+          - img [ref=e16]
+          - text: Transactions
+        - link "Contracts" [ref=e18] [cursor=pointer]:
+          - /url: /aire/contracts
+          - img [ref=e19]
+          - text: Contracts
+        - link "AirSign" [ref=e22] [cursor=pointer]:
+          - /url: /airsign
+          - img [ref=e23]
+          - text: AirSign
+        - link "Brief" [ref=e25] [cursor=pointer]:
+          - /url: /aire/morning-brief
+          - img [ref=e26]
+          - text: Brief
+        - link "Compliance" [ref=e32] [cursor=pointer]:
+          - /url: /aire/compliance
+          - img [ref=e33]
+          - text: Compliance
+        - link "Intelligence" [ref=e35] [cursor=pointer]:
+          - /url: /aire/intelligence
+          - img [ref=e36]
+          - text: Intelligence
+        - link "Contacts" [ref=e37] [cursor=pointer]:
+          - /url: /aire/relationships
+          - img [ref=e38]
+          - text: Contacts
+        - link "Comms" [ref=e43] [cursor=pointer]:
+          - /url: /aire/communications
+          - img [ref=e44]
+          - text: Comms
+        - link "Email" [ref=e46] [cursor=pointer]:
+          - /url: /aire/email
+          - img [ref=e47]
+          - text: Email
+        - link "Monitor" [ref=e50] [cursor=pointer]:
+          - /url: /aire/monitoring
+          - img [ref=e51]
+          - text: Monitor
+        - link "Voice" [ref=e53] [cursor=pointer]:
+          - /url: /aire/voice-analytics
+          - img [ref=e54]
+          - text: Voice
+        - link "Data" [ref=e57] [cursor=pointer]:
+          - /url: /aire/data-health
+          - img [ref=e58]
+          - text: Data
+        - link "Settings" [ref=e62] [cursor=pointer]:
+          - /url: /aire/settings
+          - img [ref=e63]
+          - text: Settings
+        - link "Billing" [ref=e66] [cursor=pointer]:
+          - /url: /billing
+          - img [ref=e67]
+          - text: Billing
+      - link "Back to site" [ref=e70] [cursor=pointer]:
+        - /url: /
+        - img [ref=e71]
+        - text: Back to site
+    - main [ref=e73]:
+      - generic [ref=e74]:
+        - generic [ref=e75]:
+          - generic [ref=e76]:
+            - paragraph [ref=e77]: Document Signing
+            - heading "AirSign" [level=1] [ref=e78]
+          - link "+ New envelope" [ref=e79] [cursor=pointer]:
+            - /url: /airsign/new
+        - generic [ref=e80]:
+          - generic [ref=e81]:
+            - paragraph [ref=e82]: "0"
+            - paragraph [ref=e83]: draft
+          - generic [ref=e84]:
+            - paragraph [ref=e85]: "0"
+            - paragraph [ref=e86]: sent
+          - generic [ref=e87]:
+            - paragraph [ref=e88]: "0"
+            - paragraph [ref=e89]: in progress
+          - generic [ref=e90]:
+            - paragraph [ref=e91]: "0"
+            - paragraph [ref=e92]: completed
+          - generic [ref=e93]:
+            - paragraph [ref=e94]: "0"
+            - paragraph [ref=e95]: voided
+          - generic [ref=e96]:
+            - paragraph [ref=e97]: "0"
+            - paragraph [ref=e98]: expired
+        - generic [ref=e99]:
+          - paragraph [ref=e100]: No envelopes yet
+          - paragraph [ref=e101]: Send your first document for electronic signature.
+          - link "Create envelope" [ref=e102] [cursor=pointer]:
+            - /url: /airsign/new
+  - button "Open Next.js Dev Tools" [ref=e108] [cursor=pointer]:
+    - img [ref=e109]
+  - alert [ref=e112]

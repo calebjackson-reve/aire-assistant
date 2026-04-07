@@ -1,0 +1,139 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link "A AIRE" [ref=e5] [cursor=pointer]:
+        - /url: /aire
+        - generic [ref=e6]: A
+        - generic [ref=e7]: AIRE
+      - navigation [ref=e8]:
+        - link "Dashboard" [ref=e9] [cursor=pointer]:
+          - /url: /aire
+          - img [ref=e10]
+          - text: Dashboard
+        - link "Transactions" [ref=e15] [cursor=pointer]:
+          - /url: /aire/transactions
+          - img [ref=e16]
+          - text: Transactions
+        - link "Contracts" [ref=e18] [cursor=pointer]:
+          - /url: /aire/contracts
+          - img [ref=e19]
+          - text: Contracts
+        - link "AirSign" [ref=e22] [cursor=pointer]:
+          - /url: /airsign
+          - img [ref=e23]
+          - text: AirSign
+        - link "Brief" [ref=e25] [cursor=pointer]:
+          - /url: /aire/morning-brief
+          - img [ref=e26]
+          - text: Brief
+        - link "Compliance" [ref=e32] [cursor=pointer]:
+          - /url: /aire/compliance
+          - img [ref=e33]
+          - text: Compliance
+        - link "Intelligence" [ref=e35] [cursor=pointer]:
+          - /url: /aire/intelligence
+          - img [ref=e36]
+          - text: Intelligence
+        - link "Contacts" [ref=e37] [cursor=pointer]:
+          - /url: /aire/relationships
+          - img [ref=e38]
+          - text: Contacts
+        - link "Comms" [ref=e43] [cursor=pointer]:
+          - /url: /aire/communications
+          - img [ref=e44]
+          - text: Comms
+        - link "Email" [ref=e46] [cursor=pointer]:
+          - /url: /aire/email
+          - img [ref=e47]
+          - text: Email
+        - link "Monitor" [ref=e50] [cursor=pointer]:
+          - /url: /aire/monitoring
+          - img [ref=e51]
+          - text: Monitor
+        - link "Voice" [ref=e53] [cursor=pointer]:
+          - /url: /aire/voice-analytics
+          - img [ref=e54]
+          - text: Voice
+        - link "Data" [ref=e57] [cursor=pointer]:
+          - /url: /aire/data-health
+          - img [ref=e58]
+          - text: Data
+        - link "Settings" [ref=e62] [cursor=pointer]:
+          - /url: /aire/settings
+          - img [ref=e63]
+          - text: Settings
+        - link "Billing" [ref=e66] [cursor=pointer]:
+          - /url: /billing
+          - img [ref=e67]
+          - text: Billing
+      - link "Back to site" [ref=e70] [cursor=pointer]:
+        - /url: /
+        - img [ref=e71]
+        - text: Back to site
+    - main [ref=e73]:
+      - generic [ref=e75]:
+        - generic [ref=e76]:
+          - generic [ref=e77]:
+            - paragraph [ref=e78]: AirSign
+            - heading "554" [level=1] [ref=e79]
+          - generic [ref=e80]: DRAFT
+        - generic [ref=e81]:
+          - paragraph [ref=e82]: Place signature fields on the document
+          - generic [ref=e83]:
+            - generic [ref=e84]:
+              - generic [ref=e85]:
+                - generic [ref=e86]: "Place Field:"
+                - button "Signature" [ref=e87]
+                - button "Initials" [ref=e88]
+                - button "Date" [ref=e89]
+                - button "Text" [ref=e90]
+                - button "Checkbox" [ref=e91]
+              - generic [ref=e92]:
+                - generic [ref=e93]: "Assign to:"
+                - button "ccaleb jackson" [ref=e94]
+              - generic [ref=e95]:
+                - paragraph [ref=e98]: Loading page 1...
+                - generic [ref=e100]:
+                  - generic [ref=e102]:
+                    - text: Text
+                    - generic [ref=e103]: (ccaleb)
+                  - generic [ref=e105]:
+                    - text: Signature
+                    - generic [ref=e106]: (ccaleb)
+                  - generic [ref=e108]:
+                    - text: Date
+                    - generic [ref=e109]: (ccaleb)
+            - generic [ref=e110]:
+              - generic [ref=e111]:
+                - paragraph [ref=e112]: Fields (3)
+                - generic [ref=e113]:
+                  - generic [ref=e114] [cursor=pointer]:
+                    - generic [ref=e116]: Text
+                    - generic [ref=e117]: p1
+                    - generic [ref=e118]: ccaleb
+                  - generic [ref=e119] [cursor=pointer]:
+                    - generic [ref=e121]: Signature
+                    - generic [ref=e122]: p1
+                    - generic [ref=e123]: ccaleb
+                  - generic [ref=e124] [cursor=pointer]:
+                    - generic [ref=e126]: Date
+                    - generic [ref=e127]: p1
+                    - generic [ref=e128]: ccaleb
+              - button "Save 3 Fields" [ref=e129]
+        - generic [ref=e132]:
+          - button "Send for signing" [ref=e133]
+          - generic [ref=e134]:
+            - paragraph [ref=e135]: Signers
+            - generic [ref=e137]:
+              - paragraph [ref=e139]: ccaleb jackson
+              - paragraph [ref=e140]: cjjfrancis96@gmail.com · SIGNER
+          - generic [ref=e141]:
+            - paragraph [ref=e142]: Fields
+            - paragraph [ref=e143]: 3 total
+            - paragraph [ref=e144]: 0 completed · 3 pending
+          - generic [ref=e145]:
+            - paragraph [ref=e146]: Audit trail
+            - generic [ref=e148]: createdApr 4, 10:38 PM
+  - button "Open Next.js Dev Tools" [ref=e155] [cursor=pointer]:
+    - img [ref=e156]
+  - alert [ref=e159]

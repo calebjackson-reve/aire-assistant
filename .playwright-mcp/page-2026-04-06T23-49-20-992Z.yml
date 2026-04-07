@@ -1,0 +1,325 @@
+- generic [active] [ref=e1]:
+  - navigation:
+    - generic:
+      - link "AIRE":
+        - /url: /
+      - generic:
+        - link "Platform":
+          - /url: "#platform"
+        - link "Tools":
+          - /url: "#tools"
+        - link "Pricing":
+          - /url: "#pricing"
+        - link "About":
+          - /url: "#about"
+      - generic:
+        - link "Sign In":
+          - /url: /sign-in
+        - link "Get Started":
+          - /url: /sign-up
+  - generic [ref=e6]:
+    - paragraph [ref=e7]: Real Estate Intelligence System
+    - heading "Built for parishes, not platforms" [level=1] [ref=e8]:
+      - text: Built for parishes,
+      - text: not platforms
+    - paragraph [ref=e9]: Act of Sale deadlines, GBRAR comp data, Louisiana disclosure rules — seven AI agents that understand how we close in Baton Rouge. Built by an agent who did $3.38M in Q1.
+    - generic [ref=e10]:
+      - link "Open Dashboard" [ref=e11] [cursor=pointer]:
+        - /url: /aire
+      - link "See the Platform" [ref=e12] [cursor=pointer]:
+        - /url: "#platform"
+  - generic [ref=e17]:
+    - generic [ref=e18]:
+      - paragraph [ref=e19]: "0"
+      - paragraph [ref=e20]: Transactions Closed
+    - generic [ref=e21]:
+      - paragraph [ref=e22]: $0.00M
+      - paragraph [ref=e23]: Total Volume
+    - generic [ref=e24]:
+      - paragraph [ref=e25]: "0"
+      - paragraph [ref=e26]: Avg Days on Market
+    - generic [ref=e27]:
+      - paragraph [ref=e28]: $0K+
+      - paragraph [ref=e29]: Client Equity Created
+  - generic [ref=e32]:
+    - generic [ref=e33]:
+      - paragraph [ref=e34]: The Platform
+      - heading "Four systems working while you sell" [level=2] [ref=e35]
+    - generic [ref=e36]:
+      - generic [ref=e37]:
+        - generic [ref=e38]:
+          - paragraph [ref=e39]: Transaction Coordinator
+          - heading "Every deadline tracked. Every document filed." [level=3] [ref=e40]
+          - paragraph [ref=e41]: Auto-calculated deadlines from contract dates. Louisiana Act of Sale timelines, inspection periods, and financing contingencies — all managed by AI. No more spreadsheets.
+          - generic [ref=e42]:
+            - generic [ref=e43]:
+              - paragraph [ref=e44]: 47 min
+              - paragraph [ref=e45]: saved per transaction
+            - generic [ref=e46]:
+              - paragraph [ref=e47]: "0"
+              - paragraph [ref=e48]: missed deadlines
+        - generic [ref=e55]:
+          - paragraph [ref=e56]: Active Transaction
+          - paragraph [ref=e57]: 5834 Guice Dr, Baton Rouge
+          - generic [ref=e58]: Active
+          - paragraph [ref=e59]: Deadlines
+          - generic [ref=e60]:
+            - generic [ref=e61]:
+              - generic [ref=e63]: Inspection Period
+              - generic [ref=e64]: Overdue
+            - generic [ref=e65]:
+              - generic [ref=e67]: Appraisal Due
+              - generic [ref=e68]: Apr 8
+            - generic [ref=e69]:
+              - generic [ref=e71]: Act of Sale
+              - generic [ref=e72]: Apr 30
+      - generic [ref=e73]:
+        - generic [ref=e74]:
+          - paragraph [ref=e75]: AirSign
+          - heading "Send. Sign. Seal. From your phone." [level=3] [ref=e76]
+          - paragraph [ref=e77]: Upload any PDF, place signature fields, send signing links via email. Your buyers and sellers sign from any device. You get a sealed PDF with embedded signatures and a full audit trail.
+          - generic [ref=e78]:
+            - generic [ref=e79]:
+              - paragraph [ref=e80]: 8 sec
+              - paragraph [ref=e81]: to send for signing
+            - generic [ref=e82]:
+              - paragraph [ref=e83]: 100%
+              - paragraph [ref=e84]: mobile compatible
+        - generic [ref=e91]:
+          - paragraph [ref=e92]: AirSign Envelope
+          - paragraph [ref=e93]: Purchase_Agreement_5834_Guice.pdf
+          - paragraph [ref=e94]: Signers
+          - generic [ref=e95]:
+            - generic [ref=e96]:
+              - generic [ref=e97]: ✓
+              - generic [ref=e98]: John Smith (Buyer)
+              - generic [ref=e99]: Signed
+            - generic [ref=e100]:
+              - generic [ref=e101]: ●
+              - generic [ref=e102]: Sarah Davis (Seller)
+              - generic [ref=e103]: Pending
+          - button "Send Reminder" [ref=e104]
+      - generic [ref=e105]:
+        - generic [ref=e106]:
+          - paragraph [ref=e107]: Morning Brief
+          - heading "Your market intelligence, every morning at 7am." [level=3] [ref=e108]
+          - paragraph [ref=e109]: Three AI researchers scan your transactions, communications, and market data overnight. By the time you pour coffee, your brief is ready — deadlines due today, new listings in your farm, and relationship follow-ups.
+          - generic [ref=e110]:
+            - generic [ref=e111]:
+              - paragraph [ref=e112]: "3"
+              - paragraph [ref=e113]: AI researchers
+            - generic [ref=e114]:
+              - paragraph [ref=e115]: 7:00 AM
+              - paragraph [ref=e116]: daily delivery
+        - generic [ref=e123]:
+          - generic [ref=e124]:
+            - generic [ref=e125]:
+              - paragraph [ref=e126]: Morning Brief
+              - paragraph [ref=e127]: Friday, April 4
+            - generic [ref=e128]: Pending
+          - generic [ref=e129]:
+            - generic [ref=e130]:
+              - generic [ref=e132]: 2 overdue deadlines across pipeline
+              - generic [ref=e133]: 06:30
+            - generic [ref=e134]:
+              - generic [ref=e136]: Appraisal due today — 5834 Guice Dr
+              - generic [ref=e137]: 06:30
+            - generic [ref=e138]:
+              - generic [ref=e140]: 3 contacts need follow-up this week
+              - generic [ref=e141]: 06:30
+          - generic [ref=e142]:
+            - button "Approve" [ref=e143]
+            - button "Dismiss" [ref=e144]
+      - generic [ref=e145]:
+        - generic [ref=e146]:
+          - paragraph [ref=e147]: Voice Commands
+          - heading "Speak. It acts." [level=3] [ref=e148]
+          - paragraph [ref=e149]: "\"Create a transaction at 5834 Guice Drive. Add buyer John Smith. Schedule inspection for Friday.\" Natural language to action in under 4 seconds. Built for agents who are always in the car."
+          - generic [ref=e150]:
+            - generic [ref=e151]:
+              - paragraph [ref=e152]: <4s
+              - paragraph [ref=e153]: response time
+            - generic [ref=e154]:
+              - paragraph [ref=e155]: 30+
+              - paragraph [ref=e156]: voice actions
+        - generic [ref=e163]:
+          - paragraph [ref=e164]: Voice Command
+          - generic [ref=e165]:
+            - img [ref=e166]
+            - generic [ref=e169]: "\"Create a transaction at 5834 Guice Drive\""
+          - generic [ref=e170]:
+            - generic [ref=e173]: Classified — create_transaction
+            - paragraph [ref=e174]:
+              - text: Transaction created at 5834 Guice Dr.
+              - text: Deadlines auto-calculated from today.
+  - generic [ref=e176]:
+    - generic [ref=e177]:
+      - paragraph [ref=e178]: Free Tools
+      - heading "Built for the Greater Baton Rouge market" [level=2] [ref=e179]
+      - paragraph [ref=e180]: Parishes, flood zones, mineral rights — the data sources that actually matter here.
+    - generic [ref=e181]:
+      - generic [ref=e183]:
+        - generic [ref=e184]:
+          - heading "AIRE Estimate" [level=3] [ref=e185]
+          - generic [ref=e186]: AVM
+        - paragraph [ref=e187]: AI-powered property valuations using ensemble scoring and local comp analysis.
+      - generic [ref=e189]:
+        - generic [ref=e190]:
+          - heading "Market Pulse" [level=3] [ref=e191]
+          - generic [ref=e192]: Live Data
+        - paragraph [ref=e193]: Live data from GBRAR MLS, Redfin, NAR, and ATTOM for Greater Baton Rouge.
+      - generic [ref=e195]:
+        - generic [ref=e196]:
+          - heading "Flood Vision" [level=3] [ref=e197]
+          - generic [ref=e198]: Risk
+        - paragraph [ref=e199]: Flood zones, insurance estimates, and elevation data for every Louisiana parish.
+      - generic [ref=e201]:
+        - generic [ref=e202]:
+          - heading "Deal DNA" [level=3] [ref=e203]
+          - generic [ref=e204]: Analysis
+        - paragraph [ref=e205]: Comps, price per square foot, days on market, and leverage points for any property.
+      - generic [ref=e207]:
+        - generic [ref=e208]:
+          - heading "Neighborhood Score" [level=3] [ref=e209]
+          - generic [ref=e210]: Intelligence
+        - paragraph [ref=e211]: Schools, safety, appreciation trends, and walkability scoring by ZIP.
+  - generic [ref=e213]:
+    - generic [ref=e214]:
+      - paragraph [ref=e215]: How It Works
+      - heading "Three steps to closing smarter" [level=2] [ref=e216]
+    - generic [ref=e217]:
+      - generic [ref=e218]:
+        - generic: "01"
+        - generic [ref=e219]:
+          - heading "Connect your transactions" [level=3] [ref=e220]
+          - paragraph [ref=e221]: Import from your MLS or create manually. AIRE reads the contract and sets every deadline.
+      - generic [ref=e222]:
+        - generic: "02"
+        - generic [ref=e223]:
+          - heading "AIRE monitors and acts" [level=3] [ref=e224]
+          - paragraph [ref=e225]: Daily briefs, document tracking, signature reminders, compliance scanning — all automatic.
+      - generic [ref=e226]:
+        - generic: "03"
+        - generic [ref=e227]:
+          - heading "You close more deals" [level=3] [ref=e228]
+          - paragraph [ref=e229]: Spend your time with clients, not spreadsheets. AIRE handles the coordination.
+  - generic [ref=e231]:
+    - generic [ref=e232]:
+      - paragraph [ref=e233]: Pricing
+      - heading "Simple, transparent, built for agents" [level=2] [ref=e234]
+    - generic [ref=e235]:
+      - generic [ref=e236]:
+        - paragraph [ref=e238]: Access
+        - generic [ref=e240]: Free
+        - paragraph [ref=e241]: Try the tools. No credit card.
+        - list [ref=e242]:
+          - listitem [ref=e243]: AIRE Estimate
+          - listitem [ref=e245]: Market Pulse dashboard
+          - listitem [ref=e247]: Flood Vision lookup
+        - link "Open Dashboard" [ref=e249] [cursor=pointer]:
+          - /url: /aire
+      - generic [ref=e250]:
+        - generic [ref=e251]:
+          - paragraph [ref=e252]: Pro
+          - generic [ref=e253]: Popular
+        - generic [ref=e254]:
+          - generic [ref=e255]: $97
+          - generic [ref=e256]: /mo
+        - paragraph [ref=e257]: The full AI operating system.
+        - list [ref=e258]:
+          - listitem [ref=e259]: Everything in Access
+          - listitem [ref=e261]: Transaction Coordinator
+          - listitem [ref=e263]: AirSign e-signatures
+          - listitem [ref=e265]: Morning Brief
+          - listitem [ref=e267]: Voice Commands
+          - listitem [ref=e269]: Document automation
+          - listitem [ref=e271]: Deadline alerts (SMS)
+        - link "Open Dashboard" [ref=e273] [cursor=pointer]:
+          - /url: /aire
+      - generic [ref=e274]:
+        - paragraph [ref=e276]: Investor
+        - generic [ref=e277]:
+          - generic [ref=e278]: $197
+          - generic [ref=e279]: /mo
+        - paragraph [ref=e280]: Advanced deal analysis and full system.
+        - list [ref=e281]:
+          - listitem [ref=e282]: Everything in Pro
+          - listitem [ref=e284]: Deal DNA deep analysis
+          - listitem [ref=e286]: Cash flow projections
+          - listitem [ref=e288]: Portfolio tracking
+          - listitem [ref=e290]: Priority support
+          - listitem [ref=e292]: API access
+        - link "Open Dashboard" [ref=e294] [cursor=pointer]:
+          - /url: /aire
+  - generic [ref=e297]:
+    - img "Caleb Jackson — REALTOR at Reve Realtors, Baton Rouge" [ref=e300]
+    - generic [ref=e302]:
+      - paragraph [ref=e303]: About
+      - heading "Caleb Jackson" [level=2] [ref=e304]
+      - paragraph [ref=e305]: REALTOR · Reve Realtors · Baton Rouge, Louisiana
+      - generic [ref=e306]:
+        - paragraph [ref=e307]: I built AIRE because the tools agents have today are broken — outdated data, generic national platforms, and zero Louisiana-specific intelligence. I closed 18 transactions and $3.38M in Q1 2026, and every one showed me what the industry still gets wrong.
+        - paragraph [ref=e308]: Every feature in this platform exists because I needed it at the closing table, on the phone with a lender, or at 6 AM reviewing my pipeline. AIRE is built by an active agent, for agents who want an unfair advantage with real data.
+      - generic [ref=e309]:
+        - link "Book a Conversation" [ref=e310] [cursor=pointer]:
+          - /url: https://calendly.com/calebjackson
+        - link "Follow on Instagram" [ref=e311] [cursor=pointer]:
+          - /url: https://www.instagram.com/calebjackson_24/
+  - generic [ref=e314]:
+    - paragraph [ref=e315]: Get Started
+    - heading "Your next deal deserves better tools." [level=2] [ref=e316]
+    - paragraph [ref=e317]: Start free. No credit card. Full platform access for 14 days.
+    - generic [ref=e318]:
+      - link "Open Dashboard" [ref=e319] [cursor=pointer]:
+        - /url: /aire
+      - link "Book a Call" [ref=e320] [cursor=pointer]:
+        - /url: https://calendly.com/calebjackson
+  - contentinfo [ref=e321]:
+    - generic [ref=e322]:
+      - generic [ref=e323]:
+        - generic [ref=e324]:
+          - generic [ref=e325]: AIRE
+          - paragraph [ref=e326]: AI-powered transaction management for Louisiana real estate. Built by an active agent, for agents.
+        - generic [ref=e327]:
+          - generic [ref=e328]:
+            - paragraph [ref=e329]: Navigate
+            - generic [ref=e330]:
+              - link "Platform" [ref=e331] [cursor=pointer]:
+                - /url: "#platform"
+              - link "Tools" [ref=e332] [cursor=pointer]:
+                - /url: "#tools"
+              - link "Pricing" [ref=e333] [cursor=pointer]:
+                - /url: "#pricing"
+              - link "About" [ref=e334] [cursor=pointer]:
+                - /url: "#about"
+              - link "Privacy" [ref=e335] [cursor=pointer]:
+                - /url: /privacy
+          - generic [ref=e336]:
+            - paragraph [ref=e337]: Connect
+            - generic [ref=e338]:
+              - link "Book a call" [ref=e339] [cursor=pointer]:
+                - /url: https://calendly.com/calebjackson
+              - link "Instagram" [ref=e340] [cursor=pointer]:
+                - /url: https://www.instagram.com/calebjackson_24/
+                - img [ref=e341]
+                - text: Instagram
+              - link "TikTok" [ref=e345] [cursor=pointer]:
+                - /url: https://www.tiktok.com/@calebjackson
+                - img [ref=e346]
+                - text: TikTok
+              - link "LinkedIn" [ref=e348] [cursor=pointer]:
+                - /url: https://www.linkedin.com/in/caleb-jackson-22b627270
+                - img [ref=e349]
+                - text: LinkedIn
+              - link "X / Twitter" [ref=e353] [cursor=pointer]:
+                - /url: https://x.com/calebjackson24
+                - img [ref=e354]
+                - text: X / Twitter
+      - generic [ref=e357]:
+        - generic [ref=e358]: © 2026 AIRE Intelligence. Baton Rouge, Louisiana.
+        - generic [ref=e359]: Caleb Jackson · Reve REALTORS
+  - button "Scroll to top":
+    - img
+  - button "Open Next.js Dev Tools" [ref=e365] [cursor=pointer]:
+    - img [ref=e366]
+  - alert [ref=e369]

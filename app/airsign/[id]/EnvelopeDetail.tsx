@@ -4,6 +4,7 @@ import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { PDFViewer, type PageDimensions } from "@/components/airsign/PDFViewer"
 import { FieldOverlay, type OverlayField } from "@/components/airsign/FieldOverlay"
+import { FieldPlacer, type PlacedField } from "@/components/airsign/FieldPlacer"
 
 interface Envelope {
   id: string
@@ -76,8 +77,11 @@ export function EnvelopeDetail({
   const [currentPage, setCurrentPage] = useState(1)
   const [pageDims, setPageDims] = useState<PageDimensions>({ width: 800, height: 1035 })
   const [sending, setSending] = useState(false)
+  const [savingFields, setSavingFields] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState<string | null>(null)
+  const [resending, setResending] = useState<string | null>(null)
+  const [confirmSend, setConfirmSend] = useState(false)
 
   const handlePageLoad = useCallback((_pageCount: number, dims: PageDimensions) => {
     setPageDims(dims)
@@ -98,6 +102,40 @@ export function EnvelopeDetail({
       setError("Network error")
     } finally {
       setSending(false)
+    }
+  }
+
+  async function handleSaveFields(placedFields: PlacedField[]) {
+    setSavingFields(true)
+    setError(null)
+    try {
+      const res = await fetch(`/api/airsign/envelopes/${envelope.id}/fields`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fields: placedFields.map(f => ({
+            signerId: f.signerId,
+            type: f.type,
+            label: f.label,
+            required: f.required,
+            page: f.page,
+            xPercent: f.xPercent,
+            yPercent: f.yPercent,
+            widthPercent: f.widthPercent,
+            heightPercent: f.heightPercent,
+          })),
+        }),
+      })
+      if (res.ok) {
+        router.refresh()
+      } else {
+        const err = await res.json()
+        setError(err.error || "Failed to save fields")
+      }
+    } catch {
+      setError("Network error saving fields")
+    } finally {
+      setSavingFields(false)
     }
   }
 
@@ -128,7 +166,7 @@ export function EnvelopeDetail({
       <div className="flex items-center justify-between mb-6">
         <div>
           <p className="text-warm text-sm tracking-wide mb-1">AirSign</p>
-          <h1 className="font-[family-name:var(--font-newsreader)] italic text-cream text-2xl">{envelope.name}</h1>
+          <h1 className="font-[family-name:var(--font-cormorant)] italic text-cream text-2xl">{envelope.name}</h1>
         </div>
         <span className={`text-xs px-3 py-1 rounded ${STATUS_STYLES[envelope.status] || "text-cream-dim"}`}>
           {envelope.status.replace(/_/g, " ")}
@@ -141,10 +179,35 @@ export function EnvelopeDetail({
         </div>
       )}
 
+      {/* Field Placer for DRAFT envelopes */}
+      {envelope.status === "DRAFT" && envelope.documentUrl && (
+        <div className="mb-6">
+          <p className="text-cream-dim text-xs tracking-wide mb-3">Place signature fields on the document</p>
+          <FieldPlacer
+            pdfUrl={envelope.documentUrl}
+            signers={signers.map(s => ({ id: s.id, name: s.name, email: s.email, role: s.role }))}
+            initialFields={fields.map(f => ({
+              id: f.id,
+              type: f.type as PlacedField["type"],
+              label: f.label || "",
+              signerId: f.signerId,
+              required: f.required,
+              page: f.page,
+              xPercent: f.xPercent,
+              yPercent: f.yPercent,
+              widthPercent: f.widthPercent,
+              heightPercent: f.heightPercent,
+            }))}
+            onSave={handleSaveFields}
+            saving={savingFields}
+          />
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: PDF viewer */}
+        {/* Left: PDF viewer (non-DRAFT or no document) */}
         <div className="lg:col-span-2">
-          {envelope.documentUrl ? (
+          {envelope.status !== "DRAFT" && envelope.documentUrl ? (
             <div className="relative">
               <PDFViewer
                 pdfUrl={envelope.documentUrl}
@@ -158,32 +221,32 @@ export function EnvelopeDetail({
                 pageHeight={pageDims.height}
               />
               {(envelope.pageCount ?? 0) > 1 && (
-                <div className="flex items-center justify-center gap-4 mt-3">
+                <div className="flex items-center justify-center gap-3 mt-3">
                   <button
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
-                    className="text-cream-dim text-sm disabled:opacity-30"
+                    className="px-3 py-1.5 text-sm border border-brown-border rounded-lg text-cream-dim hover:border-warm/30 hover:text-cream disabled:opacity-20 disabled:cursor-not-allowed transition focus:outline-none focus:ring-2 focus:ring-warm/30"
                   >
                     ← Prev
                   </button>
-                  <span className="text-cream-dim/50 text-xs">
-                    Page {currentPage} of {envelope.pageCount}
+                  <span className="text-cream-dim/50 text-xs font-mono">
+                    {currentPage} / {envelope.pageCount}
                   </span>
                   <button
                     onClick={() => setCurrentPage((p) => Math.min(envelope.pageCount ?? 1, p + 1))}
                     disabled={currentPage === (envelope.pageCount ?? 1)}
-                    className="text-cream-dim text-sm disabled:opacity-30"
+                    className="px-3 py-1.5 text-sm border border-brown-border rounded-lg text-cream-dim hover:border-warm/30 hover:text-cream disabled:opacity-20 disabled:cursor-not-allowed transition focus:outline-none focus:ring-2 focus:ring-warm/30"
                   >
                     Next →
                   </button>
                 </div>
               )}
             </div>
-          ) : (
+          ) : !envelope.documentUrl ? (
             <div className="border border-brown-border rounded p-12 text-center">
               <p className="text-cream-dim text-sm">No document uploaded</p>
             </div>
-          )}
+          ) : null}
         </div>
 
         {/* Right: Signers + Actions + Audit */}
@@ -191,12 +254,71 @@ export function EnvelopeDetail({
           {/* Send button (DRAFT only) */}
           {envelope.status === "DRAFT" && (
             <button
-              onClick={handleSend}
+              onClick={() => setConfirmSend(true)}
               disabled={sending}
-              className="w-full bg-warm text-brown font-medium py-3 rounded text-sm hover:brightness-110 disabled:opacity-50 transition"
+              className="w-full bg-warm text-brown font-medium py-3 rounded text-sm hover:brightness-110 disabled:opacity-50 transition focus:outline-none focus:ring-2 focus:ring-warm/50"
             >
               {sending ? "Sending..." : "Send for signing"}
             </button>
+          )}
+
+          {/* Send confirmation modal */}
+          {confirmSend && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={() => setConfirmSend(false)}>
+              <div className="bg-forest-deep border border-brown-border rounded-xl p-6 max-w-sm mx-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                <h3 className="text-cream text-lg font-medium mb-2">Send for Signing?</h3>
+                <p className="text-cream-dim text-sm mb-2">
+                  This will send signing invitations to {signers.length} signer{signers.length !== 1 ? "s" : ""}:
+                </p>
+                <ul className="text-cream-dim/70 text-xs mb-6 space-y-1">
+                  {signers.map(s => <li key={s.id}>• {s.name} ({s.email})</li>)}
+                </ul>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setConfirmSend(false)}
+                    className="flex-1 border border-brown-border text-cream-dim py-2.5 rounded-lg text-sm hover:border-warm/30 transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => { setConfirmSend(false); handleSend() }}
+                    className="flex-1 bg-warm text-brown py-2.5 rounded-lg text-sm font-medium hover:brightness-110 transition"
+                  >
+                    Send Now
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Signing Progress */}
+          {envelope.status !== "DRAFT" && (
+            <div className="border border-brown-border rounded p-4">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-cream-dim text-xs tracking-wide">Progress</p>
+                <span className="text-cream-dim/50 text-xs">
+                  {signers.filter(s => s.signedAt).length} / {signers.length} signed
+                </span>
+              </div>
+              <div className="h-1.5 bg-brown-border rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-warm rounded-full transition-all"
+                  style={{ width: `${signers.length > 0 ? (signers.filter(s => s.signedAt).length / signers.length) * 100 : 0}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Download Sealed PDF */}
+          {envelope.status === "COMPLETED" && envelope.documentUrl && (
+            <a
+              href={envelope.documentUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full text-center bg-green-600/20 text-green-400 font-medium py-3 rounded text-sm hover:bg-green-600/30 transition"
+            >
+              Download Sealed PDF
+            </a>
           )}
 
           {/* Signers */}
@@ -216,14 +338,29 @@ export function EnvelopeDetail({
                   </div>
                   <p className="text-cream-dim/50 text-xs">{s.email} · {s.role}</p>
 
-                  {/* Show signing link after sent */}
+                  {/* Show signing link + resend after sent */}
                   {envelope.status !== "DRAFT" && !s.signedAt && !s.declinedAt && (
-                    <button
-                      onClick={() => copyLink(s.signingUrl, s.id)}
-                      className="mt-2 text-warm text-xs hover:underline"
-                    >
-                      {copied === s.id ? "Copied!" : "Copy signing link"}
-                    </button>
+                    <div className="flex items-center gap-3 mt-2">
+                      <button
+                        onClick={() => copyLink(s.signingUrl, s.id)}
+                        className="text-warm text-xs hover:underline"
+                      >
+                        {copied === s.id ? "Copied!" : "Copy signing link"}
+                      </button>
+                      <button
+                        disabled={resending === s.id}
+                        onClick={async () => {
+                          setResending(s.id)
+                          try {
+                            await fetch(`/api/airsign/envelopes/${envelope.id}/send`, { method: "POST" })
+                          } catch { /* ignore */ }
+                          finally { setResending(null) }
+                        }}
+                        className="text-cream-dim/50 text-xs hover:text-warm transition"
+                      >
+                        {resending === s.id ? "Sending..." : "Resend email"}
+                      </button>
+                    </div>
                   )}
                 </div>
               ))}

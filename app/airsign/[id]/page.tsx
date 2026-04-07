@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
 import prisma from "@/lib/prisma"
 import { EnvelopeDetail } from "./EnvelopeDetail"
+import { DarkLayout } from "@/components/layouts/DarkLayout"
 
 export default async function EnvelopeDetailPage({
   params,
@@ -9,7 +10,7 @@ export default async function EnvelopeDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { userId } = await auth()
-  if (!userId) redirect("/sign-in")
+  if (!userId) redirect("/sign-in?redirect_url=/airsign")
 
   const user = await prisma.user.findUnique({ where: { clerkId: userId } })
   if (!user) redirect("/sign-in")
@@ -20,7 +21,7 @@ export default async function EnvelopeDetailPage({
     where: { id },
     include: {
       signers: true,
-      fields: true,
+      fields: { orderBy: [{ page: "asc" }, { yPercent: "asc" }] },
       auditEvents: { orderBy: { createdAt: "desc" }, include: { signer: true } },
     },
   })
@@ -30,6 +31,7 @@ export default async function EnvelopeDetailPage({
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
 
   return (
+    <DarkLayout>
     <div className="max-w-5xl mx-auto px-6 py-10">
       <EnvelopeDetail
         envelope={{
@@ -77,5 +79,6 @@ export default async function EnvelopeDetailPage({
         }))}
       />
     </div>
+    </DarkLayout>
   )
 }

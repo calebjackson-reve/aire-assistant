@@ -1,19 +1,31 @@
 import type { Metadata } from "next"
-import { Newsreader, Space_Grotesk } from "next/font/google"
+import { Cormorant_Garamond, Space_Grotesk, IBM_Plex_Mono, Syncopate } from "next/font/google"
 import { ClerkProvider } from "@clerk/nextjs"
 import "./globals.css"
 
-const newsreader = Newsreader({
-  variable: "--font-newsreader",
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
   subsets: ["latin"],
   style: ["normal", "italic"],
-  weight: ["300", "400"],
+  weight: ["300", "400", "500", "600"],
 })
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600"],
+})
+
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: "--font-ibm-mono",
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+})
+
+const syncopate = Syncopate({
+  variable: "--font-syncopate",
+  subsets: ["latin"],
+  weight: ["400", "700"],
 })
 
 export const metadata: Metadata = {
@@ -40,7 +52,7 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en" className={`${newsreader.variable} ${spaceGrotesk.variable} antialiased`}>
+      <html lang="en" className={`${cormorant.variable} ${spaceGrotesk.variable} ${ibmPlexMono.variable} ${syncopate.variable} antialiased`}>
         <body>{children}</body>
       </html>
     </ClerkProvider>

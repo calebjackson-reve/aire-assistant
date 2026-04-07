@@ -20,7 +20,7 @@ export default async function AirSignPage() {
     orderBy: { updatedAt: "desc" },
   })
 
-  const counts = { DRAFT: 0, SENT: 0, IN_PROGRESS: 0, COMPLETED: 0, VOIDED: 0, EXPIRED: 0 }
+  const counts = { DRAFT: 0, SENT: 0, IN_PROGRESS: 0, COMPLETED: 0, VOIDED: 0, EXPIRED: 0, DECLINED: 0 }
   for (const e of envelopes) counts[e.status]++
 
   return (
@@ -29,7 +29,7 @@ export default async function AirSignPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <p className="text-warm text-sm tracking-wide mb-1">Document Signing</p>
-            <h1 className="font-[family-name:var(--font-newsreader)] italic text-cream text-3xl">AirSign</h1>
+            <h1 className="font-[family-name:var(--font-cormorant)] italic text-cream text-3xl">AirSign</h1>
           </div>
           <Link href="/airsign/new" className="bg-warm text-brown font-medium px-4 py-2 rounded text-sm hover:brightness-110 transition">
             + New envelope
@@ -43,7 +43,7 @@ export default async function AirSignPage() {
               <p className={`text-xl font-light ${counts[s] > 0 && s === "COMPLETED" ? "text-warm" : "text-cream"}`}>
                 {counts[s]}
               </p>
-              <p className="text-cream-dim/50 text-xs mt-0.5">{s.replace(/_/g, " ").toLowerCase()}</p>
+              <p className="text-cream-dim/50 text-xs mt-0.5 capitalize">{s.replace(/_/g, " ").toLowerCase()}</p>
             </div>
           ))}
         </div>
@@ -60,19 +60,29 @@ export default async function AirSignPage() {
           <div className="space-y-2">
             {envelopes.map((env) => {
               const signed = env.signers.filter((s) => s.signedAt).length
+              const badgeStyle =
+                env.status === "COMPLETED" ? "bg-green-500/10 text-green-400" :
+                env.status === "SENT" || env.status === "IN_PROGRESS" ? "bg-warm/10 text-warm" :
+                env.status === "VOIDED" ? "bg-red-500/10 text-red-400" :
+                env.status === "EXPIRED" ? "bg-cream-dim/10 text-cream-dim/50" :
+                "bg-brown-light text-cream-dim"
               return (
-                <Link key={env.id} href={`/airsign/${env.id}`} className="block border border-brown-border rounded p-4 hover:border-warm/20 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-cream text-sm font-medium">{env.name}</p>
-                      <p className="text-cream-dim text-xs mt-0.5">{env.signers.length} signers · {env._count.fields} fields</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-cream-dim/50 text-xs">{signed}/{env.signers.length} signed</span>
-                      <span className="text-cream-dim text-xs">{env.status.replace(/_/g, " ").toLowerCase()}</span>
-                    </div>
+                <div key={env.id} className="border border-brown-border rounded p-4 hover:border-warm/20 transition-colors flex items-center justify-between">
+                  <Link href={`/airsign/${env.id}`} className="flex-1 min-w-0">
+                    <p className="text-cream text-sm font-medium">{env.name}</p>
+                    <p className="text-cream-dim text-xs mt-0.5">
+                      {env.signers.length} signers · {env._count.fields} fields · {signed}/{env.signers.length} signed
+                    </p>
+                  </Link>
+                  <div className="flex items-center gap-2 ml-4 shrink-0">
+                    <span className={`text-[10px] px-2 py-0.5 rounded ${badgeStyle}`}>
+                      {env.status.replace(/_/g, " ")}
+                    </span>
+                    <Link href={`/airsign/${env.id}`} className="text-cream-dim text-xs border border-brown-border rounded px-2 py-1 hover:border-warm/30 transition">
+                      View
+                    </Link>
                   </div>
-                </Link>
+                </div>
               )
             })}
           </div>

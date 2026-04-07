@@ -48,6 +48,11 @@ export async function GET() {
 // POST: Create a new transaction + auto-calculate Louisiana deadlines
 export async function POST(req: NextRequest) {
   try {
+    // Free tier: max 3 transactions
+    const { requireFeature } = await import("@/lib/auth/subscription-gate");
+    const gate = await requireFeature("transactions");
+    if (gate) return gate;
+
     const { userId: clerkId } = await auth();
     if (!clerkId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

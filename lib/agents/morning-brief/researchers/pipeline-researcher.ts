@@ -1,7 +1,18 @@
 // lib/agents/morning-brief/researchers/pipeline-researcher.ts
-// Queries Transaction table for active deals needing attention.
+// Queries Transaction table for active deals + AIRE intelligence scores.
 
 import prisma from "@/lib/prisma"
+import { normalizeAddress } from "@/lib/data/engines/normalize"
+import { getLatestScore } from "@/lib/data/db/queries/scores"
+
+export interface DealIntelligence {
+  aireEstimate: number | null
+  confidenceTier: 'HIGH' | 'MEDIUM' | 'LOW' | null
+  disagreementPct: number | null
+  ppsTotal: number | null
+  assessorGapPct: number | null
+  scoredAt: string | null
+}
 
 export interface PipelineDeal {
   id: string
@@ -16,6 +27,7 @@ export interface PipelineDeal {
   pendingDeadlineCount: number
   needsAttention: boolean
   attentionReason: string | null
+  intelligence: DealIntelligence | null
 }
 
 export interface PipelineResearchResult {
@@ -23,6 +35,7 @@ export interface PipelineResearchResult {
   totalActive: number
   closingSoon: number   // closing within 14 days
   needsAttention: number
+  lowConfidenceDeals: number  // deals where AIRE estimate confidence is LOW
 }
 
 export async function researchPipeline(userId: string): Promise<PipelineResearchResult> {
@@ -48,7 +61,29 @@ export async function researchPipeline(userId: string): Promise<PipelineResearch
     orderBy: { updatedAt: "desc" },
   })
 
-  const deals: PipelineDeal[] = transactions.map((t) => {
+  // Look up AIRE scores for each deal's property (parallel, fault-tolerant)
+  const scoreMap = new Map<string, DealIntelligence>()
+  try {
+    const lookups = transactions.map(async (t) => {
+      const normalized = normalizeAddress(t.propertyAddress)
+      if (!normalized) return
+      const score = await getLatestScore(normalized.property_id)
+      if (!score) return
+      scoreMap.set(t.id, {
+        aireEstimate: score.aire_estimate,
+        confidenceTier: score.confidence_tier,
+        disagreementPct: score.source_disagreement_pct,
+        ppsTotal: score.pps_total,
+        assessorGapPct: score.assessor_gap_pct,
+        scoredAt: score.score_date,
+      })
+    })
+    await Promise.allSettled(lookups)
+  } catch {
+    // Intelligence tables may not have data yet — continue without scores
+  }
+
+  const deals = transactions.map((t): PipelineDeal => {
     const daysUntilClosing = t.closingDate
       ? Math.floor((new Date(t.closingDate).getTime() - now.getTime()) / (24 * 60 * 60 * 1000))
       : null
@@ -73,6 +108,14 @@ export async function researchPipeline(userId: string): Promise<PipelineResearch
       attentionReason = "Draft transaction stale for 7+ days"
     }
 
+    const intelligence = scoreMap.get(t.id) ?? null
+
+    // Flag low-confidence estimates as needing attention
+    if (intelligence?.confidenceTier === 'LOW' && !needsAttention) {
+      needsAttention = true
+      attentionReason = `AIRE estimate confidence is LOW (${(intelligence.disagreementPct ?? 0 * 100).toFixed(1)}% source disagreement)`
+    }
+
     return {
       id: t.id,
       propertyAddress: t.propertyAddress,
@@ -86,6 +129,7 @@ export async function researchPipeline(userId: string): Promise<PipelineResearch
       pendingDeadlineCount,
       needsAttention,
       attentionReason,
+      intelligence,
     }
   })
 
@@ -94,5 +138,6 @@ export async function researchPipeline(userId: string): Promise<PipelineResearch
     totalActive: deals.length,
     closingSoon: deals.filter((d) => d.daysUntilClosing !== null && d.daysUntilClosing <= 14).length,
     needsAttention: deals.filter((d) => d.needsAttention).length,
+    lowConfidenceDeals: deals.filter((d) => d.intelligence?.confidenceTier === 'LOW').length,
   }
 }

@@ -5,6 +5,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import prisma from "@/lib/prisma"
+import { sendSigningInvitation } from "@/lib/airsign/email"
 
 export async function POST(
   req: NextRequest,
@@ -69,24 +70,43 @@ export async function POST(
     },
   })
 
-  // Build signing URLs
+  // Sequential signing gate — only invite signers in the lowest order group
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-  const signingLinks = envelope.signers.map((s) => ({
+  const minOrder = Math.min(...envelope.signers.map((s) => s.order))
+  const firstBatch = envelope.signers.filter((s) => s.order === minOrder)
+  const waitingSigners = envelope.signers.filter((s) => s.order > minOrder)
+
+  const signingLinks = firstBatch.map((s) => ({
     signerName: s.name,
     signerEmail: s.email,
     signingUrl: `${appUrl}/sign/${s.token}`,
     order: s.order,
   }))
 
-  // TODO: Send emails via Resend when RESEND_API_KEY is configured
-  // For now, return signing URLs directly
+  for (const s of waitingSigners) {
+    console.log(`[AirSign] Signer ${s.name} (order ${s.order}) queued — will be invited after order ${minOrder} completes`)
+  }
 
-  console.log(`[AirSign] Envelope ${id} sent with ${signingLinks.length} signing links`)
+  // Send signing invitation emails via Resend (only to first-batch signers)
+  const emailResults: Array<{ signer: string; status: string; error?: string }> = []
+  for (const link of signingLinks) {
+    const result = await sendSigningInvitation({
+      signerName: link.signerName,
+      signerEmail: link.signerEmail,
+      envelopeName: envelope.name,
+      signingUrl: link.signingUrl,
+      expiresAt,
+    })
+    emailResults.push({ signer: link.signerName, status: result.status, error: result.error })
+  }
+
+  console.log(`[AirSign] Envelope ${id} sent with ${signingLinks.length} signing links, ${emailResults.filter(e => e.status === "sent").length} emails delivered`)
 
   return NextResponse.json({
     success: true,
     status: "SENT",
     expiresAt: expiresAt.toISOString(),
     signingLinks,
+    emailResults,
   })
 }

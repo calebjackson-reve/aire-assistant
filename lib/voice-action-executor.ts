@@ -5,7 +5,10 @@
  */
 
 import prisma from "@/lib/prisma";
-import { generateDocument } from "@/lib/document-generator";
+import * as chrono from "chrono-node";
+import { advanceTransaction } from "@/lib/workflow/state-machine";
+import { AIRE_DATA } from "@/lib/data/market-data";
+import { writeContract } from "@/lib/contracts/contract-writer";
 
 export interface ActionRequest {
   userId: string;
@@ -68,7 +71,7 @@ export async function executeAction(req: ActionRequest): Promise<ActionResult> {
       return marketAnalysis(entities);
 
     case "create_addendum":
-      return createAddendumDraft(userId, voiceCommandId, entities);
+      return createAddendum(userId, voiceCommandId, entities);
 
     case "send_alert":
       return sendAlert(userId, entities);
@@ -81,6 +84,10 @@ export async function executeAction(req: ActionRequest): Promise<ActionResult> {
 
     case "run_compliance":
       return runComplianceScan(userId, entities);
+
+    case "write_contract":
+    case "write_purchase_agreement":
+      return writeContractFromVoice(userId, voiceCommandId, entities);
 
     default:
       return {
@@ -242,16 +249,28 @@ async function updateTransactionStatus(
     };
   }
 
-  await prisma.transaction.update({
-    where: { id: txn.id },
-    data: { status: newStatus as "DRAFT" | "ACTIVE" | "PENDING_INSPECTION" | "PENDING_APPRAISAL" | "PENDING_FINANCING" | "CLOSING" | "CLOSED" | "CANCELLED" },
+  // Use workflow state machine for validated transitions + event logging
+  const result = await advanceTransaction({
+    transactionId: txn.id,
+    toStatus: newStatus as "DRAFT" | "ACTIVE" | "PENDING_INSPECTION" | "PENDING_APPRAISAL" | "PENDING_FINANCING" | "CLOSING" | "CLOSED" | "CANCELLED",
+    trigger: "voice_command",
+    triggeredBy: userId,
+    metadata: { source: "voice_command", requestedStatus: newStatus },
   });
+
+  if (!result.success) {
+    return {
+      success: false,
+      action: "update_status",
+      message: result.error || `Cannot transition ${txn.status} → ${newStatus}.`,
+    };
+  }
 
   return {
     success: true,
     action: "update_status",
-    message: `${txn.propertyAddress} updated to ${newStatus}.`,
-    data: { transactionId: txn.id, oldStatus: txn.status, newStatus },
+    message: `${txn.propertyAddress} updated from ${result.fromStatus} to ${newStatus}.`,
+    data: { transactionId: txn.id, oldStatus: result.fromStatus, newStatus, eventId: result.eventId },
   };
 }
 
@@ -381,12 +400,14 @@ async function scheduleClosing(
     };
   }
 
-  const closingDate = new Date(dateStr);
-  if (isNaN(closingDate.getTime())) {
+  // chrono-node handles "next Friday", "in two weeks", "May 15", "end of month", etc.
+  // forwardDate: true forces ambiguous dates (e.g., "Friday") to resolve to the future.
+  const closingDate = chrono.parseDate(dateStr, new Date(), { forwardDate: true });
+  if (!closingDate || isNaN(closingDate.getTime())) {
     return {
       success: false,
       action: "schedule_closing",
-      message: `Couldn't parse "${dateStr}" as a date. Try a format like "May 15, 2026".`,
+      message: `Couldn't parse "${dateStr}" as a date. Try "next Friday", "May 15", or "in two weeks".`,
     };
   }
 
@@ -406,41 +427,75 @@ async function scheduleClosing(
 async function marketAnalysis(
   entities: Record<string, string>
 ): Promise<ActionResult> {
-  // Returns a pointer — actual analysis would call the intelligence API
   const area = entities.address || entities.city || "Baton Rouge";
+
+  // Try to find matching neighborhood in AIRE_DATA
+  const neighborhood = AIRE_DATA.markets.find(
+    (m) => m.name.toLowerCase().includes(area.toLowerCase()) ||
+           m.id === area.toLowerCase().replace(/\s+/g, "-")
+  );
+
+  if (neighborhood) {
+    return {
+      success: true,
+      action: "market_analysis",
+      message: `${neighborhood.name} (${neighborhood.label}, Heat Score: ${neighborhood.heatScore}/100):\n` +
+        `Median Price: $${neighborhood.medianPrice.toLocaleString()} (${neighborhood.medianPriceChange > 0 ? "+" : ""}${neighborhood.medianPriceChange}% YoY)\n` +
+        `DOM: ${neighborhood.dom} days | List/Sale: ${neighborhood.listSaleRatio}%\n` +
+        `Price/sqft: $${neighborhood.pricePerSqft} | Inventory: ${neighborhood.inventory} months\n` +
+        `${neighborhood.recommendation}`,
+      data: { neighborhood, source: "AIRE_DATA" },
+    };
+  }
+
+  // Fall back to metro-level data
+  const metro = AIRE_DATA.metro;
   return {
     success: true,
     action: "market_analysis",
-    message: `Market analysis for ${area}: Use the AIRE Intelligence dashboard at /aire for full market data, AIRE Estimate, and neighborhood scoring.`,
-    data: { area, redirectTo: "/aire" },
+    message: `Baton Rouge Metro Market:\n` +
+      `Median Price: $${metro.medianPrice.toLocaleString()} (${metro.medianPriceChange > 0 ? "+" : ""}${metro.medianPriceChange}% YoY)\n` +
+      `Closed Sales: ${metro.closedSales} | Pending: ${metro.pendingSales}\n` +
+      `DOM: ${metro.dom} days | List/Sale: ${metro.listSaleRatio}%\n` +
+      `Inventory: ${metro.inventory} (${metro.monthsSupply} months supply)\n` +
+      `Available neighborhoods: ${AIRE_DATA.markets.map((m) => m.name).join(", ")}`,
+    data: { metro, availableNeighborhoods: AIRE_DATA.markets.map((m) => m.id) },
   };
 }
 
-async function createAddendumDraft(
+/**
+ * Create an addendum by calling the contract writer (lrec-103).
+ * Replaces the legacy createAddendumDraft path — unified with the
+ * contract-writer pipeline so addenda and PAs share clause/validation logic.
+ */
+async function createAddendum(
   userId: string,
   voiceCommandId: string,
   entities: Record<string, string>
 ): Promise<ActionResult> {
   const address = entities.address;
-  const docType = entities.document_type || "addendum";
-
   if (!address) {
     return {
       success: false,
       action: "create_addendum",
-      message: "Which property? Please specify the address.",
+      message: "Which property? Try: 'Create addendum for 123 Main St — extend inspection by 5 days'",
     };
   }
 
-  const txn = await prisma.transaction.findFirst({
-    where: {
-      userId,
-      propertyAddress: { contains: address, mode: "insensitive" as const },
-    },
-    include: {
-      documents: { select: { type: true } },
-    },
+  // Look up transaction (exact → starts-with → contains)
+  let txn = await prisma.transaction.findFirst({
+    where: { userId, propertyAddress: { equals: address, mode: "insensitive" as const } },
   });
+  if (!txn) {
+    txn = await prisma.transaction.findFirst({
+      where: { userId, propertyAddress: { startsWith: address, mode: "insensitive" as const } },
+    });
+  }
+  if (!txn) {
+    txn = await prisma.transaction.findFirst({
+      where: { userId, propertyAddress: { contains: address, mode: "insensitive" as const } },
+    });
+  }
 
   if (!txn) {
     return {
@@ -450,55 +505,85 @@ async function createAddendumDraft(
     };
   }
 
-  // Generate actual PDF
-  const docTypeNormalized = docType.toLowerCase().replace(/\s+/g, "_");
-  const pdf = await generateDocument(docTypeNormalized, {
-    propertyAddress: txn.propertyAddress,
-    propertyCity: txn.propertyCity,
-    propertyState: txn.propertyState,
-    propertyZip: txn.propertyZip || undefined,
-    buyerName: txn.buyerName || undefined,
-    sellerName: txn.sellerName || undefined,
-    contractDate: txn.contractDate?.toLocaleDateString("en-US") || undefined,
-    closingDate: txn.closingDate?.toLocaleDateString("en-US") || undefined,
-    purchasePrice: txn.acceptedPrice?.toString() || txn.listPrice?.toString() || undefined,
-    addendumType: docType,
-    addendumText: entities.addendum_text || entities.description || undefined,
-    repairItems: entities.repair_items ? entities.repair_items.split(";").map((s: string) => s.trim()) : undefined,
-  });
+  const description =
+    entities.description ||
+    entities.addendum_text ||
+    entities.addendum_type ||
+    "addendum";
 
-  const document = await prisma.document.create({
-    data: {
+  // Build a natural-language command for the contract writer
+  const nlCommand = `Write an addendum for ${txn.propertyAddress}: ${description}`;
+
+  try {
+    const result = await writeContract({
+      formType: "lrec-103", // LREC Addendum
+      naturalLanguage: nlCommand,
+      fields: {
+        ...entities,
+        address: txn.propertyAddress,
+        property_address: txn.propertyAddress,
+        property_city: txn.propertyCity,
+        property_state: txn.propertyState,
+        buyer_name: entities.buyer_name || txn.buyerName || "",
+        seller_name: entities.seller_name || txn.sellerName || "",
+        description,
+        addendum_text: description,
+      },
       transactionId: txn.id,
-      name: pdf.filename,
-      type: pdf.documentType,
-      category: "generated",
-      filledData: JSON.parse(JSON.stringify(pdf.fields)),
-      fileSize: pdf.buffer.length,
-      pageCount: pdf.pageCount,
-      checklistStatus: "draft",
-    },
-  });
+      userId,
+    });
 
-  // Link voice command to transaction
-  await prisma.voiceCommand.update({
-    where: { id: voiceCommandId },
-    data: { transactionId: txn.id },
-  });
+    // Link voice command to transaction
+    await prisma.voiceCommand.update({
+      where: { id: voiceCommandId },
+      data: { transactionId: txn.id },
+    });
 
-  return {
-    success: true,
-    action: "create_addendum",
-    message: `Draft ${docType} created for ${txn.propertyAddress}. Review and complete in the Documents tab.`,
-    data: {
-      documentId: document.id,
-      transactionId: txn.id,
-      type: docType,
-      status: "draft",
-      redirectTo: `/documents/${document.id}`,
-    },
-    requiresApproval: false, // Already approved to get here
-  };
+    // Persist Document record
+    let documentId: string | null = null;
+    if (result.pdfBuffer && result.pdfBuffer.length > 0) {
+      const doc = await prisma.document.create({
+        data: {
+          transactionId: txn.id,
+          name: result.filename,
+          type: "addendum",
+          category: "addendum",
+          filledData: JSON.parse(JSON.stringify(result.fields)),
+          fileSize: result.pdfBuffer.length,
+          pageCount: result.pageCount,
+          checklistStatus: "draft",
+        },
+      });
+      documentId = doc.id;
+    }
+
+    const warnings = result.validation?.warnings?.length
+      ? ` Note: ${result.validation.warnings.join("; ")}`
+      : "";
+
+    return {
+      success: true,
+      action: "create_addendum",
+      message: `Addendum drafted for ${txn.propertyAddress}: ${result.filename} (${result.pageCount} page${result.pageCount === 1 ? "" : "s"}).${warnings}`,
+      data: {
+        documentId,
+        transactionId: txn.id,
+        filename: result.filename,
+        formType: result.formType,
+        pageCount: result.pageCount,
+        description,
+        redirectTo: documentId ? `/aire/transactions/${txn.id}` : undefined,
+      },
+      requiresApproval: false, // User already confirmed via preview
+    };
+  } catch (err) {
+    console.error("[Voice→Addendum] Error:", err);
+    return {
+      success: false,
+      action: "create_addendum",
+      message: `Failed to generate addendum for ${txn.propertyAddress}. ${err instanceof Error ? err.message : "Please try again."}`,
+    };
+  }
 }
 
 async function sendAlert(
@@ -637,4 +722,95 @@ function calculateRoi(entities: Record<string, string>): ActionResult {
     message: `ROI estimate: ${grossYield}% gross yield. ~$${monthlyFlow.toFixed(0)}/mo cash flow ($${annualFlow.toFixed(0)}/yr). Purchase: $${(price / 1000).toFixed(0)}K, Rent: $${rent.toFixed(0)}/mo.`,
     data: { price, rent, grossYield: parseFloat(grossYield), monthlyCashFlow: monthlyFlow, annualCashFlow: annualFlow },
   };
+}
+
+async function writeContractFromVoice(
+  userId: string,
+  voiceCommandId: string,
+  entities: Record<string, string>
+): Promise<ActionResult> {
+  // Build NL command from entities for the contract writer
+  const parts: string[] = []
+  if (entities.address) parts.push(`property at ${entities.address}`)
+  if (entities.buyer_name) parts.push(`buyer ${entities.buyer_name}`)
+  if (entities.seller_name) parts.push(`seller ${entities.seller_name}`)
+  if (entities.price) parts.push(`price $${entities.price}`)
+  if (entities.date) parts.push(`closing ${entities.date}`)
+  if (entities.earnest_money) parts.push(`earnest money $${entities.earnest_money}`)
+
+  const nlCommand = parts.length > 0
+    ? `Write purchase agreement for ${parts.join(", ")}`
+    : "Write purchase agreement"
+
+  // Check if a transaction exists for this address
+  let transactionId: string | undefined
+  if (entities.address) {
+    const txn = await prisma.transaction.findFirst({
+      where: { userId, propertyAddress: { contains: entities.address, mode: "insensitive" as const } },
+    })
+    if (txn) transactionId = txn.id
+  }
+
+  try {
+    const result = await writeContract({
+      formType: entities.document_type === "addendum" ? "lrec-103" : "lrec-101",
+      naturalLanguage: nlCommand,
+      fields: entities,
+      transactionId,
+      userId,
+    })
+
+    // Link voice command to transaction
+    if (transactionId) {
+      await prisma.voiceCommand.update({
+        where: { id: voiceCommandId },
+        data: { transactionId },
+      })
+    }
+
+    // Save as document if transaction exists
+    let documentId: string | null = null
+    if (transactionId && result.pdfBuffer.length > 0) {
+      const doc = await prisma.document.create({
+        data: {
+          transactionId,
+          name: result.filename,
+          type: result.formType,
+          category: "generated",
+          filledData: JSON.parse(JSON.stringify(result.fields)),
+          fileSize: result.pdfBuffer.length,
+          pageCount: result.pageCount,
+          checklistStatus: "draft",
+        },
+      })
+      documentId = doc.id
+    }
+
+    const warnings = result.validation.warnings.length > 0
+      ? ` Note: ${result.validation.warnings.join("; ")}`
+      : ""
+
+    return {
+      success: true,
+      action: "write_contract",
+      message: `Contract draft created: ${result.filename} (${result.pageCount} pages, ${result.clauses.length} clauses). Generated in ${(result.timing.totalMs / 1000).toFixed(1)}s.${warnings}`,
+      data: {
+        filename: result.filename,
+        formType: result.formType,
+        pageCount: result.pageCount,
+        clauses: result.clauses,
+        timing: result.timing,
+        documentId,
+        transactionId,
+        validation: result.validation,
+      },
+    }
+  } catch (err) {
+    console.error("[Voice→Contract] Error:", err)
+    return {
+      success: false,
+      action: "write_contract",
+      message: "Failed to generate the contract. Please try again or specify more details.",
+    }
+  }
 }

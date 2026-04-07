@@ -1,0 +1,6 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e4]:
+    - paragraph [ref=e5]: AIRE INTELLIGENCE
+    - heading "AIRE Intel" [level=1] [ref=e6]
+    - paragraph [ref=e7]: Sign in to your account
+  - alert [ref=e8]

@@ -75,7 +75,7 @@ export default async function RelationshipsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="font-[family-name:var(--font-newsreader)] italic text-cream text-3xl">
+          <h1 className="font-[family-name:var(--font-cormorant)] italic text-cream text-3xl">
             Relationship Intelligence
           </h1>
           <p className="text-cream-dim text-sm mt-1">

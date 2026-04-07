@@ -7,25 +7,37 @@ interface SignerInput {
   name: string
   email: string
   role: string
+  order: number
 }
 
 export function NewEnvelopeForm() {
   const router = useRouter()
   const [name, setName] = useState("")
   const [documentUrl, setDocumentUrl] = useState("")
+  const [fileName, setFileName] = useState("")
+  const [pageCount, setPageCount] = useState<number | null>(null)
   const [signers, setSigners] = useState<SignerInput[]>([
-    { name: "", email: "", role: "SIGNER" },
+    { name: "", email: "", role: "SIGNER", order: 1 },
   ])
+  const [parallel, setParallel] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [autoPlacedNotice, setAutoPlacedNotice] = useState<string | null>(null)
 
   function addSigner() {
-    setSigners([...signers, { name: "", email: "", role: "SIGNER" }])
+    const nextOrder = parallel ? 1 : signers.length + 1
+    setSigners([...signers, { name: "", email: "", role: "SIGNER", order: nextOrder }])
   }
 
-  function updateSigner(index: number, field: keyof SignerInput, value: string) {
+  function updateSigner(index: number, field: keyof SignerInput, value: string | number) {
     setSigners(signers.map((s, i) => (i === index ? { ...s, [field]: value } : s)))
+  }
+
+  function toggleParallel(next: boolean) {
+    setParallel(next)
+    // When toggling, reset orders: parallel = all 1, sequential = 1,2,3...
+    setSigners((prev) => prev.map((s, i) => ({ ...s, order: next ? 1 : i + 1 })))
   }
 
   function removeSigner(index: number) {
@@ -53,6 +65,12 @@ export function NewEnvelopeForm() {
       if (res.ok) {
         const data = await res.json()
         setDocumentUrl(data.url)
+        setFileName(data.filename || file.name)
+        if (data.pageCount) setPageCount(data.pageCount)
+        // Auto-fill envelope name from PDF title or filename
+        if (data.suggestedName && !name.trim()) {
+          setName(data.suggestedName)
+        }
       } else {
         setError("Upload failed. Check that BLOB_READ_WRITE_TOKEN is configured.")
       }
@@ -81,13 +99,20 @@ export function NewEnvelopeForm() {
         body: JSON.stringify({
           name: name.trim(),
           documentUrl,
-          signers: signers.map((s, i) => ({ ...s, order: i + 1 })),
+          pageCount,
+          signers: signers.map((s) => ({ ...s, order: s.order || 1 })),
         }),
       })
 
       if (res.ok) {
         const envelope = await res.json()
-        router.push(`/airsign/${envelope.id}`)
+        if (envelope.autoPlaced) {
+          setAutoPlacedNotice(`Detected ${envelope.autoPlaced.displayName} — ${envelope.autoPlaced.count} fields auto-placed.`)
+          // Brief delay so the agent sees the notice before navigation
+          setTimeout(() => router.push(`/airsign/${envelope.id}`), 1400)
+        } else {
+          router.push(`/airsign/${envelope.id}`)
+        }
       } else {
         const err = await res.json()
         setError(err.error ?? "Failed to create envelope")
@@ -107,6 +132,12 @@ export function NewEnvelopeForm() {
         </div>
       )}
 
+      {autoPlacedNotice && (
+        <div className="border border-warm/30 bg-warm/10 rounded p-3">
+          <p className="text-warm text-sm">{autoPlacedNotice}</p>
+        </div>
+      )}
+
       {/* Envelope name */}
       <div>
         <label className="text-cream-dim text-xs tracking-wide block mb-2">Envelope name</label>
@@ -114,7 +145,8 @@ export function NewEnvelopeForm() {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Purchase Agreement — 123 Main St"
+          spellCheck={false}
+          placeholder="Auto-filled from document"
           className="w-full bg-transparent border border-brown-border rounded px-4 py-3 text-cream text-sm focus:outline-none focus:border-warm/40 placeholder:text-cream-dim/30"
         />
       </div>
@@ -124,10 +156,14 @@ export function NewEnvelopeForm() {
         <label className="text-cream-dim text-xs tracking-wide block mb-2">Document (PDF)</label>
         {documentUrl ? (
           <div className="border border-warm/20 rounded p-3 flex items-center justify-between">
-            <span className="text-cream text-sm">Document uploaded</span>
+            <div className="flex items-center gap-2 min-w-0">
+              <svg className="w-4 h-4 text-warm shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span className="text-cream text-sm truncate">{fileName || "Document uploaded"}</span>
+              {pageCount ? <span className="text-cream-dim/50 text-xs shrink-0">{pageCount} pg</span> : null}
+            </div>
             <button
-              onClick={() => setDocumentUrl("")}
-              className="text-cream-dim text-xs hover:text-cream"
+              onClick={() => { setDocumentUrl(""); setPageCount(null); setFileName("") }}
+              className="text-cream-dim text-xs hover:text-cream shrink-0 ml-3"
             >
               Replace
             </button>
@@ -149,7 +185,30 @@ export function NewEnvelopeForm() {
 
       {/* Signers */}
       <div>
-        <label className="text-cream-dim text-xs tracking-wide block mb-2">Signers</label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-cream-dim text-xs tracking-wide">Signers</label>
+          <div className="flex items-center gap-1 border border-brown-border rounded overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleParallel(true)}
+              className={`text-xs px-3 py-1 transition ${parallel ? "bg-warm/20 text-warm" : "text-cream-dim/50 hover:text-cream-dim"}`}
+            >
+              Parallel
+            </button>
+            <button
+              type="button"
+              onClick={() => toggleParallel(false)}
+              className={`text-xs px-3 py-1 transition ${!parallel ? "bg-warm/20 text-warm" : "text-cream-dim/50 hover:text-cream-dim"}`}
+            >
+              Sequential
+            </button>
+          </div>
+        </div>
+        <p className="text-cream-dim/40 text-[10px] mb-2">
+          {parallel
+            ? "All signers get an invite at the same time."
+            : "Signers are invited one-at-a-time in order. Lower numbers go first. Use the same number to group signers (e.g., both buyers at step 1)."}
+        </p>
         <div className="space-y-2">
           {signers.map((signer, i) => (
             <div key={i} className="border border-brown-border rounded p-3 space-y-2">
@@ -177,15 +236,30 @@ export function NewEnvelopeForm() {
                   className="bg-transparent border border-brown-border rounded px-3 py-2 text-cream text-sm focus:outline-none focus:border-warm/40 placeholder:text-cream-dim/30"
                 />
               </div>
-              <select
-                value={signer.role}
-                onChange={(e) => updateSigner(i, "role", e.target.value)}
-                className="bg-[#1e2416] border border-brown-border rounded px-3 py-2 text-cream text-sm focus:outline-none w-full"
-              >
-                <option value="SIGNER">Signer</option>
-                <option value="WITNESS">Witness</option>
-                <option value="NOTARY">Notary</option>
-              </select>
+              <div className="grid grid-cols-[1fr_auto] gap-2">
+                <select
+                  value={signer.role}
+                  onChange={(e) => updateSigner(i, "role", e.target.value)}
+                  className="bg-[#1e2416] border border-brown-border rounded px-3 py-2 text-cream text-sm focus:outline-none"
+                >
+                  <option value="SIGNER">Signer</option>
+                  <option value="WITNESS">Witness</option>
+                  <option value="NOTARY">Notary</option>
+                </select>
+                {!parallel && (
+                  <div className="flex items-center gap-1">
+                    <label className="text-cream-dim/60 text-[10px] uppercase">Order</label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={99}
+                      value={signer.order}
+                      onChange={(e) => updateSigner(i, "order", Math.max(1, parseInt(e.target.value) || 1))}
+                      className="w-14 bg-[#1e2416] border border-brown-border rounded px-2 py-2 text-cream text-sm focus:outline-none focus:border-warm/40 text-center"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>

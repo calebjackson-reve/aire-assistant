@@ -1,129 +1,90 @@
 import Link from 'next/link'
 
+const LINKS = [
+  { label: 'Platform', href: '#platform' },
+  { label: 'Tools', href: '#tools' },
+  { label: 'Pricing', href: '#pricing' },
+  { label: 'About', href: '#about' },
+  { label: 'Privacy', href: '/privacy' },
+]
+
 const SOCIALS = [
-  { label: 'Instagram', href: 'https://www.instagram.com/calebjackson_24/' },
-  { label: 'TikTok',    href: 'https://www.tiktok.com/@calebjackson' },
-  { label: 'LinkedIn',  href: 'https://www.linkedin.com/in/caleb-jackson-22b627270' },
-  { label: 'YouTube',   href: 'https://www.youtube.com/@calebjackson' },
-  { label: 'X',         href: 'https://x.com/calebjackson24' },
+  { label: 'IG', href: 'https://www.instagram.com/calebjackson_24/' },
+  { label: 'TT', href: 'https://www.tiktok.com/@calebjackson' },
+  { label: 'LI', href: 'https://www.linkedin.com/in/caleb-jackson-22b627270' },
+  { label: 'X', href: 'https://x.com/calebjackson24' },
 ]
 
-const TOOL_LINKS = [
-  ['Market Pulse',       '/tools/market-pulse'],
-  ['Cash Flow Analyzer', '/tools/cash-flow'],
-  ['Flood Vision',       '/tools/flood-vision'],
-  ['Neighborhood Score', '/tools/neighborhood-score'],
-  ['Deal DNA',           '/tools/deal-dna'],
-]
-
-const COMPANY_LINKS = [
-  ['About', '#about'],
-  ['Tools', '/tools'],
-  ['Contact', '#contact'],
-  ['Privacy Policy', '/privacy'],
-]
+function SocialIcon({ name }: { name: string }) {
+  const cls = "w-3.5 h-3.5 opacity-50 group-hover:opacity-100 transition-opacity"
+  if (name === "IG") return <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="2" width="20" height="20" rx="5" /><circle cx="12" cy="12" r="5" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>
+  if (name === "TT") return <svg className={cls} viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1 0-5.78c.27 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15.2a6.34 6.34 0 0 0 9.49 5.5 6.33 6.33 0 0 0 2.85-5.29V8.87a8.28 8.28 0 0 0 4.1 1.08V6.5c-.01 0-.01.19 0 .19z"/></svg>
+  if (name === "LI") return <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /></svg>
+  return <svg className={cls} viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+}
 
 export default function Footer() {
   return (
-    <footer id="contact" className="bg-[#B0AC9E] border-t border-white/20">
+    <footer className="border-t border-champagne-light">
       <div className="container-aire py-16 md:py-20">
-        {/* Top — brand + columns */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 mb-12">
+        <div className="flex flex-col md:flex-row justify-between gap-12">
           {/* Brand */}
-          <div className="md:col-span-1">
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-peach to-copper-light flex items-center justify-center font-display text-sm italic text-forest-deep">
-                A
-              </div>
-              <span className="font-display text-[15px] italic text-cream">
-                AIRE Intelligence
-              </span>
-            </div>
-            <p className="text-sm text-cream-dark leading-relaxed max-w-[280px] mb-6">
-              AI-powered real estate tools for the Greater Baton Rouge market.
-              Built by Caleb Jackson at Reve REALTORS.
+          <div className="max-w-xs">
+            <span className="font-[family-name:var(--font-cormorant)] text-[22px] font-light italic text-ink block mb-4">
+              AIRE
+            </span>
+            <p className="text-sm text-ink-muted leading-relaxed">
+              AI-powered transaction management for Louisiana real estate.
+              Built by an active agent, for agents.
             </p>
-            <div className="flex gap-2">
-              {SOCIALS.map((s) => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title={s.label}
-                  className="w-8 h-8 rounded-lg border border-glass-border flex items-center justify-center text-[10px] font-medium text-cream-dark hover:text-peach hover:border-copper/30 transition-colors"
-                >
-                  {s.label.slice(0, 2).toUpperCase()}
+          </div>
+
+          {/* Links */}
+          <div className="flex gap-16">
+            <div>
+              <p className="font-[family-name:var(--font-syncopate)] text-[9px] tracking-[0.2em] uppercase text-ink-faint mb-5">
+                Navigate
+              </p>
+              <div className="flex flex-col gap-3">
+                {LINKS.map((link) => (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    className="text-sm text-ink-muted hover:text-ink transition-colors no-underline"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="font-[family-name:var(--font-syncopate)] text-[9px] tracking-[0.2em] uppercase text-ink-faint mb-5">
+                Connect
+              </p>
+              <div className="flex flex-col gap-3">
+                <a href="https://calendly.com/calebjackson" target="_blank" rel="noopener noreferrer" className="text-sm text-sage hover:text-olive transition-colors no-underline">
+                  Book a call
                 </a>
-              ))}
-            </div>
-          </div>
-
-          {/* Tools */}
-          <div>
-            <div className="text-[11px] font-semibold tracking-[0.12em] uppercase text-[#C4A882] mb-5">
-              Tools
-            </div>
-            <div className="flex flex-col gap-3">
-              {TOOL_LINKS.map(([label, href]) => (
-                <Link
-                  key={label}
-                  href={href}
-                  className="text-sm text-cream-dark hover:text-cream transition-colors no-underline"
-                >
-                  {label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* Company */}
-          <div>
-            <div className="text-[11px] font-semibold tracking-[0.12em] uppercase text-[#C4A882] mb-5">
-              Company
-            </div>
-            <div className="flex flex-col gap-3">
-              {COMPANY_LINKS.map(([label, href]) => (
-                <Link
-                  key={label}
-                  href={href}
-                  className="text-sm text-cream-dark hover:text-cream transition-colors no-underline"
-                >
-                  {label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <div className="text-[11px] font-semibold tracking-[0.12em] uppercase text-[#C4A882] mb-5">
-              Get in Touch
-            </div>
-            <div className="flex flex-col gap-3">
-              <a
-                href="https://calendly.com/calebjackson"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-peach hover:text-peach-light transition-colors no-underline"
-              >
-                Book a Consultation &rarr;
-              </a>
-              <span className="text-sm text-cream-dark">Greater Baton Rouge, Louisiana</span>
-              <span className="text-sm text-cream-dark">Licensed Real Estate Advisor</span>
-              <span className="text-sm text-cream-dark">Reve REALTORS</span>
+                {SOCIALS.map((s) => (
+                  <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-ink-muted hover:text-ink transition-colors no-underline group">
+                    <SocialIcon name={s.label} />
+                    {s.label === 'IG' ? 'Instagram' : s.label === 'TT' ? 'TikTok' : s.label === 'LI' ? 'LinkedIn' : 'X / Twitter'}
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="divider mb-6" />
+        {/* Bottom */}
+        <div className="divider mt-12 mb-6" />
         <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
-          <span className="text-xs text-cream-dark">
-            &copy; 2026 Caleb Jackson Real Estate. All rights reserved.
+          <span className="text-xs text-ink-faint">
+            &copy; 2026 AIRE Intelligence. Baton Rouge, Louisiana.
           </span>
-          <span className="text-xs text-copper/40 tracking-wider uppercase">
-            Powered by AIRE Intelligence
+          <span className="text-xs text-ink-faint">
+            Caleb Jackson &middot; Reve REALTORS
           </span>
         </div>
       </div>

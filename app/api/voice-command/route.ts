@@ -52,6 +52,46 @@ const PHRASE_SYNONYMS: Record<string, string> = {
   "book closing": "schedule closing",
 };
 
+// ─── Louisiana Place Names + RE Jargon ───────────────────
+// Phrase-level normalization applied BEFORE word-level typo correction.
+// Web Speech API regularly mangles Louisiana place names — map phonetic
+// mis-hearings back to correct spellings so fast-path matchers and Claude see canonical text.
+const LOUISIANA_CORRECTIONS: Record<string, string> = {
+  // Place names (phonetic → correct)
+  "to chip a tooless": "Tchoupitoulas",
+  "chopper tools": "Tchoupitoulas",
+  "tibba doh": "Thibodaux",
+  "thibo docks": "Thibodaux",
+  "nack a dish": "Natchitoches",
+  "natchatos": "Natchitoches",
+  "oppa lousas": "Opelousas",
+  "opera louses": "Opelousas",
+  "plaque mine": "Plaquemine",
+  "plaque a mean": "Plaquemine",
+  "karen crow": "Carencro",
+  "care in crow": "Carencro",
+  "poncho tula": "Ponchatoula",
+  "pontcha tula": "Ponchatoula",
+  "brews lee": "Brusly",
+
+  // Real estate jargon
+  "act of sale": "closing",
+  "ernest money": "earnest money",
+  "pre qual": "pre-qualification",
+  "pre-qual": "pre-qualification",
+  "wdi": "WDI",
+  "wdo": "WDO",
+  "p a": "purchase agreement",
+  "pdd": "property disclosure",
+
+  // Parish corrections (case-normalize)
+  "east baton rouge parish": "East Baton Rouge Parish",
+  "ascension parish": "Ascension Parish",
+  "livingston parish": "Livingston Parish",
+  "iberville parish": "Iberville Parish",
+  "west baton rouge parish": "West Baton Rouge Parish",
+};
+
 // ─── Typo Correction ──────────────────────────────────────
 // Common voice-to-text and typing errors
 const TYPO_CORRECTIONS: Record<string, string> = {
@@ -132,6 +172,19 @@ const CORRECT_WORDS = [...new Set(Object.values(TYPO_CORRECTIONS))];
  */
 export function normalizeTranscript(raw: string): string {
   let text = raw.toLowerCase().trim();
+
+  // Louisiana place name + RE jargon normalization (longest phrase first)
+  // Case-insensitive match, but canonical output preserves the corrected casing.
+  const sortedLA = Object.entries(LOUISIANA_CORRECTIONS).sort(
+    (a, b) => b[0].length - a[0].length
+  );
+  for (const [phrase, canonical] of sortedLA) {
+    if (text.includes(phrase)) {
+      // Replace all occurrences; keep lowercase for downstream normalizer,
+      // Claude will see the canonical spelling via the original transcript passthrough.
+      text = text.split(phrase).join(canonical.toLowerCase());
+    }
+  }
 
   // Fix individual word typos
   const words = text.split(/\s+/);
@@ -279,6 +332,11 @@ Return ONLY valid JSON:
 
 export async function POST(req: NextRequest) {
   try {
+    // Tier gate: INVESTOR only
+    const { requireFeature } = await import("@/lib/auth/subscription-gate");
+    const gateResponse = await requireFeature("voice_commands");
+    if (gateResponse) return gateResponse;
+
     const { userId: clerkId } = await auth();
     if (!clerkId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

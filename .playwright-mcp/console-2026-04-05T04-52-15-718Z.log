@@ -1,0 +1,9 @@
+[   29392ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   29744ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   31072ms] [WARNING] Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   39231ms] [WARNING] Warning: TT: undefined function: 21 @ https://unpkg.com/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs:24
+[   39302ms] [WARNING] Warning: TT: undefined function: 21 @ https://unpkg.com/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs:24
+[   39353ms] [WARNING] Warning: TT: invalid function id: 136 @ https://unpkg.com/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs:24
+[   39501ms] [WARNING] Warning: TT: undefined function: 21 @ https://unpkg.com/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs:24
+[   39653ms] [WARNING] Warning: UnknownErrorException: Ensure that the `standardFontDataUrl` API parameter is provided. @ https://unpkg.com/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs:24
+[   39699ms] [WARNING] Warning: Cannot load system font: ZapfDingbats, installing it could help to improve PDF rendering. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431

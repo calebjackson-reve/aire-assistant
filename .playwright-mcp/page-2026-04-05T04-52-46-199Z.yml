@@ -1,0 +1,10 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e6]: A
+      - generic [ref=e7]:
+        - paragraph [ref=e8]: AirSign
+        - paragraph [ref=e9]: Secure Electronic Signatures
+    - paragraph [ref=e16]: Loading document...
+  - button "Open Next.js Dev Tools" [ref=e25] [cursor=pointer]:
+    - img [ref=e26]

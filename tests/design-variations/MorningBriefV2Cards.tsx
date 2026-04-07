@@ -37,7 +37,7 @@ export function MorningBriefV2({ brief, dateStr }: { brief: BriefData | null; da
             <p className="text-[#6b7d52] text-xs font-medium tracking-[0.15em] uppercase mb-1">
               Morning Brief
             </p>
-            <h1 className="font-[family-name:var(--font-newsreader)] italic text-[#1e2416] text-2xl">
+            <h1 className="font-[family-name:var(--font-cormorant)] italic text-[#1e2416] text-2xl">
               {dateStr}
             </h1>
           </div>

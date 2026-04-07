@@ -1,418 +1,197 @@
-﻿# AIRE Platform - 3 Agent Build Coordination (CORRECTED REPO)
-## Build Start: 2026-04-04 01:43:52
-## Repository: aire-assistant (C:\Users\cjjfr\OneDrive\AIRE ALL FILES\aire-assistant)
+# AIRE Assistant — Project Instructions
 
----
+## Stack
+Next.js 16, React 19, Prisma 6.19, Neon PostgreSQL, Clerk auth, Stripe billing, Vercel, Twilio
+Schema source of truth: `prisma/schema.prisma` — never duplicate schemas elsewhere.
 
-## Schema Migration — COMPLETE
-**Executed:** 2026-04-04
-**Method:** `prisma db push --force-reset` (dev database wiped and recreated)
-**Result:** All tables synced successfully in 5.23s
-**Database:** Neon PostgreSQL `neondb` at `us-east-1.aws.neon.tech`
+## Build Status
 
-**All models now live in database:**
-- Core: User, Transaction, Deadline, Document, DocumentMemory
-- Agent 1 (Email): EmailAccount, EmailScan, EmailAttachment
-- Agent 2 (Voice/Docs): DocumentTemplate, GeneratedDocument, WorkflowEvent
-- Agent 3 (Brief): MorningBrief, Contact, RelationshipIntelLog, ConsensusLog
-- AirSign: AirSignEnvelope, AirSignSigner, AirSignField, AirSignAuditEvent
-- Auth: VoiceCommand
+| System | Status | Key Files |
+|--------|--------|-----------|
+| Document Pipeline (classify, extract, memory) | COMPLETE | `lib/document-classifier.ts`, `lib/document-extractor.ts`, `lib/document-memory.ts`, `lib/multi-pass-extractor.ts` |
+| Email Intelligence (Agent 1) | COMPLETE | `lib/agents/email-scanner.ts`, email schema models |
+| Voice Commands v1 | COMPLETE | `app/api/voice-command/route.ts`, `components/VoiceCommandBar.tsx` |
+| Voice Pipeline v2 (Optimized) | COMPLETE | `lib/voice-pipeline.ts`, `app/api/voice-command/v2/route.ts` |
+| Voice Streaming (SSE) | COMPLETE | `app/api/voice-command/v2/stream/route.ts`, VoiceCommandBar SSE consumer |
+| Voice Analytics Dashboard | COMPLETE | `app/aire/voice-analytics/page.tsx`, `app/api/voice-command/analytics/route.ts` |
+| Voice Action Execution | COMPLETE | `lib/voice-action-executor.ts`, `app/api/voice-command/execute/route.ts` |
+| Compliance & LA Rules | COMPLETE | `app/api/compliance/scan/route.ts`, `lib/louisiana-rules-engine.ts` |
+| Morning Brief (Agent 3) | COMPLETE | `app/api/cron/morning-brief/route.ts`, `lib/agents/morning-brief/` |
+| Relationship Intelligence | COMPLETE | `lib/agents/relationship-intelligence.ts`, `app/api/cron/relationship-intelligence/route.ts` |
+| Workflow State Machine | COMPLETE | `lib/workflow/state-machine.ts` |
+| AirSign Layer 1 (CRUD+Signing) | COMPLETE | `lib/airsign/seal-pdf.ts`, `app/api/airsign/`, `app/sign/[token]/` |
+| AirSign Layer 2 (Field Placement+Email) | COMPLETE | `components/airsign/FieldPlacer.tsx`, Resend in send route |
+| AirSign Layer 3 (Signature Capture+Seal) | COMPLETE | `components/airsign/SignatureModal.tsx`, image embed in seal-pdf |
+| Document Auto-Filing | COMPLETE | `lib/document-autofiler.ts` |
+| TC Transaction CRUD | COMPLETE | `app/api/transactions/[id]/route.ts` (GET/PATCH/DELETE) |
+| TC Deadline Management | COMPLETE | `app/api/transactions/[id]/deadlines/route.ts` |
+| TC Dashboard Pages | COMPLETE | `app/aire/transactions/page.tsx`, `app/aire/transactions/[id]/page.tsx` |
+| TC Transaction Detail UI | COMPLETE | `components/tc/TransactionDetail.tsx`, `components/tc/TransactionTimeline.tsx` |
+| TC Party Communications | COMPLETE | `lib/tc/party-communications.ts`, `app/api/tc/send-update/route.ts` |
+| TC Vendor Scheduling | COMPLETE | `lib/tc/vendor-scheduler.ts`, `app/api/tc/schedule-vendor/route.ts` |
+| TC Notifications (email+SMS) | COMPLETE | `lib/tc/notifications.ts` |
+| TC Morning Brief | COMPLETE | `lib/tc/morning-brief.ts`, `app/api/tc/morning-brief/route.ts` |
+| TC Automation Cron | COMPLETE | `app/api/cron/tc-reminders/route.ts` |
+| Document Generation (LREC forms) | COMPLETE | `lib/document-generator.ts`, `app/api/documents/generate/route.ts` |
+| Contract Writing Engine | COMPLETE | `lib/contracts/` (lrec-fields, clause-library, contract-writer) |
+| Contract API | COMPLETE | `app/api/contracts/write/route.ts` (NL + structured → PDF) |
+| Voice → Contract Pipeline | COMPLETE | `write_contract` intent in voice executor + v2 pipeline |
+| Data Layer (Intelligence Merge) | COMPLETE | `lib/data/` (6 engines, DB queries, cache, sync), `app/api/data/` (8 routes) |
+| Data Sync Cron | COMPLETE | `app/api/cron/data-sync/route.ts`, `lib/data/sync/` |
+| Intelligence CMA API | COMPLETE | `app/api/intelligence/cma/route.ts` (ensemble + PPS + neighborhood) |
+| Intelligence Tables (Neon) | COMPLETE | 7 tables created: properties_clean, market_snapshots, aire_scores, job_runs, error_logs, raw_imports, backtest_results |
+| Data Import API | COMPLETE | `app/api/data/import/route.ts` (MLS + PropStream JSON import) |
+| Backtest Engine | COMPLETE | `lib/data/engines/backtest.ts`, `app/api/data/backtest/route.ts` |
+| Data Health Dashboard | COMPLETE | `app/aire/data-health/page.tsx`, `app/api/data/health/tables/route.ts` |
+| Morning Brief Market Data | COMPLETE | `lib/agents/morning-brief/researchers/market-researcher.ts` wired into cron |
+| Morning Brief Intelligence Layer | COMPLETE | Pipeline deals enriched with AIRE scores; market researcher pulls scoring health + low-confidence flags; synthesis prompt includes intelligence insights |
+| Intelligence Admin Dashboard | COMPLETE | `app/aire/intelligence/ScoredPropertiesTable.tsx`, `app/api/data/admin/route.ts` — browse/search/filter scored properties by confidence tier |
+| Monitoring Dashboard | COMPLETE | `app/aire/monitoring/page.tsx`, `app/api/monitoring/`, `lib/monitoring/` |
+| Monitoring History View | COMPLETE | `app/aire/monitoring/history/page.tsx` |
+| Communication Monitor | COMPLETE | `lib/comms/` (gmail, sms, calls, response detection, draft replies) |
+| Comms Morning Brief Researcher | COMPLETE | `lib/agents/morning-brief/researchers/comms-researcher.ts` |
+| Comms Scan Cron (30min) | COMPLETE | `app/api/cron/comms-scan/route.ts` |
+| Cron Registry (vercel.json) | COMPLETE | 8 crons: morning-brief, deadline-alerts, rel-intel, email-scan, data-sync, tc-reminders, comms-scan |
+| Email Triage API | COMPLETE | `app/api/email/triage/`, `draft-reply/`, `handle/`, `scan-now/` |
+| Email Triage UI | COMPLETE | `app/aire/email/EmailDashboard.tsx` (missed calls, needs response, draft reply, handled) |
+| Email Settings Page | COMPLETE | `app/aire/settings/email/page.tsx` (connected accounts, connect Gmail) |
+| TC Full UI (Dashboard→Detail flow) | COMPLETE | Dashboard with pipeline value, search/filter list, tabbed detail (overview/deadlines/docs/comms/contracts), nav badges |
+| Transaction Search + Filter | COMPLETE | `app/aire/transactions/TransactionList.tsx` (client-side search, status filter, sort by closing/price/recent) |
+| Transaction Comms Tab | COMPLETE | Quick-send templates (Offer Accepted, Inspection, Closing, Update) calling `/api/tc/send-update` |
+| Contract Writer UI | COMPLETE | `app/aire/contracts/new/ContractForm.tsx` (NL input, form type, txn picker, field preview, Generate & Send for Signatures) |
+| Contract List Page | COMPLETE | `app/aire/contracts/page.tsx` (generated docs with status badges) |
+| Morning Brief Viewer | COMPLETE | `app/aire/morning-brief/page.tsx` (deadlines, pipeline, contacts, actions, approval) |
+| Nav Badge Counts | COMPLETE | `app/aire/layout.tsx` passes active/overdue counts to `DarkLayout` sidebar |
+| Billing Flow (Stripe) | COMPLETE | `app/billing/page.tsx` (on-brand, $97/$197 pricing), `app/api/billing/checkout/`, webhook sets tier on checkout |
+| Document Upload UI | COMPLETE | `app/api/documents/upload/route.ts` (Blob + classify + workflow), upload button in TransactionDetail Documents tab |
+| Settings Page | COMPLETE | `app/aire/settings/page.tsx` (email config + billing links), nav link added |
 
-**Post-migration notes:**
-- All test data cleared — Clerk users will re-sync on next login
-- First login will trigger Clerk webhook → create fresh User record
+## DO NOT REBUILD
+- Document classifier, extractor, memory, multi-pass pipeline
+- Morning Brief (researchers, QA validator, synthesis, approval gate)
+- Relationship Intelligence (4-agent scoring, consensus, hit list)
+- Compliance scan + Louisiana rules engine
+- AirSign signing flow + seal-pdf
+- Workflow state machine + WorkflowEvent logging
+- Voice v1 route (kept for backward compat, v2 is the active endpoint)
+- Monitoring system (dashboard, API, activity logger, history)
+- Communication monitor (gmail scanner, sms scanner, response detector)
 
----
+## What's Next
+1. **Set Twilio credentials** — TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN (SMS notifications + comms scanner)
+2. **Deploy and verify** — Push to Vercel, test billing checkout end-to-end with Stripe test mode
+3. **Document extraction on upload** — Wire /api/documents/upload to run multi-pass extraction after blob upload
 
-## Agent 1: Email Intelligence & Document Pipeline
-### Status: BUILD COMPLETE — Schema migrated, all code deployed
-### Repository Confirmed: aire-assistant
+## Voice Pipeline Enhancement Backlog
+1. ~~**Streaming classification**~~ DONE — SSE endpoint at `/api/voice-command/v2/stream`
+2. **Whisper integration** — Replace browser Web Speech API with OpenAI Whisper for higher accuracy transcription, especially for Louisiana place names (Tchoupitoulas, Thibodaux, etc.).
+3. ~~**Multi-turn conversation**~~ DONE — Implicit entity resolution from last command's transaction; Claude prompt includes multi-turn instructions
+4. **Voice-triggered AirSign** — "Send the purchase agreement to John Smith for signature" → auto-creates AirSign envelope with document + signer.
+5. ~~**Offline fast-path expansion**~~ DONE — 28 regex patterns across 9 intents (was 6 patterns). Covers pipeline, deadlines, transactions, contracts, compliance, status updates, market analysis, parties, ROI.
 
-### Prisma Schema Changes (Agent 1 Proposal)
-```prisma
-model EmailAccount {
-  id           String   @id @default(cuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id])
-  email        String
-  provider     String   // "gmail" | "outlook"
-  accessToken  String?  @db.Text
-  refreshToken String?  @db.Text
-  tokenExpiry  DateTime?
-  isActive     Boolean  @default(true)
-  lastScan     DateTime?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  scans        EmailScan[]
-  @@unique([userId, email])
-  @@index([userId, isActive])
-}
+## Agent Integration Contracts
+- **After classifying a document:** call `onDocumentUploaded(transactionId, docType, userId)` from `lib/workflow/state-machine.ts`
+- **After voice command status update:** call `advanceTransaction({...trigger: "voice_command"})` from `lib/workflow/state-machine.ts`
+- **After AirSign envelope completed:** webhook fires at `/api/airsign/webhook` → creates Document + advances workflow
 
-model EmailScan {
-  id               String   @id @default(cuid())
-  accountId        String
-  account          EmailAccount @relation(fields: [accountId], references: [id])
-  scanStart        DateTime @default(now())
-  scanEnd          DateTime?
-  emailsScanned    Int      @default(0)
-  attachmentsFound Int      @default(0)
-  documentsCreated Int      @default(0)
-  status           String   @default("running")
-  error            String?  @db.Text
-  createdAt        DateTime @default(now())
-  attachments      EmailAttachment[]
-  @@index([accountId, createdAt])
-}
+## Contract Writing Engine Enhancement Backlog
+1. **Fillable PDF templates** — Fill actual LREC PDF forms (AcroForm) instead of generating from scratch. Requires obtaining official LREC fillable PDFs.
+2. **Parish records API** — Auto-pull legal descriptions (lot/block/subdivision) from parish assessor websites. East Baton Rouge, Ascension, Livingston priority.
+3. **Counter-offer generation** — "Counter at $195K with 10-day inspection" → generates counter-offer addendum referencing original PA.
+4. **Clause negotiation AI** — "Make the inspection clause stronger" → rewrites clause with buyer-favorable language.
+5. **Contract comparison** — Compare two versions of a contract and highlight changes (redline mode).
 
-model EmailAttachment {
-  id           String   @id @default(cuid())
-  scanId       String
-  scan         EmailScan @relation(fields: [scanId], references: [id])
-  emailId      String
-  emailSubject String?
-  emailFrom    String?
-  filename     String
-  mimeType     String
-  size         Int
-  downloaded   Boolean  @default(false)
-  classified   Boolean  @default(false)
-  documentId   String?
-  createdAt    DateTime @default(now())
-  @@index([scanId])
-  @@index([emailId])
-}
-```
-**Agent 2/3:** No conflicts expected — all new models. Will add `emailAccounts EmailAccount[]` to User.
+## AIRE Pages (26 total)
+/aire — Dashboard (pipeline value header, morning brief, active txns, stats, 4 quick actions incl Run Compliance)
+/aire/transactions — Transaction list (search by address/buyer/seller/MLS, filter by status, sort by closing/price/recent)
+/aire/transactions/new — Create transaction form (full fields: property, prices, parties, dates)
+/aire/transactions/[id] — Transaction detail (5 tabs: Overview, Deadlines grouped by urgency with Complete buttons, Documents, Communications with quick-send templates, Contracts with generate link)
+/aire/contracts — Contract list
+/aire/contracts/new — Contract writer (NL input, form selector, preview, generate)
+/aire/morning-brief — Morning brief viewer
+/aire/compliance — Compliance scanner
+/aire/communications — Communications
+/aire/relationships — Relationship intelligence
+/aire/email — Email intelligence
+/aire/monitoring — Agent monitoring dashboard (real-time, auto-refresh)
+/aire/monitoring/history — Build history timeline
+/aire/intelligence — Market intelligence + scored properties admin table
+/aire/voice-analytics — Voice pipeline timing, intent distribution, fast-path rate
+/aire/settings — Settings hub (email accounts, billing link)
+/aire/settings/email — Gmail connection + email triage settings
+/airsign — Envelope dashboard
+/airsign/new — Create envelope
+/airsign/[id] — Envelope detail (field placement, signers, audit, sealed PDF)
+/sign/[token] — Public signing page (signature modal, draw/type)
 
-### Pre-Build Audit Report
-**Audit Completed:** 2026-04-04
+## TC UI Gap Analysis (2026-04-04)
+### What works end-to-end in the UI today:
+- Dashboard → see all active transactions, pipeline value, overdue count, morning brief link
+- Transaction list → search, filter by status, sort, click into any deal
+- Transaction detail → tabbed view with Overview (deal info + parties), Deadlines (grouped by urgency, one-click complete), Documents, Communications (quick-send templates), Contracts
+- Create transaction → full form with all fields, redirect to detail on success
+- Write contract → NL input, form type, transaction picker, field preview, generate PDF, send for signatures via AirSign
+- Morning brief → full daily brief with deadlines, pipeline, contacts, action items, approve/dismiss
+- Navigation → sidebar with badge counts for active transactions and overdue deadlines
 
-#### Existing Infrastructure
+### What would NOT work for a real user:
+1. **Communications require RESEND_API_KEY** — Quick-send templates call `/api/tc/send-update` but emails fall back to console.log without the env var. SMS needs Twilio credentials.
+2. **Document upload in transaction detail** — No upload button in the Documents tab yet. Documents are created via API/AirSign webhook but no drag-and-drop UI.
+3. **Contract "Send for Signatures" needs BLOB_READ_WRITE_TOKEN** — The PDF is generated and can be downloaded, but AirSign envelope creation needs blob storage for the PDF file.
 
-**Repository:** Next.js 16.2.1, React 19, Prisma 6.19, Clerk auth, Stripe billing, Neon PostgreSQL
+## Agent 2 Gap Analysis (2026-04-04)
+### Top 3 things a user would hit today that would NOT work:
+1. **PDF download from contracts** — `/api/contracts/write` returns base64 PDF, but no persistent URL. Without `BLOB_READ_WRITE_TOKEN`, generated contracts can only be downloaded in-session (no reload persistence). Fix: set env var or add local file storage fallback.
+2. **AirSign emails won't send** — `RESEND_API_KEY` is not set. Signing invitation emails fall back to console.log. Signers can only get their links via the "Copy signing link" button in the envelope detail page.
+3. **Vendor list is hardcoded** — `lib/tc/vendor-scheduler.ts` has placeholder vendor entries with empty phone/email. Needs Agent 1 to add a Vendor model to Prisma, or Caleb to populate the JSON vendor list with real Baton Rouge vendors.
 
-**Prisma Models (12):** User, Transaction, Deadline, Document, DocumentMemory, VoiceCommand, ConsensusLog, Contact, RelationshipIntelLog, MorningBrief, AirSignEnvelope/Signer/Field/AuditEvent
+### Working end-to-end today (no env vars needed):
+- Transaction CRUD (create, list, detail, update, delete)
+- Contract writing from natural language → PDF download
+- Deadline auto-calculation from contract dates
+- Workflow state machine (advance, history, auto-advance on doc upload)
+- Voice command classification + execution (via `/api/voice-command/v2`)
+- Document classification + extraction
+- Compliance scanning with Louisiana rules engine
+- Morning brief generation
 
-**API Routes (25):**
-- `api/documents/classify` — AI document classification
-- `api/documents/extract` — field extraction
-- `api/documents/memory/*` — review queue, stats, corrections, export
-- `api/email/oauth` — OAuth initiation (37 lines, stub)
-- `api/email/callback` — OAuth callback (93 lines, stub)
-- `api/transactions/*` — CRUD + checklist + refile
-- `api/cron/morning-brief` — scheduled brief generation
-- `api/cron/relationship-intelligence` — scheduled scoring
-- `api/cron/deadline-alerts` — deadline monitoring
-- `api/voice-command` — voice processing
-- `api/compliance/scan` — compliance checker
-- `api/communications/draft` — message drafting
-- `api/intelligence/estimate` — AIRE Estimate
-- `api/morning-brief/action` — brief actions
-- `api/billing/*` — checkout + portal
-- `api/webhooks/*` — Clerk + Stripe
+## AirSign Completion Audit (2026-04-04)
 
-**Document Pipeline (1,049 lines — BUILT):**
-- `lib/document-classifier.ts` (288 lines) — AI classification with confidence
-- `lib/document-extractor.ts` (182 lines) — field extraction
-- `lib/document-memory.ts` (150 lines) — self-improving memory
-- `lib/multi-pass-extractor.ts` (429 lines) — multi-pass strategy
+**Status: Production-ready pending env vars.**
 
-**Agents:** `lib/agents/orchestrator.ts`, `consensus.ts`, `relationship-intelligence.ts`, `morning-brief/`
+### AirSign Routes (12 total):
+- Pages: `/airsign` (dashboard), `/airsign/new` (create), `/airsign/[id]` (detail+field placement), `/sign/[token]` (public signing)
+- APIs: `envelopes` (CRUD), `envelopes/[id]` (detail), `envelopes/[id]/fields` (field placement), `envelopes/[id]/send` (email delivery), `sign/[token]` (signer auth+submit), `upload` (PDF upload), `webhook` (completion handler)
 
-**AirSign:** `app/airsign/` (layout + page), `components/airsign/` (FieldOverlay, PDFViewer) — basic flow exists
+### E2E Test: 7/7 pass (scripts/test-airsign-flow.ts)
+- Envelope CRUD, signer tokens, field placement, signing simulation, PDF sealing, audit events
 
-#### Gmail Integration Status
-- **Gmail MCP:** Available via `mcp__claude_ai_Gmail__*` tools (search, read, draft, labels, profile)
-- **Gmail API packages:** NOT in package.json (no `googleapis`)
-- **Email OAuth stubs:** Exist but incomplete (130 lines total)
+### Fixes Applied:
+1. **Mobile signing** — Added touch event handlers (onTouchStart/Move/End) to SignatureModal canvas + DPI-corrected coordinate mapping
+2. **Webhook reliability** — Each step (document creation, workflow advance, notifications) now has independent try/catch so one failure doesn't block others
+3. **PDF seal encoding** — Replaced Unicode checkmark (✓) with ASCII "X" to avoid WinAnsi encoding error in pdf-lib
 
-#### What Needs to Be Built
-1. **Email scanning agent** — No agent exists. Need `lib/agents/email-scanner.ts`
-2. **Email schema models** — No `EmailAccount`, `EmailScan`, `EmailAttachment` in Prisma
-3. **Email-to-Document pipeline** — Connect email attachments → classifier → memory
-4. **Email OAuth completion** — Stubs exist, need full Gmail/Outlook flow
-5. **Scheduled email scanning cron** — No `api/cron/email-scan` exists
+### What Works Without Any Env Vars:
+- Create envelope, upload PDF, place fields, add signers
+- Send envelope (emails logged to console with full signing URLs)
+- Signers can open `/sign/[token]`, view PDF, fill fields, sign with draw or type
+- Smart field auto-placement for LREC forms
+- Copy signing link button for manual sharing
+- Sealed PDF generation with audit certificate page
+- Webhook fires on completion → creates Document record, advances workflow
 
-#### What Already Works (DO NOT REBUILD)
-- Document classifier, extractor, memory, multi-pass — all functional
-- Document API routes — classify, extract, memory CRUD
-- AirSign basic signing flow
-- Morning Brief pipeline
-- Relationship Intelligence scoring
+### Blockers (env vars needed for full production):
+- All env vars now set (see below)
 
-#### Recommended Build Order
-1. Add Email schema models to Prisma
-2. Build `lib/agents/email-scanner.ts` using Gmail MCP tools
-3. Create `api/cron/email-scan/route.ts` for scheduled scanning
-4. Wire email attachments → existing document classifier
-5. Complete OAuth flow for user-connected Gmail accounts
+## Env Vars (All Set as of 2026-04-06)
+All env vars are configured in `.env.local`. No missing vars.
+- `DATABASE_URL` — Neon PostgreSQL (host: ep-muddy-cherry-am44pnvo-pooler, updated 2026-04-06)
+- `ANTHROPIC_API_KEY`, `CLERK_SECRET_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
+- `RESEND_API_KEY`, `BLOB_READ_WRITE_TOKEN`, `AIRSIGN_INTERNAL_SECRET`, `AIRE_WEBHOOK_SECRET`
+- `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER`
+- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
 
----
-
-## Agent 2: Voice Commands, Document Generation & Compliance
-### Status: BUILDING — Phases 1-3 COMPLETE, Phase 4-5 ready
-### Repository Confirmed: aire-assistant
-
-### Pre-Build Audit Report
-**Audit Completed:** 2026-04-04
-
-#### Voice Pipeline Status
-- **Voice API route exists:** YES — `app/api/voice-command/route.ts` (173 lines)
-  - 6-step pipeline: transcript → fuzzy match (Levenshtein) → Claude AI classification → entity extraction → DB save → response
-  - 11 known intents: create_transaction, create_addendum, check_deadlines, update_status, show_pipeline, calculate_roi, send_alert, market_analysis, add_party, schedule_closing
-  - Uses Anthropic SDK directly (claude-sonnet-4-20250514)
-  - **Missing:** No action execution (Step 5 just saves to DB, doesn't actually create transactions/addendums)
-  - **Missing:** No MCP event push (commented as TODO)
-- **VoiceCommandBar component exists:** YES — `components/VoiceCommandBar.tsx` (220 lines)
-  - Web Speech API (webkitSpeechRecognition), interim results, keyboard input fallback
-  - Posts to `/api/voice-command`, displays result card with confirm button
-  - **Missing:** Confirm button is non-functional (no onClick handler for action execution)
-- **VoiceCommand model in Prisma:** YES — rawTranscript, parsedIntent, parsedEntities, confidence, result, status
-- **Intent classification built:** YES (fuzzy + AI), but no action execution layer
-
-#### Compliance System Status
-- **Compliance API route exists:** YES — `app/api/compliance/scan/route.ts` (170 lines)
-  - Full scan: deadlines, document completeness, party completeness, severity scoring
-  - Uses `louisiana-rules-engine.ts` for deadline calculation
-  - Returns ComplianceScanResult with issues array + 0-100 health score
-  - Imports consensus engine (`lib/agents/consensus.ts`) but doesn't use it in the scan
-- **Louisiana Rules Engine exists:** YES — `lib/louisiana-rules-engine.ts` (215 lines)
-  - Calculates 8 deadline types: inspection, repair response, appraisal, financing, title, walkthrough, closing, earnest money
-  - Louisiana holidays (2026), business day adjustment, upcoming deadline alerts
-  - SMS alert formatting built in
-- **Compliance models in schema:** No dedicated ComplianceLog model — issues are computed on-the-fly
-
-#### Document Generation Status
-- **Document generation routes:** NONE — no route for generating/filling LREC forms
-- **LREC form templates:** NONE — classifier recognizes forms but can't generate them
-- **Document classifier exists:** YES — `lib/document-classifier.ts` (288 lines) with 15 LREC form types
-- **Document extractor exists:** YES — `lib/document-extractor.ts` + `lib/multi-pass-extractor.ts`
-- **Document memory exists:** YES — `lib/document-memory.ts` with self-improving classification
-
-#### What Already Works (DO NOT REBUILD)
-- Voice command API with AI classification + fuzzy matching
-- VoiceCommandBar UI component with speech recognition
-- Compliance scan with deadline/document/party checks
-- Louisiana rules engine with all deadline types
-- Document classifier, extractor, memory system
-
-#### What Needs to Be Built
-1. **Voice action execution layer** — Bridge from parsed intent → actual CRUD operations (create transaction, generate addendum, etc.)
-2. **VoiceCommandBar confirm handler** — Wire confirm button to execute the classified action
-3. **Document generation engine** — Fill LREC form templates with extracted/provided data (PDF generation)
-4. **LREC form template library** — Store fillable PDF templates or build programmatic PDF generation
-5. **Compliance logging model** — Persist scan results for trend tracking (optional)
-6. **Voice → Document pipeline** — "Create addendum for 123 Main St" should generate a real document
-
-#### Recommended Build Order
-1. Build voice action executor (`lib/voice-action-executor.ts`) — maps intents to real operations
-2. Wire VoiceCommandBar confirm button to action executor via new API route
-3. Build document generation engine (`lib/document-generator.ts`) for LREC forms
-4. Connect voice "create addendum" intent → document generator
-5. Add compliance scan to voice intents ("run compliance check" command)
-
----
-
-## AirSign Layer 1 — BUILT
-**Built:** 2026-04-04 by Agent 3 (autonomous mode)
-**Build status:** npm run build PASSED — 0 type errors
-
-### Files Created (12 new files)
-**Core Engine:**
-- `lib/airsign/seal-pdf.ts` — Burns signatures onto PDF via pdf-lib, appends audit certificate page
-
-**API Routes (6):**
-- `app/api/airsign/envelopes/route.ts` — POST create, GET list
-- `app/api/airsign/envelopes/[id]/route.ts` — GET detail, PATCH update, DELETE void
-- `app/api/airsign/envelopes/[id]/fields/route.ts` — POST add fields, PUT replace
-- `app/api/airsign/envelopes/[id]/send/route.ts` — POST validate + send signing links
-- `app/api/airsign/sign/[token]/route.ts` — GET load for signer, POST sign/decline + auto-seal
-- `app/api/airsign/upload/route.ts` — POST upload PDF to Vercel Blob
-
-**Pages (4):**
-- `app/airsign/new/page.tsx` + `NewEnvelopeForm.tsx` — Create envelope, upload PDF, add signers
-- `app/airsign/[id]/page.tsx` + `EnvelopeDetail.tsx` — Envelope detail, PDF viewer, signer status, audit trail, send button
-- `app/sign/[token]/page.tsx` + `SigningFlow.tsx` — Public signing page (no auth, token-based)
-
-**Dependencies added:** `@vercel/blob`
-
-### AirSign Flow
-1. Agent creates envelope at `/airsign/new` → uploads PDF + adds signers
-2. Agent places fields via `/api/airsign/envelopes/[id]/fields`
-3. Agent sends envelope → signing URLs generated per signer
-4. Signers open `/sign/[token]` → view PDF, fill fields, sign or decline
-5. When all signers complete → PDF auto-sealed with signatures burned in + audit certificate appended
-6. Sealed PDF uploaded to Vercel Blob, envelope marked COMPLETED
-
-### Env Vars Needed
-- `BLOB_READ_WRITE_TOKEN` — Required for PDF upload/seal storage
-- `RESEND_API_KEY` — Future: email delivery of signing links
-
----
-
-## Agent 3: Morning Brief, Status Updates & Workflow Orchestration
-### Status: BUILD COMPLETE — Phases 1-5 done + AirSign Layer 1
-### Repository Confirmed: aire-assistant
-
-### Prisma Schema Changes (Agent 3 Proposal)
-```prisma
-model WorkflowEvent {
-  id            String      @id @default(cuid())
-  transactionId String
-  transaction   Transaction @relation(fields: [transactionId], references: [id])
-  fromStatus    String?
-  toStatus      String
-  trigger       String      // "document_uploaded" | "deadline_passed" | "deadline_completed" | "manual" | "voice_command" | "system"
-  triggeredBy   String?     // userId or "system"
-  metadata      Json?
-  createdAt     DateTime    @default(now())
-
-  @@index([transactionId, createdAt])
-}
-
-// Add to Transaction model:
-//   workflowEvents WorkflowEvent[]
-```
-**Agent 1/2:** No conflicts — one new model + one relation on Transaction.
-
-### Pre-Build Audit Report
-**Audit Completed:** 2026-04-04
-
-#### Morning Brief Status — FULLY BUILT
-- **Cron route exists:** YES — `app/api/cron/morning-brief/route.ts` (168 lines)
-  - Runs daily at 6:30 AM via Vercel Cron
-  - Auth: Bearer token via CRON_SECRET
-  - Targets PRO/INVESTOR tier users only
-  - Deduplicates by userId+briefDate (won't re-run same day)
-  - Runs 3 researchers in parallel → QA validation → Claude synthesis → DB store
-  - Status stored as "pending" — requires human approval before delivery
-- **Orchestrator:** YES — `lib/agents/orchestrator.ts` (36 lines)
-  - Generic parallel runner using Promise.allSettled
-  - Returns timing + error info per researcher
-- **Deadline Researcher:** YES — `lib/agents/morning-brief/researchers/deadline-researcher.ts` (78 lines)
-  - Queries next 7 days of uncompleted deadlines
-  - Groups by urgency: overdue, today, urgent (1-3 days), upcoming (4-7 days)
-- **Pipeline Researcher:** YES — `lib/agents/morning-brief/researchers/pipeline-researcher.ts` (98 lines)
-  - Queries active transactions (not CLOSED/CANCELLED)
-  - Flags deals needing attention: closing soon with missing docs, overdue deadlines, stale drafts
-- **Contact Researcher:** YES — `lib/agents/morning-brief/researchers/contact-researcher.ts` (83 lines)
-  - Queries contacts + latest RelationshipIntelLog
-  - Returns: hotLeads (score≥70), needsFollow (>14 days silent), recentIntel (scored in 7 days)
-- **QA Validator:** YES — `lib/agents/morning-brief/qa-validator.ts` (96 lines)
-  - Fair Housing term scanner on suggested messages (red flags)
-  - LREC completeness check: missing parties, missing docs near closing
-  - Data quality: overdue deadline warnings
-  - Red flags block QA pass
-- **Brief Action API:** YES — `app/api/morning-brief/action/route.ts` (52 lines)
-  - POST with briefId + action (approve/dismiss)
-  - Clerk auth, user ownership verification
-  - Updates status + timestamp
-- **MorningBrief schema model:** YES — briefDate, researcher data (JSON), QA flags, summary, actionItems, approval gate
-- **Claude synthesis:** YES — Sonnet 4, Louisiana-specific (Act of Sale, parish), Fair Housing compliant, action items extracted as structured JSON
-
-#### Deadline Alerts Status — BUILT
-- **Cron route exists:** YES — `app/api/cron/deadline-alerts/route.ts` (146 lines)
-  - Runs daily at 6:00 AM
-  - Finds deadlines due within 48 hours, not yet alerted, not completed
-  - Sends SMS via Twilio (if configured), marks alertSent=true
-  - Uses `formatDeadlineAlert` from Louisiana rules engine
-
-#### Relationship Intelligence Status — FULLY BUILT
-- **Cron route exists:** YES — `app/api/cron/relationship-intelligence/route.ts` (134 lines)
-  - Weekly Monday 6:00 AM run, POST + GET endpoints
-  - GET returns latest hit list for a user
-- **Engine:** YES — `lib/agents/relationship-intelligence.ts` (433 lines)
-  - 4 parallel AI agents: Behavioral, Life Event, Market Timing, Recency/Warmth
-  - Weighted synthesis (30/25/25/20), consensus check for high-score contacts
-  - Ninja Selling framework, Louisiana-specific prompts
-  - Batched processing (5 contacts at a time), writes to RelationshipIntelLog + updates Contact scores
-
-#### Communication Drafting Status — BUILT
-- **API route exists:** YES — `app/api/communications/draft/route.ts` (80 lines)
-  - Clerk-authed POST, takes contactName/channel/purpose
-  - Claude generates email/text/call scripts with Fair Housing check
-  - Ninja Selling tone, Louisiana context
-
-#### Workflow/State Machine Status — NOT BUILT
-- **No workflow state machine exists** — Transaction status is a flat enum (DRAFT → ACTIVE → PENDING_* → CLOSING → CLOSED → CANCELLED)
-- **No automated status transitions** — status changes are manual only
-- **No workflow event log** — no model to track state transitions with timestamps/reasons
-- **No auto-update system** — no mechanism to detect when a transaction should advance (e.g., inspection complete → move to PENDING_APPRAISAL)
-
-#### What Already Works (DO NOT REBUILD)
-- Morning Brief: full pipeline (researchers → QA → synthesis → approval gate)
-- Deadline alerts: cron + Twilio SMS
-- Relationship Intelligence: 4-agent scoring + consensus + hit list
-- Communication drafting: AI message generation
-- Orchestrator: parallel researcher runner
-- Consensus engine: multi-run agreement checking
-
-#### What Was Built (Agent 3 — 2026-04-04)
-1. **WorkflowEvent model** — `prisma/schema.prisma` — logs every state transition
-2. **State machine** — `lib/workflow/state-machine.ts` (290 lines)
-   - All TransactionStatus transitions with guard conditions
-   - `advanceTransaction()` — validate + update + log atomically
-   - `onDocumentUploaded()` — auto-advance by document type
-   - `onDeadlineCompleted()` — auto-advance by deadline name
-   - `getAllowedTransitions()` / `isTransitionAllowed()` — query helpers
-3. **Advance API** — `app/api/transactions/[id]/advance/route.ts` (POST + GET)
-4. **Workflow History API** — `app/api/transactions/[id]/workflow/route.ts` (GET)
-5. **Dashboard components:**
-   - `components/dashboard/WorkflowTimeline.tsx` — visual timeline
-   - `components/dashboard/WorkflowAdvance.tsx` — advance buttons
-   - `components/dashboard/HitList.tsx` — relationship intelligence hit list
-6. **Morning Brief UI** — ALREADY EXISTED (not rebuilt):
-   - `app/aire/morning-brief/page.tsx` + `actions.tsx`
-   - `app/aire/page.tsx` — dashboard with brief card
-
-#### Integration Points for Agent 1 & 2
-- **Agent 1:** Call `onDocumentUploaded(transactionId, docType, userId)` after classifying docs
-- **Agent 2:** Call `advanceTransaction({...trigger: "voice_command"})` for status updates
-
----
-
-## Prisma Schema Changes — Agent 2 Proposal
-**Proposed:** 2026-04-04
-**Status:** Awaiting coordination with Agent 1 & 3
-
-```prisma
-model DocumentTemplate {
-  id          String   @id @default(cuid())
-  name        String
-  description String
-  category    String
-  pdfTemplate Bytes?
-  fields      Json
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  generated   GeneratedDocument[]
-}
-
-model GeneratedDocument {
-  id              String            @id @default(cuid())
-  templateId      String
-  template        DocumentTemplate  @relation(fields: [templateId], references: [id])
-  userId          String
-  transactionId   String?
-  transaction     Transaction?      @relation(fields: [transactionId], references: [id])
-  voiceCommandId  String?
-  voiceCommand    VoiceCommand?     @relation(fields: [voiceCommandId], references: [id])
-  populatedFields Json
-  pdfUrl          String?
-  status          String            @default("draft")
-  createdAt       DateTime          @default(now())
-}
-
-// Relation additions needed:
-// Transaction: add generatedDocuments GeneratedDocument[]
-// VoiceCommand: add generatedDocuments GeneratedDocument[]
-```
-
----
-
-## Architecture Correction Notes
-- Previous launch in clerk-nextjs was incorrect
-- All agents now operating in aire-assistant (the real product repo)
-- Skills files confirmed present
-- Existing code will be audited before new development
-
+## TypeScript Fixes (2026-04-06)
+- `app/airsign/page.tsx:23` — Added `DECLINED: 0` to EnvelopeStatus counts object (missing enum variant)
+- `app/components/layout/Navbar.tsx:68` — Removed `afterSignOutUrl` prop from `<UserButton />` (deprecated in Clerk v7)
+- `tsc --noEmit` returns 0 errors, `next build` passes clean

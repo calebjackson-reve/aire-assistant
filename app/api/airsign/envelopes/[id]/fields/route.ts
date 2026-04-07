@@ -80,26 +80,33 @@ export async function PUT(
   }
 
   const body = await req.json() as { fields: FieldInput[] }
+  console.log("[AirSign Fields PUT]", { envelopeId: id, fieldCount: body.fields?.length ?? 0 })
 
-  // Delete existing, create new — atomic
-  await prisma.$transaction([
-    prisma.airSignField.deleteMany({ where: { envelopeId: id } }),
-    prisma.airSignField.createMany({
-      data: (body.fields ?? []).map((f) => ({
-        envelopeId: id,
-        signerId: f.signerId ?? null,
-        type: f.type,
-        label: f.label ?? null,
-        required: f.required ?? true,
-        page: f.page,
-        xPercent: f.xPercent,
-        yPercent: f.yPercent,
-        widthPercent: f.widthPercent,
-        heightPercent: f.heightPercent,
-      })),
-    }),
-  ])
+  try {
+    // Delete existing, create new — atomic
+    const [deleted, created] = await prisma.$transaction([
+      prisma.airSignField.deleteMany({ where: { envelopeId: id } }),
+      prisma.airSignField.createMany({
+        data: (body.fields ?? []).map((f) => ({
+          envelopeId: id,
+          signerId: f.signerId ?? null,
+          type: f.type,
+          label: f.label ?? null,
+          required: f.required ?? true,
+          page: f.page,
+          xPercent: f.xPercent,
+          yPercent: f.yPercent,
+          widthPercent: f.widthPercent,
+          heightPercent: f.heightPercent,
+        })),
+      }),
+    ])
+    console.log("[AirSign Fields PUT] Success:", { deleted: deleted.count, created: created.count })
 
-  const fields = await prisma.airSignField.findMany({ where: { envelopeId: id } })
-  return NextResponse.json({ fields })
+    const fields = await prisma.airSignField.findMany({ where: { envelopeId: id } })
+    return NextResponse.json({ fields })
+  } catch (err) {
+    console.error("[AirSign Fields PUT] ERROR:", err)
+    return NextResponse.json({ error: "Failed to save fields", details: String(err) }, { status: 500 })
+  }
 }

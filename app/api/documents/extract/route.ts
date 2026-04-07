@@ -5,6 +5,8 @@ import { extractDocumentFields } from "@/lib/document-extractor";
 import { classifyByPatterns } from "@/lib/document-classifier";
 import { multiPassExtract } from "@/lib/multi-pass-extractor";
 import { logDocumentMemory } from "@/lib/document-memory";
+import { autoFileDocument } from "@/lib/document-autofiler";
+import { onDocumentUploaded } from "@/lib/workflow/state-machine";
 import { PDFDocument } from "pdf-lib";
 
 // Common English words — used to detect real text vs binary garbage
@@ -179,10 +181,43 @@ export async function POST(req: NextRequest) {
       (extractionResult as unknown as Record<string, unknown>).passResults = multiResult.passResults;
     }
 
-    // ── Step 5: Save to database ──
+    // ── Step 5: Auto-file if no transactionId provided ──
+    let resolvedTransactionId = transactionId || null;
+    let autoFileResult = null;
+
+    if (!transactionId) {
+      try {
+        let fileUserId: string | null = null;
+        try {
+          const session = await auth();
+          if (session.userId) {
+            const user = await prisma.user.findUnique({ where: { clerkId: session.userId } });
+            if (user) fileUserId = user.id;
+          }
+        } catch { /* no auth */ }
+
+        if (fileUserId) {
+          autoFileResult = await autoFileDocument({
+            userId: fileUserId,
+            extractedFields: extractionResult.fields as Record<string, string | number | boolean | null>,
+            filename: file.name,
+          });
+          if (autoFileResult && autoFileResult.confidence >= 0.5) {
+            resolvedTransactionId = autoFileResult.transactionId;
+            console.log(`📁 [AutoFile] Filed to "${autoFileResult.propertyAddress}" (${(autoFileResult.confidence * 100).toFixed(0)}% via ${autoFileResult.matchedOn.join(",")})`);
+          } else if (autoFileResult) {
+            console.log(`📁 [AutoFile] Low-confidence match: "${autoFileResult.propertyAddress}" (${(autoFileResult.confidence * 100).toFixed(0)}%) — not auto-filing`);
+          }
+        }
+      } catch (autoFileError) {
+        console.error("[AutoFile] Error:", autoFileError);
+      }
+    }
+
+    // ── Step 6: Save to database ──
     const document = await prisma.document.create({
       data: {
-        transactionId: transactionId || null,
+        transactionId: resolvedTransactionId,
         name: file.name,
         type: classification.type,
         category: classification.category,
@@ -194,6 +229,31 @@ export async function POST(req: NextRequest) {
         checklistStatus: "extracted",
       },
     });
+
+    // ── Step 7: Trigger workflow auto-advance if document was filed to a transaction ──
+    if (resolvedTransactionId) {
+      try {
+        let triggerUserId: string | undefined;
+        try {
+          const session = await auth();
+          if (session.userId) {
+            const user = await prisma.user.findUnique({ where: { clerkId: session.userId } });
+            if (user) triggerUserId = user.id;
+          }
+        } catch { /* no auth */ }
+
+        const advanceResult = await onDocumentUploaded(
+          resolvedTransactionId,
+          classification.type,
+          triggerUserId
+        );
+        if (advanceResult?.success) {
+          console.log(`[Workflow] Auto-advanced ${advanceResult.fromStatus} → ${advanceResult.toStatus} via document "${classification.type}"`);
+        }
+      } catch (workflowError) {
+        console.error("[Workflow] Auto-advance error:", workflowError);
+      }
+    }
 
     // Log to document memory (non-blocking)
     try {
@@ -247,6 +307,13 @@ export async function POST(req: NextRequest) {
           ? { passResults: (extractionResult as unknown as Record<string, unknown>).passResults }
           : {}),
       },
+      autoFile: autoFileResult ? {
+        transactionId: autoFileResult.transactionId,
+        propertyAddress: autoFileResult.propertyAddress,
+        confidence: autoFileResult.confidence,
+        matchedOn: autoFileResult.matchedOn,
+        applied: resolvedTransactionId === autoFileResult.transactionId,
+      } : null,
     });
   } catch (error) {
     console.error("❌ Document extraction error:", error);

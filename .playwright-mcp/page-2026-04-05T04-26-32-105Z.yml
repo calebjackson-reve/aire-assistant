@@ -1,0 +1,139 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link "A AIRE" [ref=e5] [cursor=pointer]:
+        - /url: /aire
+        - generic [ref=e6]: A
+        - generic [ref=e7]: AIRE
+      - navigation [ref=e8]:
+        - link "Dashboard" [ref=e9] [cursor=pointer]:
+          - /url: /aire
+          - img [ref=e10]
+          - text: Dashboard
+        - link "Transactions" [ref=e15] [cursor=pointer]:
+          - /url: /aire/transactions
+          - img [ref=e16]
+          - text: Transactions
+        - link "Contracts" [ref=e18] [cursor=pointer]:
+          - /url: /aire/contracts
+          - img [ref=e19]
+          - text: Contracts
+        - link "AirSign" [ref=e22] [cursor=pointer]:
+          - /url: /airsign
+          - img [ref=e23]
+          - text: AirSign
+        - link "Brief" [ref=e25] [cursor=pointer]:
+          - /url: /aire/morning-brief
+          - img [ref=e26]
+          - text: Brief
+        - link "Compliance" [ref=e32] [cursor=pointer]:
+          - /url: /aire/compliance
+          - img [ref=e33]
+          - text: Compliance
+        - link "Intelligence" [ref=e35] [cursor=pointer]:
+          - /url: /aire/intelligence
+          - img [ref=e36]
+          - text: Intelligence
+        - link "Contacts" [ref=e37] [cursor=pointer]:
+          - /url: /aire/relationships
+          - img [ref=e38]
+          - text: Contacts
+        - link "Comms" [ref=e43] [cursor=pointer]:
+          - /url: /aire/communications
+          - img [ref=e44]
+          - text: Comms
+        - link "Email" [ref=e46] [cursor=pointer]:
+          - /url: /aire/email
+          - img [ref=e47]
+          - text: Email
+        - link "Monitor" [ref=e50] [cursor=pointer]:
+          - /url: /aire/monitoring
+          - img [ref=e51]
+          - text: Monitor
+        - link "Voice" [ref=e53] [cursor=pointer]:
+          - /url: /aire/voice-analytics
+          - img [ref=e54]
+          - text: Voice
+        - link "Data" [ref=e57] [cursor=pointer]:
+          - /url: /aire/data-health
+          - img [ref=e58]
+          - text: Data
+        - link "Settings" [ref=e62] [cursor=pointer]:
+          - /url: /aire/settings
+          - img [ref=e63]
+          - text: Settings
+        - link "Billing" [ref=e66] [cursor=pointer]:
+          - /url: /billing
+          - img [ref=e67]
+          - text: Billing
+      - link "Back to site" [ref=e70] [cursor=pointer]:
+        - /url: /
+        - img [ref=e71]
+        - text: Back to site
+    - main [ref=e73]:
+      - generic [ref=e74]:
+        - generic [ref=e75]:
+          - generic [ref=e76]:
+            - paragraph [ref=e77]: Document Signing
+            - heading "AirSign" [level=1] [ref=e78]
+          - link "+ New envelope" [ref=e79] [cursor=pointer]:
+            - /url: /airsign/new
+        - generic [ref=e80]:
+          - generic [ref=e81]:
+            - paragraph [ref=e82]: "1"
+            - paragraph [ref=e83]: draft
+          - generic [ref=e84]:
+            - paragraph [ref=e85]: "0"
+            - paragraph [ref=e86]: sent
+          - generic [ref=e87]:
+            - paragraph [ref=e88]: "1"
+            - paragraph [ref=e89]: in progress
+          - generic [ref=e90]:
+            - paragraph [ref=e91]: "2"
+            - paragraph [ref=e92]: completed
+          - generic [ref=e93]:
+            - paragraph [ref=e94]: "0"
+            - paragraph [ref=e95]: voided
+          - generic [ref=e96]:
+            - paragraph [ref=e97]: "0"
+            - paragraph [ref=e98]: expired
+        - generic [ref=e99]:
+          - generic [ref=e100]:
+            - link "UX Test — 456 Live Oak Ave 1 signers · 3 fields · 0/1 signed" [ref=e101] [cursor=pointer]:
+              - /url: /airsign/cmnl98h8r0001u1j0839i8box
+              - paragraph [ref=e102]: UX Test — 456 Live Oak Ave
+              - paragraph [ref=e103]: 1 signers · 3 fields · 0/1 signed
+            - generic [ref=e104]:
+              - generic [ref=e105]: IN PROGRESS
+              - link "View" [ref=e106] [cursor=pointer]:
+                - /url: /airsign/cmnl98h8r0001u1j0839i8box
+          - generic [ref=e107]:
+            - link "Purchase Agreement — 5834 Guice Dr 1 signers · 3 fields · 1/1 signed" [ref=e108] [cursor=pointer]:
+              - /url: /airsign/cmnl7agph0001u1owvv5yxtdz
+              - paragraph [ref=e109]: Purchase Agreement — 5834 Guice Dr
+              - paragraph [ref=e110]: 1 signers · 3 fields · 1/1 signed
+            - generic [ref=e111]:
+              - generic [ref=e112]: COMPLETED
+              - link "View" [ref=e113] [cursor=pointer]:
+                - /url: /airsign/cmnl7agph0001u1owvv5yxtdz
+          - generic [ref=e114]:
+            - link "554 1 signers · 0 fields · 0/1 signed" [ref=e115] [cursor=pointer]:
+              - /url: /airsign/cmnl7pfvi0001u1ecgrrr6et4
+              - paragraph [ref=e116]: "554"
+              - paragraph [ref=e117]: 1 signers · 0 fields · 0/1 signed
+            - generic [ref=e118]:
+              - generic [ref=e119]: DRAFT
+              - link "View" [ref=e120] [cursor=pointer]:
+                - /url: /airsign/cmnl7pfvi0001u1ecgrrr6et4
+          - generic [ref=e121]:
+            - link "E2E Test - Purchase Agreement 1 signers · 2 fields · 1/1 signed" [ref=e122] [cursor=pointer]:
+              - /url: /airsign/cmnl78yqh0001u128og071w9n
+              - paragraph [ref=e123]: E2E Test - Purchase Agreement
+              - paragraph [ref=e124]: 1 signers · 2 fields · 1/1 signed
+            - generic [ref=e125]:
+              - generic [ref=e126]: COMPLETED
+              - link "View" [ref=e127] [cursor=pointer]:
+                - /url: /airsign/cmnl78yqh0001u128og071w9n
+  - button "Open Next.js Dev Tools" [ref=e133] [cursor=pointer]:
+    - img [ref=e134]
+  - alert [ref=e137]
