@@ -81,7 +81,7 @@ export async function getPreferredVendors(type: VendorType, userId?: string): Pr
     orderBy: [{ preferred: "desc" }, { name: "asc" }],
   })
 
-  return dbVendors.map((v, i) => ({
+  return dbVendors.map((v: { name: string; company: string | null; phone: string | null; email: string | null; notes: string | null; preferred: boolean }, i: number) => ({
     name: v.name,
     company: v.company || "",
     phone: v.phone || "",
@@ -112,7 +112,7 @@ export async function getAvailableVendorTypes(userId?: string): Promise<string[]
     distinct: ["category"],
   })
 
-  return result.map(r => r.category)
+  return result.map((r: { category: string }) => r.category)
 }
 
 // ─── SMS DISPATCH ───────────────────────────────────────────────────────────

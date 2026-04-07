@@ -115,7 +115,7 @@ ${pdfText.slice(0, 15000)}`,
       where: { userId: user.id },
       select: { name: true, category: true },
     })
-    const existingSet = new Set(existing.map(e => `${e.name.toLowerCase()}|${e.category}`))
+    const existingSet = new Set(existing.map((e: { name: string; category: string }) => `${e.name.toLowerCase()}|${e.category}`))
 
     const vendors = []
     for (const v of extracted) {

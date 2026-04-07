@@ -32,6 +32,7 @@ Schema source of truth: `prisma/schema.prisma` — never duplicate schemas elsew
 | TC Notifications (email+SMS) | COMPLETE | `lib/tc/notifications.ts` |
 | TC Morning Brief | COMPLETE | `lib/tc/morning-brief.ts`, `app/api/tc/morning-brief/route.ts` |
 | TC Automation Cron | COMPLETE | `app/api/cron/tc-reminders/route.ts` |
+| Vendor Management | COMPLETE | `prisma/schema.prisma` (Vendor model), `app/api/vendors/route.ts`, `app/api/vendors/import/route.ts`, `app/aire/settings/vendors/` |
 | Document Generation (LREC forms) | COMPLETE | `lib/document-generator.ts`, `app/api/documents/generate/route.ts` |
 | Contract Writing Engine | COMPLETE | `lib/contracts/` (lrec-fields, clause-library, contract-writer) |
 | Contract API | COMPLETE | `app/api/contracts/write/route.ts` (NL + structured → PDF) |
@@ -101,7 +102,7 @@ Schema source of truth: `prisma/schema.prisma` — never duplicate schemas elsew
 4. **Clause negotiation AI** — "Make the inspection clause stronger" → rewrites clause with buyer-favorable language.
 5. **Contract comparison** — Compare two versions of a contract and highlight changes (redline mode).
 
-## AIRE Pages (26 total)
+## AIRE Pages (27 total)
 /aire — Dashboard (pipeline value header, morning brief, active txns, stats, 4 quick actions incl Run Compliance)
 /aire/transactions — Transaction list (search by address/buyer/seller/MLS, filter by status, sort by closing/price/recent)
 /aire/transactions/new — Create transaction form (full fields: property, prices, parties, dates)
@@ -117,8 +118,9 @@ Schema source of truth: `prisma/schema.prisma` — never duplicate schemas elsew
 /aire/monitoring/history — Build history timeline
 /aire/intelligence — Market intelligence + scored properties admin table
 /aire/voice-analytics — Voice pipeline timing, intent distribution, fast-path rate
-/aire/settings — Settings hub (email accounts, billing link)
+/aire/settings — Settings hub (email accounts, vendors, billing link)
 /aire/settings/email — Gmail connection + email triage settings
+/aire/settings/vendors — Vendor management (add, import PDF, preferred star)
 /airsign — Envelope dashboard
 /airsign/new — Create envelope
 /airsign/[id] — Envelope detail (field placement, signers, audit, sealed PDF)
@@ -143,7 +145,7 @@ Schema source of truth: `prisma/schema.prisma` — never duplicate schemas elsew
 ### Top 3 things a user would hit today that would NOT work:
 1. **PDF download from contracts** — `/api/contracts/write` returns base64 PDF, but no persistent URL. Without `BLOB_READ_WRITE_TOKEN`, generated contracts can only be downloaded in-session (no reload persistence). Fix: set env var or add local file storage fallback.
 2. **AirSign emails won't send** — `RESEND_API_KEY` is not set. Signing invitation emails fall back to console.log. Signers can only get their links via the "Copy signing link" button in the envelope detail page.
-3. **Vendor list is hardcoded** — `lib/tc/vendor-scheduler.ts` has placeholder vendor entries with empty phone/email. Needs Agent 1 to add a Vendor model to Prisma, or Caleb to populate the JSON vendor list with real Baton Rouge vendors.
+3. **Vendor list needs population** — Vendor model added to Prisma; `lib/tc/vendor-scheduler.ts` now queries DB per-user. Users can add vendors manually or import via PDF at `/aire/settings/vendors`.
 
 ### Working end-to-end today (no env vars needed):
 - Transaction CRUD (create, list, detail, update, delete)

@@ -36,7 +36,7 @@ export default async function VendorSettingsPage() {
       </div>
 
       <VendorManager
-        initialVendors={user.vendors.map((v) => ({
+        initialVendors={user.vendors.map((v: any) => ({
           ...v,
           createdAt: v.createdAt.toISOString(),
           updatedAt: v.updatedAt.toISOString(),
