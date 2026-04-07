@@ -36,7 +36,7 @@ export async function withAgentRun({ agentName, userId, fn }: AgentRunOptions) {
         status: "success",
         completedAt: new Date(),
         durationMs,
-        resultMetadata: typeof result === "object" ? (result as Record<string, unknown>) : { result },
+        resultMetadata: JSON.parse(JSON.stringify(typeof result === "object" ? result : { result })),
       },
     })
 

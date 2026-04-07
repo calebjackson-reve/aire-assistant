@@ -119,10 +119,10 @@ export function VendorManager({ initialVendors }: { initialVendors: Vendor[] }) 
 
     try {
       await fetch("/api/vendors", {
-        method: "POST",
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...vendor,
+          id: vendor.id,
           preferred: !vendor.preferred,
         }),
       })

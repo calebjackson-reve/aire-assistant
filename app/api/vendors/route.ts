@@ -77,3 +77,51 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Failed to create vendor" }, { status: 500 })
   }
 }
+
+// PATCH: Update an existing vendor (toggle preferred, edit fields)
+export async function PATCH(req: NextRequest) {
+  try {
+    const { userId: clerkId } = await auth()
+    if (!clerkId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const user = await prisma.user.findUnique({ where: { clerkId } })
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 })
+    }
+
+    const body = await req.json()
+    const { id, ...updates } = body
+
+    if (!id) {
+      return NextResponse.json({ error: "Vendor id is required" }, { status: 400 })
+    }
+
+    // Verify vendor belongs to user
+    const existing = await prisma.vendor.findFirst({
+      where: { id, userId: user.id },
+    })
+    if (!existing) {
+      return NextResponse.json({ error: "Vendor not found" }, { status: 404 })
+    }
+
+    const vendor = await prisma.vendor.update({
+      where: { id },
+      data: {
+        ...(updates.name !== undefined && { name: updates.name }),
+        ...(updates.company !== undefined && { company: updates.company }),
+        ...(updates.category !== undefined && { category: updates.category }),
+        ...(updates.phone !== undefined && { phone: updates.phone }),
+        ...(updates.email !== undefined && { email: updates.email }),
+        ...(updates.notes !== undefined && { notes: updates.notes }),
+        ...(updates.preferred !== undefined && { preferred: updates.preferred }),
+      },
+    })
+
+    return NextResponse.json({ vendor })
+  } catch (error) {
+    console.error("Update vendor error:", error)
+    return NextResponse.json({ error: "Failed to update vendor" }, { status: 500 })
+  }
+}
