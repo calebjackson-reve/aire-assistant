@@ -27,6 +27,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
+    // Feature gate: voice commands require PRO or higher
+    if (user.tier === "FREE") {
+      return NextResponse.json({
+        error: "Voice commands require a Pro subscription or higher",
+        requiredTier: "PRO",
+        currentTier: user.tier,
+      }, { status: 403 })
+    }
+
     const body = await req.json()
     const transcript = body.transcript as string
 

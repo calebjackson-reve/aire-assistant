@@ -91,6 +91,15 @@ export async function executeAction(req: ActionRequest): Promise<ActionResult> {
     case "write_purchase_agreement":
       return writeContractFromVoice(userId, voiceCommandId, entities);
 
+    case "start_file":
+      return startFile(userId, entities);
+
+    case "check_docs":
+      return checkMissingDocs(userId, entities);
+
+    case "fill_mls":
+      return fillMLS(userId, entities);
+
     default:
       return {
         success: false,
@@ -931,5 +940,147 @@ async function writeContractFromVoice(
       action: "write_contract",
       message: "Failed to generate the contract. Please try again or specify more details.",
     }
+  }
+}
+
+// ─── Start File (New Listing / Buyer File) ─────────────────────
+
+async function startFile(
+  userId: string,
+  entities: Record<string, string>
+): Promise<ActionResult> {
+  const { getChecklist } = await import("@/lib/transaction-checklists")
+  const fileType = entities.fileType || "listing"
+  const address = entities.address
+  const buyerName = entities.buyer_name
+
+  if (fileType === "buyer" && buyerName) {
+    const checklist = getChecklist("new_buyer")
+    const required = checklist.filter(d => d.required)
+    return {
+      success: true,
+      action: "start_file",
+      message: `Starting a buyer file for ${buyerName}. You'll need ${required.length} documents: ${required.map(d => d.name).join(", ")}. Want me to create the transaction?`,
+      data: { fileType: "buyer", buyerName, checklist: required },
+    }
+  }
+
+  if (address) {
+    // Create the transaction
+    const txn = await prisma.transaction.create({
+      data: {
+        userId,
+        propertyAddress: address,
+        propertyCity: entities.city || "Baton Rouge",
+        propertyState: entities.state || "LA",
+        propertyZip: entities.zip || "",
+        status: "DRAFT",
+      },
+    })
+
+    const checklist = getChecklist("pre_listing")
+    const required = checklist.filter(d => d.required)
+    return {
+      success: true,
+      action: "start_file",
+      message: `Listing file started for ${address}. You'll need ${required.length} documents: ${required.map(d => d.name).join(", ")}. Want me to generate the listing agreement?`,
+      data: { transactionId: txn.id, fileType: "listing", address, checklist: required, redirectTo: `/aire/transactions/${txn.id}` },
+    }
+  }
+
+  return {
+    success: false,
+    action: "start_file",
+    message: "What's the property address? Say something like 'Start a listing for 123 Main Street'.",
+  }
+}
+
+// ─── Check Missing Documents ───────────────────────────────────
+
+async function checkMissingDocs(
+  userId: string,
+  entities: Record<string, string>
+): Promise<ActionResult> {
+  const { checkDocumentCompleteness } = await import("@/lib/transaction-checklists")
+
+  const address = entities.address
+  let txn
+
+  if (address) {
+    txn = await prisma.transaction.findFirst({
+      where: { userId, propertyAddress: { contains: address, mode: "insensitive" as const } },
+      include: { documents: { select: { type: true } } },
+    })
+  } else {
+    // Use most recent active transaction
+    txn = await prisma.transaction.findFirst({
+      where: { userId, status: { notIn: ["CLOSED", "CANCELLED"] } },
+      orderBy: { updatedAt: "desc" },
+      include: { documents: { select: { type: true } } },
+    })
+  }
+
+  if (!txn) {
+    return {
+      success: false,
+      action: "check_docs",
+      message: address ? `No transaction found for "${address}".` : "No active transactions found.",
+    }
+  }
+
+  const uploadedTypes = txn.documents.map((d: { type: string }) => d.type)
+  const phase = txn.status === "DRAFT" || txn.status === "ACTIVE" ? "pre_listing" : "under_contract"
+  const result = checkDocumentCompleteness(uploadedTypes, phase)
+
+  if (result.missing.length === 0) {
+    return {
+      success: true,
+      action: "check_docs",
+      message: `All required documents are uploaded for ${txn.propertyAddress}. ${result.completionPct}% complete.`,
+      data: { transactionId: txn.id, completionPct: result.completionPct },
+    }
+  }
+
+  return {
+    success: true,
+    action: "check_docs",
+    message: `${txn.propertyAddress} is ${result.completionPct}% complete. Missing ${result.missing.length} required docs: ${result.missing.map(d => d.name).join(", ")}.`,
+    data: { transactionId: txn.id, missing: result.missing, completionPct: result.completionPct },
+  }
+}
+
+// ─── Fill MLS (redirect to auto-fill wizard) ───────────────────
+
+async function fillMLS(
+  userId: string,
+  entities: Record<string, string>
+): Promise<ActionResult> {
+  const address = entities.address
+
+  if (!address) {
+    return {
+      success: false,
+      action: "fill_mls",
+      message: "Which property? Say something like 'Fill the MLS for 123 Main Street'.",
+    }
+  }
+
+  const txn = await prisma.transaction.findFirst({
+    where: { userId, propertyAddress: { contains: address, mode: "insensitive" as const } },
+  })
+
+  if (!txn) {
+    return {
+      success: false,
+      action: "fill_mls",
+      message: `No transaction found for "${address}". Create a listing first.`,
+    }
+  }
+
+  return {
+    success: true,
+    action: "fill_mls",
+    message: `Opening the MLS auto-fill wizard for ${txn.propertyAddress}. Upload an appraisal or old listing to extract all Paragon fields.`,
+    data: { transactionId: txn.id, redirectTo: `/aire/mls-input?txn=${txn.id}` },
   }
 }

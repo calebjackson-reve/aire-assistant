@@ -297,6 +297,38 @@ const FAST_MATCHERS: FastMatch[] = [
     intent: "create_addendum",
     extractEntities: (m) => ({ address: m[1].trim() }),
   },
+
+  // ── START FILE / DOCUMENT CHECKLIST (6 patterns) ──
+  {
+    pattern: /^(?:start|open|create) (?:a )?(?:new )?(?:file|listing|listing file) (?:for|at|on) (.+)$/i,
+    intent: "start_file",
+    extractEntities: (m) => ({ address: m[1].trim(), fileType: "listing" }),
+  },
+  {
+    pattern: /^(?:start|open|create) (?:a )?(?:new )?(?:buyer file|buyer) (?:for|named?) (.+)$/i,
+    intent: "start_file",
+    extractEntities: (m) => ({ buyer_name: m[1].trim(), fileType: "buyer" }),
+  },
+  {
+    pattern: /^(?:what|which) (?:docs?|documents?) (?:am i|are we|do i) (?:missing|need) (?:for|on) (.+)$/i,
+    intent: "check_docs",
+    extractEntities: (m) => ({ address: m[1].trim() }),
+  },
+  {
+    pattern: /^(?:what|which) (?:docs?|documents?) (?:am i|are we|do i) (?:missing|need)$/i,
+    intent: "check_docs",
+    extractEntities: () => ({}),
+  },
+  {
+    pattern: /^(?:fill|auto.?fill|populate) (?:the )?(?:mls|listing|paragon) (?:for|at|on) (.+)$/i,
+    intent: "fill_mls",
+    extractEntities: (m) => ({ address: m[1].trim() }),
+  },
+  {
+    pattern: /^(?:generate|create) (?:the )?(?:mls|listing) (?:input )?sheet (?:for|at|on) (.+)$/i,
+    intent: "fill_mls",
+    extractEntities: (m) => ({ address: m[1].trim() }),
+  },
 ]
 
 // ─── MID-COMMAND CORRECTION DETECTION ───────────────────────────────────────
@@ -412,7 +444,12 @@ Parse voice commands into intent + entities. Be fast and precise.
 
 INTENTS: create_transaction, create_addendum, check_deadlines, update_status,
 show_pipeline, calculate_roi, send_alert, market_analysis, add_party,
-schedule_closing, send_document, run_compliance, write_contract, needs_clarification
+schedule_closing, send_document, run_compliance, write_contract, start_file,
+check_docs, fill_mls, needs_clarification
+
+start_file: user wants to start a new file/listing/buyer file. Extract address or buyer name.
+check_docs: user wants to know what documents are missing for a transaction.
+fill_mls: user wants to auto-fill or generate the MLS input sheet for a listing.
 
 write_contract: user wants to write/create/draft a purchase agreement, PA, or contract.
 Examples: "write PA for 123 Main", "draft purchase agreement", "write contract for the Smith deal"

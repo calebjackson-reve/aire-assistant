@@ -36,6 +36,14 @@ export async function POST(req: NextRequest) {
     return new Response(JSON.stringify({ error: "User not found" }), { status: 404 })
   }
 
+  // Feature gate: voice commands require PRO or higher
+  if (user.tier === "FREE") {
+    return new Response(
+      JSON.stringify({ error: "Voice commands require a Pro subscription or higher", requiredTier: "PRO" }),
+      { status: 403 }
+    )
+  }
+
   const encoder = new TextEncoder()
   const stream = new ReadableStream({
     async start(controller) {
