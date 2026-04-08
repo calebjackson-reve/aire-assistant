@@ -13,8 +13,8 @@ export default async function NewEnvelopePage() {
   return (
     <DarkLayout>
     <div className="max-w-3xl mx-auto px-6 py-10">
-      <p className="text-warm text-sm tracking-wide mb-1">AirSign</p>
-      <h1 className="font-[family-name:var(--font-cormorant)] italic text-cream text-3xl mb-8">
+      <p className="text-[#6b7d52] text-sm tracking-wide mb-1">AirSign</p>
+      <h1 className="font-[family-name:var(--font-cormorant)] italic text-[#1e2416] text-3xl mb-8">
         New envelope
       </h1>
       <NewEnvelopeForm />

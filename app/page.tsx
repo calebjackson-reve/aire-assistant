@@ -4,144 +4,130 @@ import { auth } from "@clerk/nextjs/server"
 import Navbar from "./components/layout/Navbar"
 import Footer from "./components/layout/Footer"
 import { ScrollReveal, CountUpStat } from "./components/ui/scroll-reveal"
-import { TCMockup, AirSignMockup, BriefMockup, VoiceMockup } from "./components/ui/feature-mockups"
-import { MagneticCard } from "./components/ui/magnetic-card"
 import { ScrollToTop } from "./components/ui/scroll-to-top"
 import { ScrollProgress } from "./components/ui/scroll-progress"
+import { PricingToggle } from "./components/landing/PricingToggle"
+import { EmailCaptureSection } from "./components/landing/EmailCaptureSection"
+import { DeviceMockup } from "./components/landing/DeviceMockup"
 
 const FEATURES = [
   {
     label: "Transaction Coordinator",
-    headline: "Every deadline tracked. Every document filed.",
-    body: "Auto-calculated deadlines from contract dates. Louisiana Act of Sale timelines, inspection periods, and financing contingencies — all managed by AI. No more spreadsheets.",
+    title: "Every deadline tracked.",
+    body: "Auto-calculated deadlines from contract dates. Louisiana Act of Sale timelines, inspection periods, financing contingencies — all managed by AI.",
     stats: [
-      { value: "47 min", label: "saved per transaction" },
+      { value: "47 min", label: "saved per deal" },
       { value: "0", label: "missed deadlines" },
     ],
   },
   {
     label: "AirSign",
-    headline: "Send. Sign. Seal. From your phone.",
-    body: "Upload any PDF, place signature fields, send signing links via email. Your buyers and sellers sign from any device. You get a sealed PDF with embedded signatures and a full audit trail.",
+    title: "Send. Sign. Seal.",
+    body: "Upload any PDF, place signature fields, send signing links. Buyers and sellers sign from any device. Sealed PDF with full audit trail.",
     stats: [
-      { value: "8 sec", label: "to send for signing" },
-      { value: "100%", label: "mobile compatible" },
+      { value: "8 sec", label: "to send" },
+      { value: "100%", label: "mobile" },
     ],
   },
   {
     label: "Morning Brief",
-    headline: "Your market intelligence, every morning at 7am.",
-    body: "Three AI researchers scan your transactions, communications, and market data overnight. By the time you pour coffee, your brief is ready — deadlines due today, new listings in your farm, and relationship follow-ups.",
+    title: "Intelligence at 7AM.",
+    body: "Three AI researchers scan your transactions, communications, and market data overnight. Deadlines, new listings, follow-ups — ready before coffee.",
     stats: [
       { value: "3", label: "AI researchers" },
-      { value: "7:00 AM", label: "daily delivery" },
+      { value: "7 AM", label: "daily" },
     ],
   },
   {
     label: "Voice Commands",
-    headline: "Speak. It acts.",
-    body: "\"Create a transaction at 5834 Guice Drive. Add buyer John Smith. Schedule inspection for Friday.\" Natural language to action in under 4 seconds. Built for agents who are always in the car.",
+    title: "Speak. It acts.",
+    body: "\"Create a transaction at 5834 Guice Drive.\" Natural language to action in under 4 seconds. Built for agents in the car.",
     stats: [
-      { value: "<4s", label: "response time" },
-      { value: "30+", label: "voice actions" },
+      { value: "<4s", label: "response" },
+      { value: "30+", label: "actions" },
     ],
   },
 ]
 
-const TOOLS = [
-  { name: "AIRE Estimate", description: "AI-powered property valuations using ensemble scoring and local comp analysis.", tag: "AVM" },
-  { name: "Market Pulse", description: "Live data from GBRAR MLS, Redfin, NAR, and ATTOM for Greater Baton Rouge.", tag: "Live Data" },
-  { name: "Flood Vision", description: "Flood zones, insurance estimates, and elevation data for every Louisiana parish.", tag: "Risk" },
-  { name: "Deal DNA", description: "Comps, price per square foot, days on market, and leverage points for any property.", tag: "Analysis" },
-  { name: "Neighborhood Score", description: "Schools, safety, appreciation trends, and walkability scoring by ZIP.", tag: "Intelligence" },
-]
-
-const TIERS = [
-  {
-    name: "Access",
-    price: "Free",
-    period: "",
-    description: "Try the tools. No credit card.",
-    features: ["AIRE Estimate", "Market Pulse dashboard", "Flood Vision lookup"],
-    cta: "Start Free",
-    featured: false,
-  },
-  {
-    name: "Pro",
-    price: "$97",
-    period: "/mo",
-    description: "The full AI operating system.",
-    features: ["Everything in Access", "Transaction Coordinator", "AirSign e-signatures", "Morning Brief", "Voice Commands", "Document automation", "Deadline alerts (SMS)"],
-    cta: "Start Pro Trial",
-    featured: true,
-  },
-  {
-    name: "Investor",
-    price: "$197",
-    period: "/mo",
-    description: "Advanced deal analysis and full system.",
-    features: ["Everything in Pro", "Deal DNA deep analysis", "Cash flow projections", "Portfolio tracking", "Priority support", "API access"],
-    cta: "Contact Us",
-    featured: false,
-  },
+const FREE_TOOLS = [
+  { name: "AIRE Estimate", description: "AI-powered property valuations with local comp analysis.", tag: "AVM" },
+  { name: "Market Pulse", description: "Live GBRAR MLS data for Greater Baton Rouge.", tag: "Data" },
+  { name: "Flood Vision", description: "Flood zones and insurance estimates by parish.", tag: "Risk" },
+  { name: "Deal DNA", description: "Comps, price/sqft, DOM, and leverage points.", tag: "Analysis" },
 ]
 
 export default async function HomePage() {
   const { userId } = await auth()
   const signedIn = !!userId
+
   return (
     <>
       <Navbar />
       <ScrollProgress />
 
-      {/* ═══ 1. HERO — Dark editorial overlay, bottom-aligned text ═══ */}
-      <section className="relative h-screen flex items-end justify-start overflow-hidden">
-        <video
-          autoPlay
-          muted
-          playsInline
-          preload="auto"
-          poster="/aire-hero.png"
-          // @ts-expect-error fetchPriority not in React types yet
-          fetchPriority="high"
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="/landing.mp4" type="video/mp4" />
-        </video>
-
-        {/* Dark gradient for text legibility — Caldera-style */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a18]/70 via-[#1a1a18]/20 to-transparent" />
-        {/* Grain texture */}
+      {/* ═══ 1. HERO — Seed-inspired, muted sage bg, device mockup ═══ */}
+      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#c8ceb8]">
+        {/* Subtle grain */}
         <div className="absolute inset-0 grain-overlay" />
 
-        <div className="relative z-10 container-aire pb-20 md:pb-28 lg:pb-32 max-w-2xl">
-          <p className="section-label text-[#f4f1ec]/50 mb-5 animate-fade-up [animation-delay:0.2s]">
-            Real Estate Intelligence System
+        {/* Top announcement bar */}
+        <div className="absolute top-0 left-0 right-0 z-20 bg-[#3a4a28] text-center py-2.5">
+          <p className="text-[#f4f1ec]/70 text-xs tracking-wide">
+            Built by an agent who closed $3.38M in Q1 2026
+            <span className="text-[#f4f1ec]/40 mx-2">&middot;</span>
+            <Link href="#pricing" className="text-[#f4f1ec] underline underline-offset-2 hover:text-white transition-colors">
+              See pricing →
+            </Link>
           </p>
-          <h1 className="text-[#f4f1ec] mb-6 animate-fade-up [animation-delay:0.4s]">
-            Built for parishes, <br className="hidden md:block" />
-            not platforms
+        </div>
+
+        <div className="relative z-10 container-aire text-center pt-28 pb-8 md:pt-32 md:pb-12">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#3a4a28]/20 border border-[#3a4a28]/15 rounded-full mb-8 animate-fade-up">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#5c6e2e]" />
+            <span className="text-[#3a4a28] text-xs font-medium">Real Estate Intelligence System</span>
+          </div>
+
+          {/* Headline */}
+          <h1 className="text-[#1e2416] mb-5 max-w-2xl mx-auto animate-fade-up [animation-delay:0.15s]">
+            The operating system<br className="hidden md:block" />
+            for Louisiana agents
           </h1>
-          <p className="text-[#f4f1ec]/50 text-base md:text-lg leading-relaxed mb-10 animate-fade-up [animation-delay:0.6s]">
-            Act of Sale deadlines, GBRAR comp data, Louisiana disclosure rules —
-            seven AI agents that understand how we close in Baton Rouge.
-            Built by an agent who did $3.38M in Q1.
+
+          {/* Subhead */}
+          <p className="text-[#3a4a28]/70 text-base md:text-lg leading-relaxed max-w-lg mx-auto mb-10 animate-fade-up [animation-delay:0.3s]">
+            Transaction coordination, e-signatures, morning briefs,
+            and voice commands — seven AI agents that understand
+            how we close in Baton Rouge.
           </p>
-          <div className="flex flex-wrap gap-4 animate-fade-up [animation-delay:0.8s]">
-            <Link href={signedIn ? "/aire" : "/sign-up"} className="btn-pill bg-[#f4f1ec] text-ink hover:bg-white hover:translate-y-[-1px] transition-all duration-300">
+
+          {/* CTAs */}
+          <div className="flex flex-wrap justify-center gap-4 mb-16 animate-fade-up [animation-delay:0.45s]">
+            <Link
+              href={signedIn ? "/aire" : "/sign-up"}
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#1e2416] text-[#f4f1ec] text-sm font-medium tracking-wide rounded-full hover:bg-[#2a3320] transition-all duration-300 hover:translate-y-[-1px] hover:shadow-[0_8px_24px_rgba(30,36,22,0.3)]"
+            >
               {signedIn ? "Open Dashboard" : "Get Started Free"}
             </Link>
-            <a href="#platform" className="btn-pill border border-[#f4f1ec]/20 text-[#f4f1ec]/60 hover:text-[#f4f1ec] hover:border-[#f4f1ec]/40 transition-all duration-300">
+            <a
+              href="#platform"
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-white/50 text-[#3a4a28] text-sm font-medium tracking-wide rounded-full border border-[#3a4a28]/10 hover:bg-white/70 transition-all duration-300"
+            >
               See the Platform
             </a>
           </div>
         </div>
 
-        {/* Bottom fade into cream */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-cream to-transparent z-[5]" />
+        {/* Device mockup — laptop showing AIRE dashboard */}
+        <div className="relative z-10 w-full max-w-4xl mx-auto px-6 animate-fade-up [animation-delay:0.6s]">
+          <DeviceMockup />
+        </div>
+
+        {/* Bottom fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-cream to-transparent z-[5]" />
       </section>
 
-      {/* ═══ 2. PROOF BAR — Q1 2026 real numbers ═══ */}
+      {/* ═══ 2. PROOF BAR ═══ */}
       <section className="bg-cream">
         <div className="container-aire">
           <div className="divider" />
@@ -155,7 +141,28 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ═══ 3. PLATFORM — One feature per block ═══ */}
+      {/* ═══ 3. PRODUCT CARDS + PRICING TOGGLE — Seed-style grid ═══ */}
+      <section id="pricing" className="section-padding bg-cream">
+        <div className="container-aire">
+          <ScrollReveal className="text-center mb-6">
+            <p className="section-label mb-4">Pricing</p>
+            <h2 className="max-w-lg mx-auto">Simple plans, built for agents</h2>
+          </ScrollReveal>
+          <p className="text-ink-muted text-sm text-center max-w-md mx-auto mb-12">
+            Start free with the tools. Upgrade when you want the full AI operating system.
+          </p>
+          <PricingToggle signedIn={signedIn} />
+        </div>
+      </section>
+
+      {/* ═══ 4. EMAIL CAPTURE — Value-first ═══ */}
+      <section className="py-20 md:py-28 bg-[#3a4a28] relative overflow-hidden">
+        <div className="absolute inset-0 grain-overlay" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[250px] rounded-full bg-[#9aab7e]/10 blur-[100px]" />
+        <EmailCaptureSection />
+      </section>
+
+      {/* ═══ 5. PLATFORM FEATURES ═══ */}
       <section id="platform" className="section-padding">
         <div className="container-aire">
           <ScrollReveal className="text-center mb-20">
@@ -163,147 +170,72 @@ export default async function HomePage() {
             <h2 className="max-w-lg mx-auto">Four systems working while you sell</h2>
           </ScrollReveal>
 
-          <div className="space-y-32">
+          <div className="space-y-24 md:space-y-32">
             {FEATURES.map((feature, i) => (
-              <div
-                key={feature.label}
-                className={`grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center ${
-                  i % 2 === 1 ? "lg:[direction:rtl]" : ""
-                }`}
-              >
-                {/* Text side */}
-                <div className={i % 2 === 1 ? "lg:[direction:ltr]" : ""}>
-                  <p className="section-label mb-4">{feature.label}</p>
-                  <h3 className="text-2xl md:text-3xl font-light italic text-ink mb-5 leading-tight">
-                    {feature.headline}
-                  </h3>
-                  <p className="text-ink-muted text-[15px] leading-relaxed mb-8">
-                    {feature.body}
-                  </p>
-                  <div className="flex gap-10">
-                    {feature.stats.map((stat) => (
-                      <div key={stat.label}>
-                        <p className="stat-number text-2xl">{stat.value}</p>
-                        <p className="text-ink-faint text-xs mt-0.5">{stat.label}</p>
-                      </div>
-                    ))}
+              <ScrollReveal key={feature.label}>
+                <div
+                  className={`grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center ${
+                    i % 2 === 1 ? "lg:[direction:rtl]" : ""
+                  }`}
+                >
+                  {/* Text */}
+                  <div className={i % 2 === 1 ? "lg:[direction:ltr]" : ""}>
+                    <p className="section-label mb-3">{feature.label}</p>
+                    <h3 className="text-2xl md:text-3xl font-light italic text-ink mb-4 leading-tight">
+                      {feature.title}
+                    </h3>
+                    <p className="text-ink-muted text-[15px] leading-relaxed mb-8">{feature.body}</p>
+                    <div className="flex gap-10">
+                      {feature.stats.map((stat) => (
+                        <div key={stat.label}>
+                          <p className="stat-number text-2xl">{stat.value}</p>
+                          <p className="text-ink-faint text-xs mt-0.5">{stat.label}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Feature card mockup */}
+                  <div className={`relative ${i % 2 === 1 ? "lg:[direction:ltr]" : ""}`}>
+                    <FeatureCard feature={feature} />
                   </div>
                 </div>
-
-                {/* Visual side — dark UI mockup */}
-                <div className={`relative ${i % 2 === 1 ? "lg:[direction:ltr]" : ""}`}>
-                  {i === 0 && <TCMockup />}
-                  {i === 1 && <AirSignMockup />}
-                  {i === 2 && <BriefMockup />}
-                  {i === 3 && <VoiceMockup />}
-                </div>
-              </div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ═══ 4. TOOLS ═══ */}
+      {/* ═══ 6. FREE TOOLS ═══ */}
       <section id="tools" className="section-padding bg-cream-warm">
         <div className="container-aire">
-          <ScrollReveal className="text-center mb-16">
+          <ScrollReveal className="text-center mb-14">
             <p className="section-label mb-4">Free Tools</p>
-            <h2 className="max-w-md mx-auto">Built for the Greater Baton Rouge market</h2>
+            <h2 className="max-w-md mx-auto">Try before you commit</h2>
             <p className="text-ink-muted text-sm mt-4 max-w-sm mx-auto">
-              Parishes, flood zones, mineral rights — the data sources that actually matter here.
+              Real data for the Greater Baton Rouge market. No signup required.
             </p>
           </ScrollReveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {TOOLS.map((tool) => (
-              <MagneticCard key={tool.name}>
-                <div className="card-glass group h-full">
-                  <div className="flex items-start justify-between mb-4">
-                    <h3 className="text-lg font-normal not-italic text-ink">{tool.name}</h3>
-                    <span className="badge">{tool.tag}</span>
-                  </div>
-                  <p className="text-ink-muted text-sm leading-relaxed">{tool.description}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
+            {FREE_TOOLS.map((tool) => (
+              <div key={tool.name} className="bg-white border border-champagne-light rounded-lg p-6 hover:shadow-[0_8px_32px_rgba(0,0,0,0.06)] hover:translate-y-[-2px] transition-all duration-300">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="badge">{tool.tag}</span>
                 </div>
-              </MagneticCard>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ 5. HOW IT WORKS ═══ */}
-      <section className="section-padding">
-        <div className="container-aire">
-          <ScrollReveal className="text-center mb-16">
-            <p className="section-label mb-4">How It Works</p>
-            <h2>Three steps to closing smarter</h2>
-          </ScrollReveal>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 max-w-3xl mx-auto">
-            {[
-              { step: "01", title: "Connect your transactions", body: "Import from your MLS or create manually. AIRE reads the contract and sets every deadline." },
-              { step: "02", title: "AIRE monitors and acts", body: "Daily briefs, document tracking, signature reminders, compliance scanning — all automatic." },
-              { step: "03", title: "You close more deals", body: "Spend your time with clients, not spreadsheets. AIRE handles the coordination." },
-            ].map((item) => (
-              <div key={item.step} className="text-center md:text-left relative">
-                {/* Decorative large number */}
-                <span className="font-[family-name:var(--font-cormorant)] text-[8rem] md:text-[10rem] font-light italic leading-none text-champagne/20 absolute -top-10 md:-top-14 left-1/2 md:left-0 -translate-x-1/2 md:translate-x-0 select-none pointer-events-none">
-                  {item.step}
-                </span>
-                <div className="relative z-10 pt-16 md:pt-20">
-                  <h3 className="text-lg font-normal not-italic text-ink mb-3">{item.title}</h3>
-                  <p className="text-ink-muted text-sm leading-relaxed">{item.body}</p>
-                </div>
+                <h3 className="text-base font-normal not-italic text-ink mb-2">{tool.name}</h3>
+                <p className="text-ink-muted text-sm leading-relaxed">{tool.description}</p>
               </div>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* ═══ 6. PRICING ═══ */}
-      <section id="pricing" className="section-padding bg-cream-warm">
-        <div className="container-aire">
-          <ScrollReveal className="text-center mb-16">
-            <p className="section-label mb-4">Pricing</p>
-            <h2>Simple, transparent, built for agents</h2>
-          </ScrollReveal>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-            {TIERS.map((tier) => (
-              <div
-                key={tier.name}
-                className={`p-8 border transition-all ${
-                  tier.featured
-                    ? "border-ink bg-white shadow-[0_8px_32px_rgba(0,0,0,0.06)]"
-                    : "border-champagne-light bg-white/50"
-                }`}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <p className="section-label">{tier.name}</p>
-                  {tier.featured && <span className="badge">Popular</span>}
-                </div>
-                <div className="flex items-baseline gap-1 mb-2">
-                  <span className="stat-number text-4xl">{tier.price}</span>
-                  {tier.period && <span className="text-ink-faint text-sm">{tier.period}</span>}
-                </div>
-                <p className="text-ink-muted text-sm mb-8">{tier.description}</p>
-                <ul className="space-y-3 mb-8">
-                  {tier.features.map((f) => (
-                    <li key={f} className="text-sm text-ink-muted flex items-start gap-2">
-                      <span className="w-1 h-1 rounded-full bg-sage mt-2 shrink-0" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href={signedIn ? "/aire" : "/sign-up"}
-                  className={`btn-pill w-full text-center ${
-                    tier.featured ? "btn-pill-primary" : "btn-pill-outline"
-                  }`}
-                >
-                  {signedIn ? "Open Dashboard" : tier.cta}
-                </Link>
-              </div>
-            ))}
+          <div className="text-center mt-10">
+            <Link
+              href={signedIn ? "/aire" : "/sign-up"}
+              className="text-sage text-sm font-medium hover:text-olive transition-colors"
+            >
+              Try all tools free →
+            </Link>
           </div>
         </div>
       </section>
@@ -339,10 +271,9 @@ export default async function HomePage() {
                   what the industry still gets wrong.
                 </p>
                 <p>
-                  Every feature in this platform exists because I needed it at the closing
-                  table, on the phone with a lender, or at 6 AM reviewing my pipeline.
-                  AIRE is built by an active agent, for agents who want an unfair advantage
-                  with real data.
+                  Every feature exists because I needed it at the closing table, on the phone
+                  with a lender, or at 6 AM reviewing my pipeline. AIRE is built by an active
+                  agent, for agents who want an unfair advantage with real data.
                 </p>
               </div>
               <div className="flex flex-wrap gap-4 mt-10">
@@ -380,14 +311,14 @@ export default async function HomePage() {
             Start free. No credit card. Full platform access for 14 days.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href={signedIn ? "/aire" : "/sign-up"} className="btn-pill bg-[#f4f1ec] text-ink hover:bg-white hover:translate-y-[-1px] transition-all duration-300">
+            <Link href={signedIn ? "/aire" : "/sign-up"} className="inline-flex items-center px-8 py-3.5 bg-[#f4f1ec] text-ink text-sm font-medium tracking-wide rounded-full hover:bg-white hover:translate-y-[-1px] transition-all duration-300">
               {signedIn ? "Open Dashboard" : "Start Free"}
             </Link>
             <a
               href="https://calendly.com/calebjackson"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-pill border border-[#f4f1ec]/15 text-[#f4f1ec]/60 hover:text-[#f4f1ec] hover:border-[#f4f1ec]/30 transition-all duration-300"
+              className="inline-flex items-center px-8 py-3.5 border border-[#f4f1ec]/15 text-[#f4f1ec]/60 text-sm font-medium tracking-wide rounded-full hover:text-[#f4f1ec] hover:border-[#f4f1ec]/30 transition-all duration-300"
             >
               Book a Call
             </a>
@@ -398,5 +329,52 @@ export default async function HomePage() {
       <Footer />
       <ScrollToTop />
     </>
+  )
+}
+
+/* ── Inline feature card (dark mockup style matching Seed product cards) ── */
+function FeatureCard({ feature }: { feature: typeof FEATURES[number] }) {
+  return (
+    <div
+      className="relative aspect-[4/3] rounded-xl overflow-hidden"
+      style={{ background: "#1e2416", boxShadow: "0 24px 64px rgba(30,36,22,0.35)" }}
+    >
+      {/* Window chrome */}
+      <div className="flex items-center gap-1.5 px-5 py-3 border-b border-[#9aab7e]/10">
+        <span className="w-2 h-2 rounded-full bg-[#c45c5c]/60" />
+        <span className="w-2 h-2 rounded-full bg-[#d4944c]/50" />
+        <span className="w-2 h-2 rounded-full bg-[#9aab7e]/50" />
+        <span className="ml-3 text-[10px] text-[#f4f1ec]/20 font-[family-name:var(--font-mono)]">
+          aire / {feature.label.toLowerCase().replace(/\s+/g, "-")}
+        </span>
+      </div>
+
+      <div className="p-5">
+        <p className="text-[9px] tracking-[0.15em] uppercase text-[#9aab7e]/50 mb-3 font-[family-name:var(--font-label)]">
+          {feature.label}
+        </p>
+        <p className="text-[#f4f1ec]/80 text-sm mb-4 font-[family-name:var(--font-body)]">
+          {feature.title}
+        </p>
+
+        {/* Simulated UI rows */}
+        <div className="space-y-0.5">
+          {feature.stats.map((stat, j) => (
+            <div key={stat.label} className="flex items-center gap-3 py-2.5 border-b border-[#9aab7e]/6 last:border-0">
+              <span className={`w-1.5 h-1.5 rounded-full ${j === 0 ? "bg-[#9aab7e]" : "bg-[#d4944c]"}`} />
+              <span className="text-[#f4f1ec]/50 text-xs font-[family-name:var(--font-mono)] flex-1">{stat.label}</span>
+              <span className="text-[#f4f1ec]/80 text-xs font-[family-name:var(--font-mono)]">{stat.value}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Fake action button */}
+        <div className="mt-5">
+          <div className="w-full py-2.5 rounded-lg bg-[#9aab7e]/15 text-[#9aab7e] text-xs text-center font-medium tracking-wide uppercase">
+            View Details
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }

@@ -67,19 +67,19 @@ export function ContactForm() {
   }
 
   const inputClass =
-    "w-full bg-forest-deep border border-brown-border rounded-lg px-4 py-2.5 text-cream placeholder:text-cream-dim/50 focus:outline-none focus:border-copper"
+    "w-full bg-white border border-[#d4c8b8]/60 rounded-lg px-4 py-2.5 text-[#1e2416] placeholder:text-[#6a6a60]/50 focus:outline-none focus:border-[#9aab7e]"
 
   return (
     <div className="max-w-2xl mx-auto py-10 px-4">
       <Link
         href="/aire/relationships"
-        className="text-cream-dim hover:text-cream text-sm inline-block mb-6"
+        className="text-[#6a6a60] hover:text-[#1e2416] text-sm inline-block mb-6"
       >
         &larr; Back to Relationships
       </Link>
 
       <div className="border border-brown-border rounded-xl p-8">
-        <h1 className="font-[family-name:var(--font-cormorant)] italic text-cream text-3xl mb-8">
+        <h1 className="font-[family-name:var(--font-cormorant)] italic text-[#1e2416] text-3xl mb-8">
           New Contact
         </h1>
 
@@ -91,7 +91,7 @@ export function ContactForm() {
           {/* Name row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-cream-dim text-sm block mb-1">
+              <label className="text-[#6a6a60] text-sm block mb-1">
                 First Name <span className="text-red-400">*</span>
               </label>
               <input
@@ -104,7 +104,7 @@ export function ContactForm() {
               />
             </div>
             <div>
-              <label className="text-cream-dim text-sm block mb-1">Last Name</label>
+              <label className="text-[#6a6a60] text-sm block mb-1">Last Name</label>
               <input
                 type="text"
                 value={lastName}
@@ -118,7 +118,7 @@ export function ContactForm() {
           {/* Email + Phone row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-cream-dim text-sm block mb-1">Email</label>
+              <label className="text-[#6a6a60] text-sm block mb-1">Email</label>
               <input
                 type="email"
                 value={email}
@@ -128,7 +128,7 @@ export function ContactForm() {
               />
             </div>
             <div>
-              <label className="text-cream-dim text-sm block mb-1">Phone</label>
+              <label className="text-[#6a6a60] text-sm block mb-1">Phone</label>
               <input
                 type="tel"
                 value={phone}
@@ -141,7 +141,7 @@ export function ContactForm() {
 
           {/* Category */}
           <div>
-            <label className="text-cream-dim text-sm block mb-1">Category</label>
+            <label className="text-[#6a6a60] text-sm block mb-1">Category</label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
@@ -157,7 +157,7 @@ export function ContactForm() {
 
           {/* Source */}
           <div>
-            <label className="text-cream-dim text-sm block mb-1">Source</label>
+            <label className="text-[#6a6a60] text-sm block mb-1">Source</label>
             <input
               type="text"
               value={source}
@@ -169,7 +169,7 @@ export function ContactForm() {
 
           {/* Notes */}
           <div>
-            <label className="text-cream-dim text-sm block mb-1">Notes</label>
+            <label className="text-[#6a6a60] text-sm block mb-1">Notes</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -184,7 +184,7 @@ export function ContactForm() {
             <button
               type="submit"
               disabled={submitting}
-              className="bg-copper hover:bg-copper-light text-forest-deep font-medium px-6 py-2.5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-[#6b7d52] hover:bg-[#5a6c44] text-[#f5f2ea] font-medium px-6 py-2.5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? "Creating..." : "Create Contact"}
             </button>

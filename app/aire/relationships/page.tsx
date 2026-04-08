@@ -6,6 +6,7 @@ import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
 import prisma from "@/lib/prisma"
 import Link from "next/link"
+import { ContactImporter } from "./ContactImporter"
 
 export default async function RelationshipsPage() {
   const { userId } = await auth()
@@ -75,53 +76,54 @@ export default async function RelationshipsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="font-[family-name:var(--font-cormorant)] italic text-cream text-3xl">
+          <h1 className="font-[family-name:var(--font-cormorant)] italic text-[#1e2416] text-3xl">
             Relationship Intelligence
           </h1>
-          <p className="text-cream-dim text-sm mt-1">
+          <p className="text-[#1e2416]-dim text-sm mt-1">
             {lastRunLabel
               ? `Last scored ${lastRunLabel} · ${totalScored} of ${totalContacts} contacts`
               : `${totalContacts} contacts · Not yet scored`}
           </p>
         </div>
         <div className="flex items-center gap-3">
-          {totalContacts === 0 && (
-            <Link
-              href="/aire/relationships/new"
-              className="text-sm text-cream-dim hover:text-cream transition-colors"
-            >
-              + Add Contact
-            </Link>
-          )}
+          <Link
+            href="/aire/relationships/new"
+            className="text-sm text-[#1e2416]-dim hover:text-[#1e2416] transition-colors"
+          >
+            + Add Contact
+          </Link>
           <RunButton agentId={user.id} />
         </div>
       </div>
 
+      {/* CSV Import */}
+      <ContactImporter />
+
       {/* Stats row */}
       {totalContacts > 0 && latestRun && (
         <div className="grid grid-cols-6 gap-3 mb-8">
-          <div className="border border-brown-border rounded-lg p-4">
-            <p className="text-cream-dim text-xs mb-1">Total</p>
-            <p className="text-2xl font-light text-cream">{totalContacts}</p>
+          <div className="bg-white border border-[#d4c8b8]/60 rounded-lg p-4">
+            <p className="text-[#1e2416]-dim text-xs mb-1">Total</p>
+            <p className="text-2xl font-light text-[#1e2416]">{totalContacts}</p>
           </div>
-          <div className="border border-brown-border rounded-lg p-4">
-            <p className="text-cream-dim text-xs mb-1">Scored</p>
+          <div className="bg-white border border-[#d4c8b8]/60 rounded-lg p-4">
+            <p className="text-[#1e2416]-dim text-xs mb-1">Scored</p>
             <p className="text-2xl font-light text-status-blue">{totalScored}</p>
           </div>
-          <div className="border border-brown-border rounded-lg p-4">
-            <p className="text-cream-dim text-xs mb-1">Avg Score</p>
-            <p className={`text-2xl font-light ${avgScore >= 60 ? "text-status-green" : avgScore >= 40 ? "text-status-amber" : "text-cream-dim"}`}>{avgScore}</p>
+          <div className="bg-white border border-[#d4c8b8]/60 rounded-lg p-4">
+            <p className="text-[#1e2416]-dim text-xs mb-1">Avg Score</p>
+            <p className={`text-2xl font-light ${avgScore >= 60 ? "text-status-green" : avgScore >= 40 ? "text-status-amber" : "text-[#1e2416]-dim"}`}>{avgScore}</p>
           </div>
-          <div className="border border-brown-border rounded-lg p-4">
-            <p className="text-cream-dim text-xs mb-1">Call</p>
+          <div className="bg-white border border-[#d4c8b8]/60 rounded-lg p-4">
+            <p className="text-[#1e2416]-dim text-xs mb-1">Call</p>
             <p className="text-2xl font-light text-status-green">{channelBreakdown.call}</p>
           </div>
-          <div className="border border-brown-border rounded-lg p-4">
-            <p className="text-cream-dim text-xs mb-1">Text</p>
+          <div className="bg-white border border-[#d4c8b8]/60 rounded-lg p-4">
+            <p className="text-[#1e2416]-dim text-xs mb-1">Text</p>
             <p className="text-2xl font-light text-status-amber">{channelBreakdown.text}</p>
           </div>
-          <div className="border border-brown-border rounded-lg p-4">
-            <p className="text-cream-dim text-xs mb-1">Email</p>
+          <div className="bg-white border border-[#d4c8b8]/60 rounded-lg p-4">
+            <p className="text-[#1e2416]-dim text-xs mb-1">Email</p>
             <p className="text-2xl font-light text-status-blue">{channelBreakdown.email}</p>
           </div>
         </div>
@@ -129,14 +131,14 @@ export default async function RelationshipsPage() {
 
       {/* Empty states */}
       {totalContacts === 0 && (
-        <div className="border border-brown-border rounded-xl p-12 text-center">
-          <p className="text-cream font-medium mb-1">No contacts yet</p>
-          <p className="text-cream-dim text-sm mb-6">
-            Add your leads, past clients, and sphere of influence to get your weekly hit list.
+        <div className="bg-white border border-[#d4c8b8]/60 rounded-xl p-12 text-center">
+          <p className="text-[#1e2416] font-medium mb-1">No contacts yet</p>
+          <p className="text-[#1e2416]-dim text-sm mb-6">
+            Import your contacts from Google, Follow Up Boss, Dotloop, or your phone — or add them one by one.
           </p>
           <Link
             href="/aire/relationships/new"
-            className="inline-block bg-copper hover:bg-copper-light text-forest-deep text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
+            className="inline-block bg-[#6b7d52] hover:bg-[#5a6c44] text-[#f5f2ea] text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
           >
             Add First Contact
           </Link>
@@ -144,11 +146,11 @@ export default async function RelationshipsPage() {
       )}
 
       {totalContacts > 0 && hitList.length === 0 && (
-        <div className="border border-brown-border rounded-xl p-12 text-center">
-          <p className="text-cream font-medium mb-1">
+        <div className="bg-white border border-[#d4c8b8]/60 rounded-xl p-12 text-center">
+          <p className="text-[#1e2416] font-medium mb-1">
             {latestRun ? "No contacts ready this week" : "Hit list not generated yet"}
           </p>
-          <p className="text-cream-dim text-sm mb-6">
+          <p className="text-[#1e2416]-dim text-sm mb-6">
             {latestRun
               ? `AIRE analyzed ${totalScored} contacts — none scored high enough to action this week.`
               : "Run AIRE's Relationship Intelligence to score your contacts."}
@@ -159,7 +161,7 @@ export default async function RelationshipsPage() {
       {/* Hit List */}
       {hitList.length > 0 && (
         <div>
-          <h2 className="text-cream font-medium mb-4">Weekly hit list</h2>
+          <h2 className="text-[#1e2416] font-medium mb-4">Weekly hit list</h2>
           <div className="space-y-3">
             {hitList.map((item, index) => (
               <HitListCard key={item.id} item={item} rank={index + 1} />
@@ -209,7 +211,7 @@ function HitListCard({ item, rank }: { item: HitListItem; rank: number }) {
     urgent: "text-status-red bg-status-red/10",
     high: "text-status-amber bg-status-amber/10",
     normal: "text-status-blue bg-status-blue/10",
-    low: "text-cream-dim bg-brown-light/30",
+    low: "text-[#1e2416]-dim bg-brown-light/30",
   }
 
   const daysSince = contact.lastContactedAt
@@ -217,19 +219,19 @@ function HitListCard({ item, rank }: { item: HitListItem; rank: number }) {
     : null
 
   return (
-    <div className="border border-brown-border rounded-xl p-5">
+    <div className="bg-white border border-[#d4c8b8]/60 rounded-xl p-5">
       <div className="flex items-start gap-4">
-        <div className="shrink-0 w-8 h-8 rounded-full bg-forest-light/50 flex items-center justify-center">
-          <span className="text-sm font-medium text-cream-dim">{rank}</span>
+        <div className="shrink-0 w-8 h-8 rounded-full bg-[#9aab7e]/15 flex items-center justify-center">
+          <span className="text-sm font-medium text-[#1e2416]-dim">{rank}</span>
         </div>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>
-              <h3 className="font-medium text-cream">
+              <h3 className="font-medium text-[#1e2416]">
                 {contact.firstName} {contact.lastName}
               </h3>
-              <p className="text-xs text-cream-dim mt-0.5">
+              <p className="text-xs text-[#1e2416]-dim mt-0.5">
                 {contact.type}
                 {contact.neighborhood ? ` · ${contact.neighborhood}` : ""}
                 {daysSince !== null ? ` · ${daysSince}d since contact` : " · Never contacted"}
@@ -239,19 +241,19 @@ function HitListCard({ item, rank }: { item: HitListItem; rank: number }) {
               <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${priorityStyles[item.priority] || priorityStyles.low}`}>
                 {item.priority}
               </span>
-              <span className="text-xs text-copper font-medium">{channelIcon[item.channel]}</span>
-              <span className="text-sm font-medium text-cream">{item.finalScore}</span>
+              <span className="text-xs text-[#6b7d52] font-medium">{channelIcon[item.channel]}</span>
+              <span className="text-sm font-medium text-[#1e2416]">{item.finalScore}</span>
             </div>
           </div>
 
-          <p className="text-sm text-cream-dim mt-2 leading-relaxed">{item.reasoning}</p>
+          <p className="text-sm text-[#1e2416]-dim mt-2 leading-relaxed">{item.reasoning}</p>
 
           {item.suggestedMessage && (
-            <div className="mt-3 rounded-lg bg-forest-deep/50 border border-brown-border/50 p-3">
-              <p className="text-[10px] text-cream-dim mb-1 font-medium uppercase tracking-wider">
+            <div className="mt-3 rounded-lg bg-[#f5f2ea] bg-white border border-[#d4c8b8]/60/50 p-3">
+              <p className="text-[10px] text-[#1e2416]-dim mb-1 font-medium uppercase tracking-wider">
                 Suggested {item.recommendation}
               </p>
-              <p className="text-sm text-cream italic">
+              <p className="text-sm text-[#1e2416] italic">
                 &quot;{item.suggestedMessage}&quot;
               </p>
             </div>
@@ -268,7 +270,7 @@ function HitListCard({ item, rank }: { item: HitListItem; rank: number }) {
             {contact.phone && (
               <a
                 href={`tel:${contact.phone}`}
-                className="text-xs bg-forest-deep/50 hover:bg-forest-light/30 text-cream-dim hover:text-cream px-3 py-1.5 rounded-lg transition-colors border border-brown-border/50"
+                className="text-xs bg-white hover:bg-[#9aab7e]/8 text-[#6a6a60] hover:text-[#1e2416] px-3 py-1.5 rounded-lg transition-colors border border-[#d4c8b8]/60"
               >
                 {contact.phone}
               </a>
@@ -276,14 +278,14 @@ function HitListCard({ item, rank }: { item: HitListItem; rank: number }) {
             {contact.email && (
               <a
                 href={`mailto:${contact.email}`}
-                className="text-xs bg-forest-deep/50 hover:bg-forest-light/30 text-cream-dim hover:text-cream px-3 py-1.5 rounded-lg transition-colors border border-brown-border/50"
+                className="text-xs bg-white hover:bg-[#9aab7e]/8 text-[#6a6a60] hover:text-[#1e2416] px-3 py-1.5 rounded-lg transition-colors border border-[#d4c8b8]/60"
               >
                 {contact.email}
               </a>
             )}
             <Link
               href={`/aire/communications?name=${encodeURIComponent(contact.firstName + " " + contact.lastName)}&type=${contact.type}`}
-              className="text-xs text-copper hover:text-copper-light px-3 py-1.5 rounded-lg transition-colors border border-copper/20"
+              className="text-xs text-[#6b7d52] hover:text-[#6b7d52]-light px-3 py-1.5 rounded-lg transition-colors border border-copper/20"
             >
               Draft message
             </Link>
@@ -298,12 +300,12 @@ function ScorePill({ label, score }: { label: string; score: number }) {
   const color =
     score >= 70 ? "text-status-green" :
     score >= 40 ? "text-status-amber" :
-    "text-cream-dim"
+    "text-[#1e2416]-dim"
 
   return (
     <div className="text-center">
       <p className={`text-xs font-bold ${color}`}>{score}</p>
-      <p className="text-[10px] text-cream-dim">{label}</p>
+      <p className="text-[10px] text-[#1e2416]-dim">{label}</p>
     </div>
   )
 }
@@ -314,7 +316,7 @@ function RunButton({ agentId }: { agentId: string }) {
       <input type="hidden" name="agentId" value={agentId} />
       <button
         type="submit"
-        className="text-sm bg-forest-deep hover:bg-forest-light/30 text-cream-dim hover:text-cream px-4 py-2 rounded-lg transition-colors border border-brown-border"
+        className="text-sm bg-white hover:bg-[#9aab7e]/8 text-[#6a6a60] hover:text-[#1e2416] px-4 py-2 rounded-lg transition-colors border border-[#d4c8b8]/60"
       >
         Run Now
       </button>

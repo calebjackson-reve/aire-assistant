@@ -957,7 +957,7 @@ function ActionCard({
                 key={i}
                 onClick={() => onComplete(action.deadlineId!)}
                 disabled={completing === action.deadlineId}
-                className="text-[10px] px-3 py-1.5 rounded border border-[#9aab7e]/20 text-[#6b7d52] hover:bg-[#9aab7e]/10 disabled:opacity-50 transition min-h-[32px]"
+                className="text-[10px] px-3 py-1.5 rounded bg-[#6b7d52] text-[#f5f2ea] hover:bg-[#5a6c44] disabled:opacity-50 transition min-h-[32px] font-medium shadow-sm"
               >
                 {completing === action.deadlineId ? "..." : action.label}
               </button>
@@ -1025,7 +1025,7 @@ function DeadlineGroup({
               <button
                 onClick={() => onComplete(d.id)}
                 disabled={completing === d.id}
-                className="text-[10px] px-3 py-1.5 rounded border border-[#9aab7e]/20 text-[#6b7d52] hover:bg-[#9aab7e]/10 disabled:opacity-50 transition shrink-0 min-h-[44px] min-w-[70px]"
+                className="text-[10px] px-3 py-1.5 rounded bg-[#9aab7e] text-[#1e2416] hover:bg-[#6b7d52] hover:text-[#f5f2ea] disabled:opacity-50 transition shrink-0 min-h-[44px] min-w-[70px] font-semibold"
               >
                 {completing === d.id ? "..." : "Complete"}
               </button>

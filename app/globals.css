@@ -232,10 +232,67 @@
 
   /* ── Dark card for app interior ── */
   .card-dark {
-    background: var(--color-forest-card);
-    border: 1px solid var(--color-brown-border);
+    background: white;
+    border: 1px solid var(--color-champagne-light);
     border-radius: 0.5rem;
     padding: 1.5rem;
+  }
+
+  /* ── App interior cards (light theme) ── */
+  .card-earth {
+    background: white;
+    border: 1px solid var(--color-champagne-light);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+  }
+
+  .card-sage {
+    background: rgba(154, 171, 126, 0.06);
+    border: 1px solid rgba(154, 171, 126, 0.15);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+  }
+
+  /* ── App interior buttons ── */
+  .btn-sage {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    background: var(--color-olive);
+    color: #f5f2ea;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    transition: all 200ms ease;
+  }
+  .btn-sage:hover {
+    background: #4d5e26;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(92, 110, 46, 0.2);
+  }
+
+  .btn-outline-sage {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    color: var(--color-olive);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(107, 125, 82, 0.3);
+    cursor: pointer;
+    transition: all 200ms ease;
+  }
+  .btn-outline-sage:hover {
+    background: rgba(154, 171, 126, 0.08);
+    border-color: var(--color-olive);
   }
 }
 
