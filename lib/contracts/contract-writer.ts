@@ -14,6 +14,8 @@ import { PDFDocument, StandardFonts, rgb, PDFPage, PDFFont } from "pdf-lib"
 import { getFormDefinition, type FormField, type FormDefinition, LOUISIANA_PARISHES } from "./lrec-fields"
 import { selectClauses, substituteVariables, type ClauseContext, type Clause } from "./clause-library"
 import { calculateDeadlines } from "@/lib/louisiana-rules-engine"
+import { withCircuitBreaker } from "@/lib/learning/circuit-breaker"
+import { logError } from "@/lib/learning/error-memory"
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 

@@ -6,6 +6,8 @@
 import Anthropic from "@anthropic-ai/sdk"
 import { Prisma } from "@prisma/client"
 import prisma from "@/lib/prisma"
+import { withCircuitBreaker } from "@/lib/learning/circuit-breaker"
+import { logError } from "@/lib/learning/error-memory"
 
 const anthropic = new Anthropic()
 
@@ -50,18 +52,26 @@ Return JSON:
 }
 Return ONLY valid JSON.`
 
-  const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 2000,
-    messages: [{ role: "user", content: prompt }],
-  })
+  const cbResult = await withCircuitBreaker(
+    () => anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 2000,
+      messages: [{ role: "user", content: prompt }],
+    }),
+    { agentName: "cma", maxRetries: 2 }
+  )
 
-  const text = response.content[0].type === "text" ? response.content[0].text : "{}"
   let parsed: Record<string, unknown>
-  try {
-    parsed = JSON.parse(text.replace(/```json\n?|\n?```/g, "").trim())
-  } catch {
+  if ("error" in cbResult) {
+    await logError({ agentName: "cma", error: cbResult.error, context: { userId, propertyAddress } }).catch(() => {})
     parsed = { estimatedValue: null, confidence: 0 }
+  } else {
+    const text = cbResult.result.content[0].type === "text" ? cbResult.result.content[0].text : "{}"
+    try {
+      parsed = JSON.parse(text.replace(/```json\n?|\n?```/g, "").trim())
+    } catch {
+      parsed = { estimatedValue: null, confidence: 0 }
+    }
   }
 
   const selectedComps = parsed.selectedComps as

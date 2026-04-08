@@ -6,6 +6,8 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { getLearningExamples } from "@/lib/document-memory";
+import { withCircuitBreaker } from "@/lib/learning/circuit-breaker";
+import { logError } from "@/lib/learning/error-memory";
 
 export interface ClassificationResult {
   type: string;

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { FeedbackButtons } from "@/components/FeedbackButtons"
 
 interface UnansweredMsg {
   id: string
@@ -261,6 +262,16 @@ export function EmailDashboard({ googleConfigured }: { googleConfigured: boolean
         <div className="bg-[#9aab7e]/8 border border-[#9aab7e]/20 rounded-xl text-center py-12">
           <p className="text-[#1e2416] text-sm font-medium">All clear</p>
           <p className="text-[#6a6a60] text-xs mt-1">No unanswered messages or missed calls.</p>
+        </div>
+      )}
+
+      {/* Feedback on triage quality */}
+      {data && (
+        <div className="flex justify-end pt-2">
+          <FeedbackButtons
+            feature="email_triage"
+            metadata={{ totalUnanswered: data.stats.totalUnanswered, criticalCount: data.stats.criticalCount }}
+          />
         </div>
       )}
     </div>

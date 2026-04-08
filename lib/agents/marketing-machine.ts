@@ -7,6 +7,8 @@
 
 import Anthropic from "@anthropic-ai/sdk"
 import prisma from "@/lib/prisma"
+import { withCircuitBreaker } from "@/lib/learning/circuit-breaker"
+import { logError } from "@/lib/learning/error-memory"
 
 const anthropic = new Anthropic()
 
@@ -130,8 +132,8 @@ MLS#: ${txn.mlsNumber || "Pending"}
     calendar: CalendarEntry[]
   }
 
-  try {
-    const res = await anthropic.messages.create({
+  const cbResult = await withCircuitBreaker(
+    () => anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
       max_tokens: 4000,
       temperature: 0.4,
@@ -142,13 +144,23 @@ MLS#: ${txn.mlsNumber || "Pending"}
           content: `Generate a complete marketing campaign for this listing:\n\n${propertyDetails}`,
         },
       ],
-    })
+    }),
+    { agentName: "marketing", maxRetries: 2 }
+  )
 
-    const text = res.content[0]?.type === "text" ? res.content[0].text : ""
+  if ("error" in cbResult) {
+    console.error("[MarketingMachine] Campaign generation failed:", cbResult.error)
+    await logError({ agentName: "marketing", error: cbResult.error, context: { userId, transactionId, propertyAddress: txn.propertyAddress } }).catch(() => {})
+    throw new Error("Marketing campaign generation failed")
+  }
+
+  try {
+    const text = cbResult.result.content[0]?.type === "text" ? cbResult.result.content[0].text : ""
     const clean = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
     campaign = JSON.parse(clean)
   } catch (err) {
-    console.error("[MarketingMachine] Campaign generation failed:", err)
+    console.error("[MarketingMachine] Campaign parse failed:", err)
+    await logError({ agentName: "marketing", error: err instanceof Error ? err : String(err), context: { userId, transactionId, phase: "parse" } }).catch(() => {})
     throw new Error("Marketing campaign generation failed")
   }
 
@@ -175,6 +187,7 @@ MLS#: ${txn.mlsNumber || "Pending"}
     campaignId = record.id
   } catch (err) {
     console.error("[MarketingMachine] Failed to store campaign:", err)
+    await logError({ agentName: "marketing", error: err instanceof Error ? err : String(err), context: { userId, transactionId, phase: "db_write" } }).catch(() => {})
     throw new Error("Failed to store marketing campaign")
   }
 

@@ -6,6 +6,7 @@
 // vercel.json: { "crons": [{ "path": "/api/cron/learning", "schedule": "0 7 * * 0" }] }
 
 import { NextRequest, NextResponse } from "next/server"
+import Anthropic from "@anthropic-ai/sdk"
 import prisma from "@/lib/prisma"
 import { getFeedbackSummary } from "@/lib/learning/feedback-engine"
 import { getErrorPatterns } from "@/lib/learning/error-memory"

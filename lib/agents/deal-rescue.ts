@@ -6,6 +6,8 @@
 
 import Anthropic from "@anthropic-ai/sdk"
 import prisma from "@/lib/prisma"
+import { withCircuitBreaker } from "@/lib/learning/circuit-breaker"
+import { logError } from "@/lib/learning/error-memory"
 
 const anthropic = new Anthropic()
 
@@ -202,8 +204,8 @@ async function scoreSentiment(
     )
     .join("\n\n")
 
-  try {
-    const res = await anthropic.messages.create({
+  const cbResult = await withCircuitBreaker(
+    () => anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
       max_tokens: 300,
       temperature: 0.2,
@@ -223,13 +225,27 @@ Return ONLY valid JSON:
   "reasoning": "one sentence"
 }`,
       messages: [{ role: "user", content: commText }],
-    })
+    }),
+    {
+      agentName: "deal_rescue",
+      maxRetries: 2,
+      fallback: async () => ({ content: [{ type: "text" as const, text: '{"score": 5, "signals": ["fallback"], "reasoning": "Circuit breaker active — neutral default"}' }] }),
+    }
+  )
 
+  if ("error" in cbResult) {
+    await logError({ agentName: "deal_rescue", error: cbResult.error, context: { commCount: recentWithContent.length } }).catch(() => {})
+    return 5 // neutral on failure
+  }
+
+  try {
+    const res = cbResult.result
     const text = res.content[0]?.type === "text" ? res.content[0].text : ""
     const clean = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
     const parsed = JSON.parse(clean)
     return Math.max(0, Math.min(10, Number(parsed.score) || 5))
-  } catch {
+  } catch (error) {
+    await logError({ agentName: "deal_rescue", error: error instanceof Error ? error : String(error), context: { phase: "sentiment_parse" } }).catch(() => {})
     return 5 // neutral on failure
   }
 }
@@ -285,7 +301,8 @@ Keep it concise and actionable. Louisiana real estate context.`
     })
 
     return res.content[0]?.type === "text" ? res.content[0].text : ""
-  } catch {
+  } catch (error) {
+    await logError({ agentName: "deal_rescue", error: error instanceof Error ? error : String(error), context: { phase: "rescue_brief", transactionId: txn.id } }).catch(() => {})
     return "Rescue brief generation failed. Review deal manually."
   }
 }
@@ -425,6 +442,7 @@ export async function runDealRescue(userId: string): Promise<DealRescueResult> {
       logsWritten++
     } catch (err) {
       console.error(`[DealRescue] Failed to log txn ${txn.id}:`, err)
+      await logError({ agentName: "deal_rescue", error: err instanceof Error ? err : String(err), context: { phase: "db_write", transactionId: txn.id } }).catch(() => {})
     }
   }
 

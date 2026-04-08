@@ -5,6 +5,7 @@
 // Checks document completeness, deadline compliance, and disclosure signatures.
 
 import prisma from "@/lib/prisma"
+import { logError } from "@/lib/learning/error-memory"
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
 
@@ -266,6 +267,7 @@ export async function runComplianceAudit(
     })
   } catch (err) {
     console.error(`[LRECGuardian] Failed to store audit log:`, err)
+    await logError({ agentName: "compliance_audit", error: err instanceof Error ? err : String(err), context: { userId, transactionId } }).catch(() => {})
   }
 
   return {

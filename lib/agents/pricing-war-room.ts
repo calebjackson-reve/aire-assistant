@@ -6,6 +6,8 @@
 
 import Anthropic from "@anthropic-ai/sdk"
 import prisma from "@/lib/prisma"
+import { withCircuitBreaker } from "@/lib/learning/circuit-breaker"
+import { logError } from "@/lib/learning/error-memory"
 
 const anthropic = new Anthropic()
 
@@ -120,23 +122,9 @@ Generate the 3-tier pricing analysis with DOM projections, net proceeds, and 5 s
     objections: Objection[]
   }
 
-  try {
-    const res = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1200,
-      temperature: 0.3,
-      system: PRICING_PROMPT,
-      messages: [{ role: "user", content: userPrompt }],
-    })
-
-    const text = res.content[0]?.type === "text" ? res.content[0].text : ""
-    const clean = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
-    analysis = JSON.parse(clean)
-  } catch (err) {
-    console.error("[PricingWarRoom] Claude analysis failed:", err)
-    // Fallback with placeholder
+  const fallbackAnalysis = () => {
     const basePrice = 250000
-    analysis = {
+    return {
       conservative: {
         label: "Conservative",
         price: basePrice * 0.95,
@@ -168,6 +156,34 @@ Generate the 3-tier pricing analysis with DOM projections, net proceeds, and 5 s
     }
   }
 
+  const cbResult = await withCircuitBreaker(
+    () => anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1200,
+      temperature: 0.3,
+      system: PRICING_PROMPT,
+      messages: [{ role: "user", content: userPrompt }],
+    }),
+    { agentName: "pricing", maxRetries: 2, fallback: async () => null }
+  )
+
+  if ("error" in cbResult || cbResult.result === null) {
+    const errorMsg = "error" in cbResult ? cbResult.error : "Circuit breaker fallback"
+    console.error("[PricingWarRoom] Claude analysis failed:", errorMsg)
+    await logError({ agentName: "pricing", error: errorMsg, context: { userId, propertyAddress } }).catch(() => {})
+    analysis = fallbackAnalysis()
+  } else {
+    try {
+      const text = cbResult.result.content[0]?.type === "text" ? cbResult.result.content[0].text : ""
+      const clean = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
+      analysis = JSON.parse(clean)
+    } catch (err) {
+      console.error("[PricingWarRoom] Claude analysis parse failed:", err)
+      await logError({ agentName: "pricing", error: err instanceof Error ? err : String(err), context: { userId, propertyAddress, phase: "parse" } }).catch(() => {})
+      analysis = fallbackAnalysis()
+    }
+  }
+
   // Ensure labels
   analysis.conservative.label = "Conservative"
   analysis.target.label = "Target"
@@ -193,6 +209,7 @@ Generate the 3-tier pricing analysis with DOM projections, net proceeds, and 5 s
     })
   } catch (err) {
     console.error("[PricingWarRoom] Failed to store log:", err)
+    await logError({ agentName: "pricing", error: err instanceof Error ? err : String(err), context: { userId, propertyAddress, phase: "db_write" } }).catch(() => {})
   }
 
   return {

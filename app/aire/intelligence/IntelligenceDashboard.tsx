@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { FeedbackButtons } from "@/components/FeedbackButtons"
 
 interface Transaction {
   id: string
@@ -182,6 +183,14 @@ export function IntelligenceDashboard({ transactions }: { transactions: Transact
               </div>
             </div>
           )}
+
+          <div className="border-t border-brown-border pt-4 flex justify-end">
+            <FeedbackButtons
+              feature="cma_estimate"
+              metadata={{ estimatedValue: result.estimatedValue, confidenceScore: result.confidenceScore }}
+              className="[&_span]:text-cream-dim/40 [&_button]:text-cream-dim/40 [&_button:hover]:text-green-400 [&_button:last-child:hover]:text-red-400"
+            />
+          </div>
         </div>
       )}
 

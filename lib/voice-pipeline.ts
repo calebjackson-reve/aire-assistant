@@ -17,6 +17,8 @@ import prisma from "@/lib/prisma"
 import Anthropic from "@anthropic-ai/sdk"
 import { normalizeTranscript } from "@/app/api/voice-command/route"
 import { generateEnglishPreview, requiresPreviewConfirmation } from "@/lib/voice/english-preview"
+import { withCircuitBreaker } from "@/lib/learning/circuit-breaker"
+import { logError } from "@/lib/learning/error-memory"
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 

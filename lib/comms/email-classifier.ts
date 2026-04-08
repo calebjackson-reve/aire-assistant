@@ -20,6 +20,8 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk"
+import { withCircuitBreaker } from "@/lib/learning/circuit-breaker"
+import { logError } from "@/lib/learning/error-memory"
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 

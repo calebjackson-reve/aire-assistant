@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
+import { FeedbackButtons } from "@/components/FeedbackButtons"
 
 interface Transaction {
   id: string
@@ -284,6 +285,13 @@ export function MLSAutoFillWizard({ transactions }: { transactions: Transaction[
         <p className="text-cream-dim/40 text-xs mt-2">
           {result.totalFilled} of {result.totalRequired} required fields filled
         </p>
+        <div className="flex justify-end mt-3">
+          <FeedbackButtons
+            feature="mls_autofill"
+            metadata={{ completionPct: result.completionPct, totalFilled: result.totalFilled, totalRequired: result.totalRequired }}
+            className="[&_span]:text-cream-dim/40 [&_button]:text-cream-dim/40 [&_button:hover]:text-green-400 [&_button:last-child:hover]:text-red-400"
+          />
+        </div>
       </div>
 
       {/* Fields by section */}

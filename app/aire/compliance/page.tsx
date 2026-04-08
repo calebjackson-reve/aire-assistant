@@ -7,6 +7,7 @@ import {
   type TransactionDates,
   type CalculatedDeadline,
 } from "@/lib/louisiana-rules-engine"
+import { FeedbackButtons } from "@/components/FeedbackButtons"
 
 interface ComplianceIssue {
   transactionId: string
@@ -192,6 +193,15 @@ export default async function CompliancePage() {
           <p className="text-cream-dim text-sm mt-1">No compliance issues detected across your active transactions.</p>
         </div>
       )}
+
+      {/* Feedback on compliance scan accuracy */}
+      <div className="flex justify-end mb-6">
+        <FeedbackButtons
+          feature="compliance_scan"
+          metadata={{ score, criticalCount, warningCount, issueCount: issues.length }}
+          className="[&_span]:text-cream-dim/40 [&_button]:text-cream-dim/40 [&_button:hover]:text-green-400 [&_button:last-child:hover]:text-red-400"
+        />
+      </div>
 
       {/* Upcoming Deadlines Timeline */}
       {upcomingDeadlines.length > 0 && (

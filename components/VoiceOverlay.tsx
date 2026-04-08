@@ -74,6 +74,7 @@ export function VoiceOverlay({ open, onClose }: VoiceOverlayProps) {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
   const streamRef = useRef<MediaStream | null>(null)
+  const lastCommandRef = useRef<{ text: string; time: number } | null>(null)
 
   // Auto-focus input when overlay opens
   useEffect(() => {
@@ -154,6 +155,24 @@ export function VoiceOverlay({ open, onClose }: VoiceOverlayProps) {
   // Send command to the voice pipeline API
   async function sendCommand(text: string) {
     if (!text.trim()) return
+
+    // Track voice re-issues as implicit negative feedback
+    if (lastCommandRef.current) {
+      const timeDiff = Date.now() - lastCommandRef.current.time
+      const firstWord = lastCommandRef.current.text.toLowerCase().split(" ")[0]
+      if (timeDiff < 30000 && text.toLowerCase().includes(firstWord)) {
+        fetch("/api/feedback", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            feature: "voice",
+            rating: 1,
+            metadata: JSON.parse(JSON.stringify({ reissue: true, original: lastCommandRef.current.text, retry: text })),
+          }),
+        }).catch(() => {})
+      }
+    }
+    lastCommandRef.current = { text, time: Date.now() }
 
     if (tryNavigate(text)) return
 

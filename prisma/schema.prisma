@@ -78,6 +78,7 @@ model User {
   agentRuns       AgentRun[]
   feedbackLogs    FeedbackLog[]
   errorMemories   ErrorMemory[]
+  managedSessions ManagedAgentSession[]
 }
 
 // ============== PHASE 2: Transaction Core ==============
@@ -1014,4 +1015,20 @@ model PromptVersion {
 
   @@unique([agentName, version])
   @@index([agentName, active])
+}
+
+// ============== Managed Agent Sessions ==============
+
+model ManagedAgentSession {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  agentName   String   // "morning_brief" | "deal_rescue" | "learning"
+  sessionId   String   @unique // Anthropic managed agent session ID
+  status      String   @default("active") // "active" | "expired" | "cancelled"
+  expiresAt   DateTime
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  @@index([userId, agentName, status])
 }

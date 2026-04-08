@@ -6,6 +6,8 @@
 
 import Anthropic from "@anthropic-ai/sdk"
 import prisma from "@/lib/prisma"
+import { withCircuitBreaker } from "@/lib/learning/circuit-breaker"
+import { logError } from "@/lib/learning/error-memory"
 
 const anthropic = new Anthropic()
 
@@ -72,12 +74,31 @@ Generate ALL of the following in JSON format:
 IMPORTANT: Do NOT use Fair Housing violations (no references to demographics, religion, family status, race, national origin, disability, sex). Focus on PROPERTY FEATURES only.
 Return ONLY valid JSON.`
 
-  const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 3000,
-    messages: [{ role: "user", content: prompt }],
-  })
+  const cbResult = await withCircuitBreaker(
+    () => anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 3000,
+      messages: [{ role: "user", content: prompt }],
+    }),
+    { agentName: "content", maxRetries: 2 }
+  )
 
+  if ("error" in cbResult) {
+    await logError({ agentName: "content", error: cbResult.error, context: { userId, propertyAddress: property.address } }).catch(() => {})
+    // Return a minimal campaign with empty content
+    const fallbackCampaign = await prisma.contentCampaign.create({
+      data: {
+        userId,
+        transactionId: transactionId || null,
+        propertyAddress: property.address,
+        status: "DRAFT",
+        fairHousingCheck: { passed: true, warnings: [] },
+      },
+    })
+    return fallbackCampaign.id
+  }
+
+  const response = cbResult.result
   const text = response.content[0].type === "text" ? response.content[0].text : ""
   let parsed: Record<string, string>
   try {

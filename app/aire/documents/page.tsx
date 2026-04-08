@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { FeedbackButtons } from "@/components/FeedbackButtons";
 
 interface TransactionOption {
   id: string;
@@ -381,6 +382,9 @@ export default function DocumentsPage() {
                 ))}
               </tbody>
             </table>
+            <div className="px-4 py-3 border-t border-[#e8e4d8] flex justify-end">
+              <FeedbackButtons feature="document_classification" metadata={{ documentCount: documents.length }} />
+            </div>
           </div>
         )}
       </div>

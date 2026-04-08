@@ -6,6 +6,8 @@
 
 import Anthropic from "@anthropic-ai/sdk"
 import prisma from "@/lib/prisma"
+import { withCircuitBreaker } from "@/lib/learning/circuit-breaker"
+import { logError } from "@/lib/learning/error-memory"
 
 const anthropic = new Anthropic()
 
@@ -171,20 +173,30 @@ Run all 4 analyses and provide your recommendation.
 
   let analysis: Record<string, unknown>
 
-  try {
-    const res = await anthropic.messages.create({
+  const cbResult = await withCircuitBreaker(
+    () => anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
       max_tokens: 1500,
       temperature: 0.2,
       system: NEGOTIATION_PROMPT,
       messages: [{ role: "user", content: userPrompt }],
-    })
+    }),
+    { agentName: "negotiation", maxRetries: 2 }
+  )
 
-    const text = res.content[0]?.type === "text" ? res.content[0].text : ""
+  if ("error" in cbResult) {
+    console.error("[NegotiationIntel] Analysis failed:", cbResult.error)
+    await logError({ agentName: "negotiation", error: cbResult.error, context: { userId, transactionId, offerPrice: incomingOffer.price } }).catch(() => {})
+    throw new Error("Negotiation analysis failed")
+  }
+
+  try {
+    const text = cbResult.result.content[0]?.type === "text" ? cbResult.result.content[0].text : ""
     const clean = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
     analysis = JSON.parse(clean)
   } catch (err) {
-    console.error("[NegotiationIntel] Analysis failed:", err)
+    console.error("[NegotiationIntel] Analysis parse failed:", err)
+    await logError({ agentName: "negotiation", error: err instanceof Error ? err : String(err), context: { userId, transactionId, phase: "parse" } }).catch(() => {})
     throw new Error("Negotiation analysis failed")
   }
 

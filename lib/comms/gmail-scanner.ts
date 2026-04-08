@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma"
 import { type InboundMessage } from "./types"
+import { logError } from "@/lib/learning/error-memory"
 
 interface GmailMessage {
   id: string
