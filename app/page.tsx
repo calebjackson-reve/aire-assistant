@@ -66,7 +66,20 @@ export default async function HomePage() {
       <ScrollProgress />
 
       {/* ═══ 1. HERO — Seed-inspired, muted sage bg, device mockup ═══ */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[#c8ceb8]">
+      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+        {/* Background video — atmospheric, lazy loaded */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="none"
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src="/landing.mp4" type="video/mp4" />
+        </video>
+        {/* Overlay to soften video and ensure text readability */}
+        <div className="absolute inset-0 bg-[#c8ceb8]/75" />
         {/* Subtle grain */}
         <div className="absolute inset-0 grain-overlay" />
 

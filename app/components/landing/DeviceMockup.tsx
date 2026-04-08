@@ -25,7 +25,7 @@ export function DeviceMockup() {
             muted
             loop
             playsInline
-            poster="/aire-dashboard-preview.png"
+            preload="none"
             className="absolute inset-0 w-full h-full object-cover"
           >
             <source src="/aire-demo.mp4" type="video/mp4" />
