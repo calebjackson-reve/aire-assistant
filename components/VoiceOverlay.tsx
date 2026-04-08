@@ -68,11 +68,14 @@ export function VoiceOverlay({ open, onClose }: VoiceOverlayProps) {
   const [loading, setLoading] = useState(false)
   const [recording, setRecording] = useState(false)
   const [transcribing, setTranscribing] = useState(false)
+  const [interimText, setInterimText] = useState("") // Real-time words as you speak
   const inputRef = useRef<HTMLInputElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
   const streamRef = useRef<MediaStream | null>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const speechRecogRef = useRef<any>(null)
 
   // Auto-focus input when overlay opens
   useEffect(() => {
@@ -214,11 +217,57 @@ export function VoiceOverlay({ open, onClose }: VoiceOverlayProps) {
   // Records audio via MediaRecorder → sends to /api/voice/transcribe (Whisper)
   // Falls back to Web Speech API if Whisper endpoint returns 503 (no OpenAI key)
 
+  // Start real-time speech preview (Web Speech API for interim text display)
+  function startInterimSpeech() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SpeechRecognition) return // No browser support, skip interim text
+
+    const recognition = new SpeechRecognition()
+    recognition.continuous = true
+    recognition.interimResults = true // Key: show words as they're spoken
+    recognition.lang = "en-US"
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onresult = (event: any) => {
+      let interim = ""
+      let final = ""
+      for (let i = 0; i < event.results.length; i++) {
+        const result = event.results[i]
+        if (result.isFinal) {
+          final += result[0].transcript + " "
+        } else {
+          interim += result[0].transcript
+        }
+      }
+      setInterimText((final + interim).trim())
+    }
+
+    recognition.onerror = () => {
+      // Silently fail — Whisper is the real transcriber
+    }
+
+    try {
+      recognition.start()
+      speechRecogRef.current = recognition
+    } catch {
+      // Already running or not supported
+    }
+  }
+
+  function stopInterimSpeech() {
+    if (speechRecogRef.current) {
+      try { speechRecogRef.current.stop() } catch { /* ignore */ }
+      speechRecogRef.current = null
+    }
+  }
+
   const startRecording = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       streamRef.current = stream
       audioChunksRef.current = []
+      setInterimText("")
 
       const mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm;codecs=opus" })
       mediaRecorderRef.current = mediaRecorder
@@ -228,13 +277,15 @@ export function VoiceOverlay({ open, onClose }: VoiceOverlayProps) {
       }
 
       mediaRecorder.onstop = async () => {
-        // Stop mic stream
+        // Stop mic stream + interim speech
         stream.getTracks().forEach(t => t.stop())
         streamRef.current = null
+        stopInterimSpeech()
 
         const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" })
         if (audioBlob.size < 1000) {
           setRecording(false)
+          setInterimText("")
           return // Too short, ignore
         }
 
@@ -242,7 +293,7 @@ export function VoiceOverlay({ open, onClose }: VoiceOverlayProps) {
         setRecording(false)
 
         try {
-          // Try Whisper first
+          // Try Whisper first — best accuracy
           const formData = new FormData()
           formData.append("audio", audioBlob, "recording.webm")
 
@@ -251,6 +302,7 @@ export function VoiceOverlay({ open, onClose }: VoiceOverlayProps) {
           if (res.ok) {
             const { text } = await res.json()
             if (text?.trim()) {
+              setInterimText("")
               setInput(text)
               setTranscribing(false)
               sendCommand(text)
@@ -258,30 +310,45 @@ export function VoiceOverlay({ open, onClose }: VoiceOverlayProps) {
             }
           }
 
-          // Fallback: Web Speech API if Whisper unavailable
+          // Fallback: use the interim text from Web Speech API if Whisper unavailable
+          if (res.status === 503 && interimText.trim()) {
+            setTranscribing(false)
+            const fallbackText = interimText.trim()
+            setInterimText("")
+            sendCommand(fallbackText)
+            return
+          }
+
           if (res.status === 503) {
             setTranscribing(false)
+            setInterimText("")
             fallbackWebSpeech()
             return
           }
 
           setTranscribing(false)
+          setInterimText("")
           setMessages(prev => [...prev, { role: "assistant", text: "Couldn't transcribe audio. Try typing instead." }])
         } catch {
           setTranscribing(false)
+          setInterimText("")
           setMessages(prev => [...prev, { role: "assistant", text: "Transcription failed. Try typing instead." }])
         }
       }
 
       mediaRecorder.start()
       setRecording(true)
+
+      // Start real-time word display in parallel
+      startInterimSpeech()
     } catch {
       setMessages(prev => [...prev, { role: "assistant", text: "Microphone access denied. Please allow microphone access and try again." }])
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname])
+  }, [pathname, interimText])
 
   function stopRecording() {
+    stopInterimSpeech()
     if (mediaRecorderRef.current?.state === "recording") {
       mediaRecorderRef.current.stop()
     } else {
@@ -371,14 +438,25 @@ export function VoiceOverlay({ open, onClose }: VoiceOverlayProps) {
               )}
             </button>
             <p className="text-cream text-lg font-display italic mb-1">
-              {recording ? "Listening..." : transcribing ? "Transcribing..." : "Ask AIRE anything"}
+              {recording ? "Listening..." : transcribing ? "Processing with Whisper..." : "Ask AIRE anything"}
             </p>
-            <p className="text-cream/40 text-sm max-w-md text-center mb-6">
-              {recording
-                ? "Tap the mic again when you're done speaking"
-                : "Tap the mic to speak, or type below. AIRE will respond by voice."
-              }
-            </p>
+
+            {/* Real-time interim text — words appear as you speak */}
+            {(recording || transcribing) && interimText ? (
+              <div className="max-w-md mx-auto mb-4 px-4">
+                <p className="text-cream/80 text-sm text-center leading-relaxed font-[family-name:var(--font-body)]">
+                  {interimText}
+                  {recording && <span className="inline-block w-0.5 h-4 bg-sage ml-0.5 animate-pulse align-middle" />}
+                </p>
+              </div>
+            ) : (
+              <p className="text-cream/40 text-sm max-w-md text-center mb-6">
+                {recording
+                  ? "Speak naturally — words will appear as you talk"
+                  : "Tap the mic to speak, or type below. AIRE will respond by voice."
+                }
+              </p>
+            )}
             {!recording && !transcribing && (
               <div className="flex flex-wrap gap-2 justify-center max-w-lg">
                 {[
@@ -468,7 +546,7 @@ export function VoiceOverlay({ open, onClose }: VoiceOverlayProps) {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={recording ? "Recording... tap stop when done" : transcribing ? "Transcribing..." : "Type a command or tap the mic..."}
+            placeholder={recording ? (interimText || "Listening...") : transcribing ? "Whisper processing..." : "Type a command or tap the mic..."}
             className="flex-1 bg-cream/5 border border-cream/10 rounded-xl px-5 py-3 text-cream text-sm focus:outline-none focus:border-sage/40 placeholder:text-cream/20"
             disabled={loading || recording || transcribing}
           />

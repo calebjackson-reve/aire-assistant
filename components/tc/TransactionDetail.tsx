@@ -584,6 +584,15 @@ export function TransactionDetail({ transaction: initial }: { transaction: Trans
                   <span className="text-[#6b7d52]/40 text-xs">{txn.documents.length} total</span>
                 </div>
                 <div className="flex items-center gap-2">
+                  <Link
+                    href={`/aire/transactions/${txn.id}/listing`}
+                    className="text-xs px-3 py-1.5 rounded-lg border border-[#9aab7e]/20 text-[#6b7d52] hover:bg-[#9aab7e]/5 transition min-h-[36px] flex items-center font-medium gap-1.5"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                    </svg>
+                    Listing Checklist
+                  </Link>
                   <select
                     value={folderFilter}
                     onChange={e => setFolderFilter(e.target.value)}
