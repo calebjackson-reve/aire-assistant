@@ -75,14 +75,27 @@ export async function parseNaturalLanguage(text: string): Promise<{
   detectedForm: string
   confidence: number
 }> {
-  const res = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 512,
-    system: NL_SYSTEM_PROMPT,
-    messages: [{ role: "user", content: text }],
-  })
+  const cbResult = await withCircuitBreaker(
+    () => anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 512,
+      system: NL_SYSTEM_PROMPT,
+      messages: [{ role: "user", content: text }],
+    }),
+    {
+      agentName: "contract_writer",
+      maxRetries: 2,
+      fallback: async () => null, // Fall back to empty fields below
+    }
+  )
 
-  const raw = res.content[0]?.type === "text" ? res.content[0].text : "{}"
+  if ("error" in cbResult || cbResult.result === null) {
+    const errorMsg = "error" in cbResult ? cbResult.error : "Circuit breaker fallback"
+    await logError({ agentName: "contract_writer", error: errorMsg, context: { phase: "nl_parse", inputLength: text.length } }).catch(() => {})
+    return { fields: {}, detectedForm: "lrec-101", confidence: 0 }
+  }
+
+  const raw = cbResult.result.content[0]?.type === "text" ? cbResult.result.content[0].text : "{}"
   try {
     const cleaned = raw.replace(/^```json?\s*\n?/i, "").replace(/\n?```\s*$/i, "")
     const parsed = JSON.parse(cleaned)
@@ -91,7 +104,8 @@ export async function parseNaturalLanguage(text: string): Promise<{
       detectedForm: parsed.detected_form || "lrec-101",
       confidence: parsed.confidence || 0,
     }
-  } catch {
+  } catch (err) {
+    await logError({ agentName: "contract_writer", error: err instanceof Error ? err : String(err), context: { phase: "nl_parse_json" } }).catch(() => {})
     return { fields: {}, detectedForm: "lrec-101", confidence: 0 }
   }
 }

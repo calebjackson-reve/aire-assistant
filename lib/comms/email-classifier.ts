@@ -379,13 +379,32 @@ From: ${email.from}
 Subject: ${email.subject}
 Body: ${trimmedBody}`
 
-  try {
-    const res = await getAnthropic().messages.create({
+  const cbResult = await withCircuitBreaker(
+    () => getAnthropic().messages.create({
       model: TIER2_MODEL,
       max_tokens: 100,
       messages: [{ role: "user", content: prompt }],
-    })
+    }),
+    {
+      agentName: "email_classifier",
+      maxRetries: 2,
+      fallback: async () => null, // Fall back to safe default below
+    }
+  )
 
+  if ("error" in cbResult || cbResult.result === null) {
+    const errorMsg = "error" in cbResult ? cbResult.error : "Circuit breaker fallback"
+    await logError({ agentName: "email_classifier", error: errorMsg, context: { from: email.from, subject: email.subject } }).catch(() => {})
+    return {
+      category: "personal",
+      confidence: 0.3,
+      tier: 2,
+      reason: `Tier 2 fallback (circuit breaker: ${errorMsg})`,
+    }
+  }
+
+  try {
+    const res = cbResult.result
     const text =
       res.content
         .filter((b): b is Anthropic.TextBlock => b.type === "text")
@@ -414,6 +433,7 @@ Body: ${trimmedBody}`
   } catch (err) {
     // Safe default: when in doubt, treat as personal so we don't burn Sonnet
     // downstream on garbage. Low confidence flags for manual review.
+    await logError({ agentName: "email_classifier", error: err instanceof Error ? err : String(err), context: { from: email.from, subject: email.subject, phase: "parse" } }).catch(() => {})
     return {
       category: "personal",
       confidence: 0.3,

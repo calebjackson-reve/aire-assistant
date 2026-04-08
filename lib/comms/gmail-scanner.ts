@@ -56,14 +56,17 @@ export async function scanGmail(userId: string, sinceMins = 30): Promise<{ inbou
           })
         } else {
           console.error("[CommsMonitor] Token refresh failed:", refreshRes.status)
+          await logError({ agentName: "gmail_scanner", error: `Token refresh failed: ${refreshRes.status}`, context: { userId, phase: "token_refresh" } }).catch(() => {})
           return { inbound: [], outbound: [] }
         }
       } catch (err) {
         console.error("[CommsMonitor] Token refresh error:", err)
+        await logError({ agentName: "gmail_scanner", error: err instanceof Error ? err : String(err), context: { userId, phase: "token_refresh" } }).catch(() => {})
         return { inbound: [], outbound: [] }
       }
     } else {
       console.error("[CommsMonitor] Token expired and no refresh token available")
+      await logError({ agentName: "gmail_scanner", error: "Token expired and no refresh token available", context: { userId, phase: "token_expired" } }).catch(() => {})
       return { inbound: [], outbound: [] }
     }
   }
@@ -79,6 +82,7 @@ export async function scanGmail(userId: string, sinceMins = 30): Promise<{ inbou
   )
   if (!listRes.ok) {
     console.error("[CommsMonitor] Gmail list failed:", listRes.status)
+    await logError({ agentName: "gmail_scanner", error: `Gmail list API failed: ${listRes.status}`, context: { userId, phase: "list_messages" } }).catch(() => {})
     return { inbound: [], outbound: [] }
   }
 
