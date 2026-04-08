@@ -93,6 +93,32 @@ export default async function AirePage() {
         <QuickAction href="/aire/compliance" label="Compliance Scan" shortcut="R" />
       </div>
 
+      {/* Welcome card for first-time users */}
+      {user.transactions.length === 0 && (
+        <div className="border border-brown-border rounded-xl p-6 mb-6">
+          <h3 className="font-[family-name:var(--font-cormorant)] italic text-cream text-xl mb-2">
+            Welcome to AIRE, {firstName}
+          </h3>
+          <p className="text-cream-dim text-sm mb-4">
+            Here&apos;s how to get started in the next 5 minutes:
+          </p>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <span className="w-6 h-6 rounded-full bg-copper/20 text-copper text-xs flex items-center justify-center font-medium">1</span>
+              <span className="text-cream text-sm">Create your first transaction</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="w-6 h-6 rounded-full bg-copper/20 text-copper text-xs flex items-center justify-center font-medium">2</span>
+              <span className="text-cream text-sm">Upload a document to auto-classify it</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="w-6 h-6 rounded-full bg-copper/20 text-copper text-xs flex items-center justify-center font-medium">3</span>
+              <span className="text-cream text-sm">Try a voice command: &quot;Show my pipeline&quot;</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Two column grid */}
       <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6">
         {/* LEFT COLUMN */}

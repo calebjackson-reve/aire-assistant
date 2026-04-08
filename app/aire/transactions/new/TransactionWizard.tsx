@@ -77,6 +77,13 @@ export function TransactionWizard() {
     if (!address.trim()) { setError("Address is required"); return }
     if (!template) { setError("Select a template"); return }
 
+    if (details.contractDate && details.closingDate) {
+      if (new Date(details.closingDate) <= new Date(details.contractDate)) {
+        setError("Closing date must be after contract date")
+        return
+      }
+    }
+
     setCreating(true)
     setError("")
 
@@ -204,6 +211,10 @@ export function TransactionWizard() {
                   </button>
                 ))}
               </div>
+            )}
+
+            {address.length >= 5 && suggestions.length === 0 && !selectedMls && (
+              <p className="text-cream-dim/40 text-xs mt-1">No MLS match found — you can enter the address manually</p>
             )}
 
             {selectedMls && (

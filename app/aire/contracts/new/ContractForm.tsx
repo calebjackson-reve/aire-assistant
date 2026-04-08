@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { FeedbackButtons } from "@/components/FeedbackButtons"
 
 interface Transaction {
   id: string
@@ -70,7 +71,10 @@ export function ContractForm() {
           setValidation(data.validation)
           setFields(data.fields || null)
         }
-        setError(data.error || "Failed to generate contract")
+        const helpText = data.error === "No fields could be extracted"
+          ? "I couldn't parse that. Try a more specific format like: 'Purchase agreement for 123 Main St, buyer John Smith, seller Jane Doe, price $250,000, closing June 15, conventional financing'"
+          : data.error || "Contract generation failed. Please try again."
+        setError(helpText)
         return
       }
 
@@ -245,7 +249,7 @@ export function ContractForm() {
             <p className="text-[#1e2416] text-sm font-medium">Contract Generated</p>
           </div>
           <p className="text-[#6b7d52]/60 text-xs mb-3">{result.filename}</p>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             <button onClick={downloadPdf} className="text-xs border border-[#9aab7e]/20 text-[#6b7d52] px-3 py-1.5 rounded hover:bg-[#9aab7e]/5 transition">
               Download PDF
             </button>
@@ -254,6 +258,12 @@ export function ContractForm() {
                 Open in AirSign →
               </a>
             )}
+            <div className="ml-auto">
+              <FeedbackButtons
+                feature="contract"
+                metadata={{ formType, filename: result.filename }}
+              />
+            </div>
           </div>
         </div>
       )}
