@@ -76,6 +76,8 @@ model User {
   pricingAnalysisLogs PricingAnalysisLog[]
   negotiationLogs NegotiationLog[]
   agentRuns       AgentRun[]
+  feedbackLogs    FeedbackLog[]
+  errorMemories   ErrorMemory[]
 }
 
 // ============== PHASE 2: Transaction Core ==============
@@ -956,4 +958,60 @@ model AgentRun {
 
   @@index([agentName, startedAt])
   @@index([userId, agentName])
+}
+
+// ============== Self-Learning Engine ==============
+
+model FeedbackLog {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  feature     String   // "morning_brief" | "voice" | "contract" | "compliance" | "document" | "email"
+  rating      Int?     // 1 (thumbs down) or 5 (thumbs up)
+  inputHash   String?  // hash of the AI input
+  outputHash  String?  // hash of the AI output
+  correction  Json?    // { field: "buyerName", before: "John", after: "Jonathan" }
+  dismissed   Boolean  @default(false) // user dismissed a suggestion/alert
+  metadata    Json?    // extra context
+  createdAt   DateTime @default(now())
+
+  @@index([userId, feature, createdAt])
+  @@index([feature, rating])
+  @@index([feature, dismissed])
+}
+
+model ErrorMemory {
+  id           String   @id @default(cuid())
+  agentName    String   // "morning_brief" | "voice" | "content" | etc.
+  errorType    String   // "transient" | "permanent" | "data_quality" | "prompt_failure"
+  errorMessage String
+  input        Json?    // what was sent to the AI
+  output       Json?    // what came back (if anything)
+  context      Json?    // extra context (userId, transactionId, etc.)
+  occurrences  Int      @default(1) // how many times this exact error has happened
+  lastSeenAt   DateTime @default(now())
+  resolved     Boolean  @default(false)
+  resolvedAt   DateTime?
+  resolution   String?  // what fixed it
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id])
+  createdAt    DateTime @default(now())
+
+  @@index([agentName, errorType, resolved])
+  @@index([agentName, createdAt])
+  @@index([errorMessage])
+}
+
+model PromptVersion {
+  id          String   @id @default(cuid())
+  agentName   String   // "voice_classifier" | "contract_writer" | "morning_brief" | etc.
+  version     Int
+  promptText  String   @db.Text
+  metrics     Json?    // { successRate: 0.92, avgRating: 4.1, errorRate: 0.03, sampleSize: 150 }
+  active      Boolean  @default(true)
+  notes       String?  // what changed from previous version
+  createdAt   DateTime @default(now())
+
+  @@unique([agentName, version])
+  @@index([agentName, active])
 }

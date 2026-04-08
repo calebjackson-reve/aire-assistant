@@ -52,7 +52,7 @@ Schema source of truth: `prisma/schema.prisma` — never duplicate schemas elsew
 | Communication Monitor | COMPLETE | `lib/comms/` (gmail, sms, calls, response detection, draft replies) |
 | Comms Morning Brief Researcher | COMPLETE | `lib/agents/morning-brief/researchers/comms-researcher.ts` |
 | Comms Scan Cron (30min) | COMPLETE | `app/api/cron/comms-scan/route.ts` |
-| Cron Registry (vercel.json) | COMPLETE | 8 crons: morning-brief, deadline-alerts, rel-intel, email-scan, data-sync, tc-reminders, comms-scan |
+| Cron Registry (vercel.json) | COMPLETE | 9 crons: morning-brief, deadline-alerts, rel-intel, email-scan, data-sync, tc-reminders, comms-scan, lrec-monitor, learning |
 | Email Triage API | COMPLETE | `app/api/email/triage/`, `draft-reply/`, `handle/`, `scan-now/` |
 | Email Triage UI | COMPLETE | `app/aire/email/EmailDashboard.tsx` (missed calls, needs response, draft reply, handled) |
 | Email Settings Page | COMPLETE | `app/aire/settings/email/page.tsx` (connected accounts, connect Gmail) |
@@ -66,6 +66,11 @@ Schema source of truth: `prisma/schema.prisma` — never duplicate schemas elsew
 | Billing Flow (Stripe) | COMPLETE | `app/billing/page.tsx` (on-brand, $97/$197 pricing), `app/api/billing/checkout/`, webhook sets tier on checkout |
 | Document Upload UI | COMPLETE | `app/api/documents/upload/route.ts` (Blob + classify + workflow), upload button in TransactionDetail Documents tab |
 | Settings Page | COMPLETE | `app/aire/settings/page.tsx` (email config + billing links), nav link added |
+| Self-Learning Engine | COMPLETE | `lib/learning/feedback-engine.ts`, `lib/learning/error-memory.ts`, `lib/learning/circuit-breaker.ts` |
+| Feedback API | COMPLETE | `app/api/feedback/route.ts` (POST feedback, GET summary) |
+| Error Memory API | COMPLETE | `app/api/learning/errors/route.ts` (GET patterns, POST resolve) |
+| Learning Cron | COMPLETE | `app/api/cron/learning/route.ts` (weekly analysis, flags underperforming features) |
+| Feedback UI | COMPLETE | `components/FeedbackButtons.tsx` (integrated in morning brief, voice overlay, contract form) |
 
 ## DO NOT REBUILD
 - Document classifier, extractor, memory, multi-pass pipeline
@@ -77,6 +82,7 @@ Schema source of truth: `prisma/schema.prisma` — never duplicate schemas elsew
 - Voice v1 route (kept for backward compat, v2 is the active endpoint)
 - Monitoring system (dashboard, API, activity logger, history)
 - Communication monitor (gmail scanner, sms scanner, response detector)
+- Self-learning engine (feedback, error memory, circuit breaker, learning cron)
 
 ## What's Next
 1. **Set Twilio credentials** — TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN (SMS notifications + comms scanner)

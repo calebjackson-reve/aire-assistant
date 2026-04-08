@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import prisma from "@/lib/prisma"
 import { MorningBriefActions } from "./actions"
 import { GenerateBriefButton } from "./GenerateBriefButton"
+import { FeedbackButtons } from "@/components/FeedbackButtons"
 import Link from "next/link"
 
 interface ActionItem { action: string; priority: string; category: string }
@@ -350,6 +351,11 @@ export default async function MorningBriefPage() {
           {/* ── Report footer ── */}
           <div className="pt-8 text-center">
             <div className="h-px w-12 bg-[#e8e4d8] mx-auto mb-4" />
+            <FeedbackButtons
+              feature="morning_brief"
+              metadata={{ briefId: brief.id, briefDate: brief.briefDate.toISOString() }}
+              className="justify-center mb-4"
+            />
             <p className="font-mono text-[9px] text-[#6b7d52]/30 uppercase tracking-[0.3em]">
               End of Brief
             </p>

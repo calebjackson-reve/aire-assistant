@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react"
 import { useRouter, usePathname } from "next/navigation"
+import { FeedbackButtons } from "@/components/FeedbackButtons"
 
 // Navigation map — voice can navigate the app
 const NAV_MAP: Record<string, string> = {
@@ -173,7 +174,15 @@ export function VoiceOverlay({ open, onClose }: VoiceOverlayProps) {
         }),
       })
 
-      if (res.ok) {
+      if (res.status === 403) {
+        const msg = "Voice commands are a Pro feature. Upgrade to unlock AI-powered voice control, morning briefs, and more."
+        setMessages(prev => [...prev, {
+          role: "assistant",
+          text: msg,
+          action: { label: "Upgrade to Pro", href: "/billing" },
+        }])
+        speak("Voice commands are available on the Pro plan.")
+      } else if (res.ok) {
         const data = await res.json()
         const intent = data.classification?.intent || "unknown"
         const response = data.response || data.classification?.response || "Command processed."
@@ -497,6 +506,15 @@ export function VoiceOverlay({ open, onClose }: VoiceOverlayProps) {
                         <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
                       </svg>
                     </button>
+                  )}
+                  {msg.role === "assistant" && (
+                    <div className="mt-2 pt-1 border-t border-cream/5">
+                      <FeedbackButtons
+                        feature="voice"
+                        metadata={{ response: msg.text }}
+                        className="[&_span]:text-cream/20 [&_button]:text-cream/20 [&_button:hover]:text-green-400 [&_button:last-child:hover]:text-red-400"
+                      />
+                    </div>
                   )}
                 </div>
               </div>
