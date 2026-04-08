@@ -491,13 +491,63 @@ async function classifyWithClaude(
 }> {
   const userMsg = `"${transcript}"${normalized !== transcript.toLowerCase().trim() ? `\n(normalized: "${normalized}")` : ""}${contextHint ? `\n${contextHint}` : ""}`
 
-  const res = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 512, // reduced from 1024 for speed
-    system: SYSTEM_PROMPT,
-    messages: [{ role: "user", content: userMsg }],
-  })
+  const cbResult = await withCircuitBreaker(
+    () => anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 512, // reduced from 1024 for speed
+      system: SYSTEM_PROMPT,
+      messages: [{ role: "user", content: userMsg }],
+    }),
+    {
+      agentName: "voice_classifier",
+      maxRetries: 2,
+      fallback: async () => {
+        // Fall back to regex fast-path classifier
+        const fastResult = tryFastPath(normalized)
+        if (fastResult) {
+          return {
+            content: [{
+              type: "text" as const,
+              text: JSON.stringify({
+                intent: fastResult.intent,
+                entities: fastResult.entities,
+                response: `Got it — ${fastResult.intent.replace(/_/g, " ")}.`,
+                action: fastResult.intent.replace(/_/g, " "),
+                confidence: 0.85,
+              }),
+            }],
+          }
+        }
+        return {
+          content: [{
+            type: "text" as const,
+            text: JSON.stringify({
+              intent: "needs_clarification",
+              entities: {},
+              response: "I'm having trouble connecting to my AI. Could you try a simpler command?",
+              action: null,
+              confidence: 0,
+              clarification_options: ["Try: 'Show my pipeline'", "Try: 'Check deadlines'"],
+            }),
+          }],
+        }
+      },
+    }
+  )
 
+  if ("error" in cbResult) {
+    await logError({ agentName: "voice_classifier", error: cbResult.error, context: { transcript, normalized } }).catch(() => {})
+    return {
+      intent: "needs_clarification",
+      entities: {},
+      response: "I heard you but couldn't quite understand. Could you rephrase?",
+      action: null,
+      confidence: 0,
+      clarificationOptions: ["Try: 'Show my pipeline'", "Try: 'Check deadlines'"],
+    }
+  }
+
+  const res = cbResult.result
   const text = res.content[0]?.type === "text" ? res.content[0].text : ""
 
   try {

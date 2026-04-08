@@ -305,13 +305,14 @@ export async function classifyWithAI(
 
   const client = new Anthropic();
 
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 500,
-    messages: [
-      {
-        role: "user",
-        content: `Classify this Louisiana real estate document. Return JSON only.
+  const cbResult = await withCircuitBreaker(
+    () => client.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 500,
+      messages: [
+        {
+          role: "user",
+          content: `Classify this Louisiana real estate document. Return JSON only.
 ${learningSection}
 Filename: ${filename}
 First 3000 chars of content:
@@ -322,11 +323,25 @@ Valid types: purchase_agreement, property_disclosure, agency_disclosure, lead_pa
 Valid categories: mandatory, addendum, federal, additional, broker, disclosure, inspection, appraisal
 
 Return: {"type": "...", "category": "...", "confidence": 0.0-1.0}`,
-      },
-    ],
-  });
+        },
+      ],
+    }),
+    {
+      agentName: "document_classifier",
+      maxRetries: 2,
+      fallback: async () => null, // Fall back to pattern result below
+    }
+  );
+
+  if ("error" in cbResult || cbResult.result === null) {
+    const errorMsg = "error" in cbResult ? cbResult.error : "Circuit breaker fallback";
+    await logError({ agentName: "document_classifier", error: errorMsg, context: { filename, userId } }).catch(() => {});
+    // Fall back to pattern-based classification
+    return patternResult;
+  }
 
   try {
+    const response = cbResult.result;
     const text =
       response.content[0].type === "text" ? response.content[0].text : "";
     const parsed = JSON.parse(text);

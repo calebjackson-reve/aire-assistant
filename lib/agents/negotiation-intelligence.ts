@@ -240,6 +240,7 @@ Run all 4 analyses and provide your recommendation.
     })
   } catch (err) {
     console.error("[NegotiationIntel] Failed to store log:", err)
+    await logError({ agentName: "negotiation", error: err instanceof Error ? err : String(err), context: { userId, transactionId, phase: "db_write" } }).catch(() => {})
   }
 
   return {

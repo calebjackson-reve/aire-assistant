@@ -99,7 +99,85 @@ export async function GET(req: NextRequest) {
       )
     }
 
-    // ── 5. Log as AgentRun ──
+    // ── 5. Auto-prompt improvement for worst-performing feature ──
+    const featureSummaries = Object.entries(feedbackReport as Record<string, { approvalRate: number | null; thumbsUp: number; thumbsDown: number }>)
+      .filter(([, s]) => s.approvalRate !== null && (s.thumbsUp + s.thumbsDown) >= 5)
+      .map(([name, s]) => ({ name, approvalRate: s.approvalRate! }))
+      .sort((a, b) => a.approvalRate - b.approvalRate)
+
+    const worstFeature = featureSummaries.length > 0 ? featureSummaries[0] : null
+
+    if (worstFeature && worstFeature.approvalRate < 80) {
+      try {
+        const badFeedback = await prisma.feedbackLog.findMany({
+          where: { feature: worstFeature.name, rating: 1 },
+          orderBy: { createdAt: "desc" },
+          take: 5,
+          select: { correction: true, metadata: true, createdAt: true },
+        })
+
+        if (badFeedback.length >= 3) {
+          // Get current active prompt version
+          const currentPrompt = await prisma.promptVersion.findFirst({
+            where: { agentName: worstFeature.name, active: true },
+            orderBy: { version: "desc" },
+          })
+
+          const promptText = currentPrompt?.promptText || "No prompt version stored yet"
+          const corrections = badFeedback.map(f => JSON.stringify(f.correction || f.metadata)).join("\n")
+
+          const anthropic = new Anthropic()
+          const improvement = await anthropic.messages.create({
+            model: "claude-sonnet-4-20250514",
+            max_tokens: 2000,
+            messages: [{
+              role: "user",
+              content: `You are improving an AI prompt for the "${worstFeature.name}" feature. Here are 5 cases where it produced bad results:\n\n${corrections}\n\nCurrent prompt:\n${promptText}\n\nGenerate an improved prompt that addresses these failures. Return ONLY the improved prompt text.`
+            }],
+          })
+
+          const improvedText = improvement.content[0].type === "text" ? improvement.content[0].text : ""
+
+          if (improvedText) {
+            const nextVersion = (currentPrompt?.version || 0) + 1
+            await prisma.promptVersion.create({
+              data: {
+                agentName: worstFeature.name,
+                version: nextVersion,
+                promptText: improvedText,
+                active: false, // Draft — needs human review
+                notes: `Auto-generated from ${badFeedback.length} negative feedback records`,
+              },
+            })
+
+            report.promptImprovement = {
+              feature: worstFeature.name,
+              approvalRate: worstFeature.approvalRate,
+              feedbackCount: badFeedback.length,
+              newVersion: nextVersion,
+              status: "draft_created",
+            }
+          }
+        } else {
+          report.promptImprovement = {
+            feature: worstFeature.name,
+            approvalRate: worstFeature.approvalRate,
+            status: "skipped_insufficient_feedback",
+            feedbackCount: badFeedback.length,
+          }
+        }
+      } catch (promptError) {
+        report.promptImprovement = {
+          feature: worstFeature.name,
+          status: "failed",
+          error: promptError instanceof Error ? promptError.message : String(promptError),
+        }
+      }
+    } else {
+      report.promptImprovement = { status: "not_needed", reason: "All features above 80% approval or insufficient data" }
+    }
+
+    // ── 6. Log as AgentRun ──
     const completedAt = new Date()
     await prisma.agentRun.create({
       data: {
