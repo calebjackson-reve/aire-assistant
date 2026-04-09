@@ -35,6 +35,18 @@
     {
       "path": "/api/cron/learning",
       "schedule": "0 7 * * 0"
+    },
+    {
+      "path": "/api/cron/deal-rescue",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/lead-scoring",
+      "schedule": "0 8 * * 1"
+    },
+    {
+      "path": "/api/cron/kpi-tracker",
+      "schedule": "0 3 1 * *"
     }
   ]
 }
