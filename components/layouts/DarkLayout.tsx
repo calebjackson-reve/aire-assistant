@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { href: "/airsign", label: "AirSign", icon: "pen", desc: "Electronic signing" },
   { href: "/aire/relationships", label: "Contacts", icon: "users", desc: "Relationship intel" },
   { href: "/aire/intelligence", label: "Market", icon: "chart", desc: "Market data" },
+  { href: "/aire/transcript-tasks", label: "Tasks", icon: "list", desc: "Transcript to tasks" },
 ]
 
 const SECONDARY_ITEMS = [
@@ -48,6 +49,11 @@ function NavIcon({ name, className }: { name: string; className?: string }) {
     mail: (
       <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" />
+      </svg>
+    ),
+    list: (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" />
       </svg>
     ),
     settings: (
