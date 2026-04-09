@@ -55,7 +55,10 @@ export async function POST(req: NextRequest) {
       const text = typeof bestDoc.filledData === "string"
         ? bestDoc.filledData
         : JSON.stringify(bestDoc.filledData)
-      mlsResult = await extractMLSFields(text, bestDoc.type || "document")
+      const docType = (bestDoc.type?.toLowerCase().includes("appraisal") ? "appraisal"
+        : bestDoc.type?.toLowerCase().includes("listing") ? "old_listing"
+        : "other") as "appraisal" | "old_listing" | "other"
+      mlsResult = await extractMLSFields(text, docType)
     } else {
       // Build from transaction data
       mlsResult = {
