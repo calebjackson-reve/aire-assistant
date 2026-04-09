@@ -1,6 +1,5 @@
 import Link from "next/link"
 import Image from "next/image"
-import { auth } from "@clerk/nextjs/server"
 import Navbar from "./components/layout/Navbar"
 import Footer from "./components/layout/Footer"
 import { ScrollReveal, CountUpStat } from "./components/ui/scroll-reveal"
@@ -56,9 +55,8 @@ const FREE_TOOLS = [
   { name: "Deal DNA", description: "Comps, price/sqft, DOM, and leverage points.", tag: "Analysis" },
 ]
 
-export default async function HomePage() {
-  const { userId } = await auth()
-  const signedIn = !!userId
+export default function HomePage() {
+  const signedIn = false // Landing page is always public — auth handled by Navbar
 
   return (
     <>

@@ -89,7 +89,7 @@ export async function getFacebookPosts(days = 7): Promise<PostPerformance[]> {
   return (data.data || []).map((post: Record<string, unknown>) => {
     const insights = (post.insights as Record<string, unknown[]>)?.data || []
     const getMetric = (name: string) => {
-      const m = insights.find((i: Record<string, unknown>) => i.name === name) as Record<string, unknown> | undefined
+      const m = (insights as Record<string, unknown>[]).find((i) => (i as Record<string, unknown>).name === name) as Record<string, unknown> | undefined
       const values = m?.values as Record<string, unknown>[] | undefined
       return (values?.[0]?.value as number) || 0
     }
@@ -137,7 +137,7 @@ export async function getInstagramPosts(days = 7): Promise<PostPerformance[]> {
     .map((post: Record<string, unknown>) => {
       const insights = (post.insights as Record<string, unknown[]>)?.data || []
       const getMetric = (name: string) => {
-        const m = insights.find((i: Record<string, unknown>) => i.name === name) as Record<string, unknown> | undefined
+        const m = (insights as Record<string, unknown>[]).find((i) => (i as Record<string, unknown>).name === name) as Record<string, unknown> | undefined
         const values = m?.values as Record<string, unknown>[] | undefined
         return (values?.[0]?.value as number) || 0
       }

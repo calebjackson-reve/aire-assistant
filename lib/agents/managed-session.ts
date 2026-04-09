@@ -9,6 +9,9 @@
 import prisma from "@/lib/prisma"
 import Anthropic from "@anthropic-ai/sdk"
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const prismaAny = prisma as any
+
 const anthropic = new Anthropic()
 
 const SESSION_TTL_MS = 23 * 60 * 60 * 1000 // 23 hours (Anthropic sessions last 24h)
@@ -22,7 +25,7 @@ export async function getOrCreateSession(
   agentName: string
 ): Promise<{ sessionId: string; isNew: boolean }> {
   // Check for existing active session
-  const existing = await prisma.managedAgentSession.findFirst({
+  const existing = await prismaAny.managedAgentSession.findFirst({
     where: {
       userId,
       agentName,
@@ -52,7 +55,7 @@ export async function getOrCreateSession(
 
     const expiresAt = new Date(Date.now() + SESSION_TTL_MS)
 
-    await prisma.managedAgentSession.create({
+    await prismaAny.managedAgentSession.create({
       data: {
         userId,
         agentName,
@@ -104,7 +107,7 @@ export async function sendToAgent(
  * Clean up expired sessions. Run as part of a cron job.
  */
 export async function cleanupExpiredSessions(): Promise<number> {
-  const result = await prisma.managedAgentSession.updateMany({
+  const result = await prismaAny.managedAgentSession.updateMany({
     where: {
       status: "active",
       expiresAt: { lt: new Date() },
@@ -131,7 +134,7 @@ export async function cancelSession(sessionId: string): Promise<void> {
     // Session may already be expired on Anthropic's side
   }
 
-  await prisma.managedAgentSession.updateMany({
+  await prismaAny.managedAgentSession.updateMany({
     where: { sessionId },
     data: { status: "cancelled" },
   })

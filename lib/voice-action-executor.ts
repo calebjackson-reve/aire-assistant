@@ -1214,7 +1214,7 @@ async function sendDocumentForSignature(
         data: {
           envelopeId: envelope.id,
           signerId: field.signerId,
-          type: field.type,
+          type: field.type as unknown as import("@prisma/client").FieldType,
           page: field.page,
           xPercent: field.x,
           yPercent: field.y,

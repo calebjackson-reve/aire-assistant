@@ -292,7 +292,7 @@ const FAST_MATCHERS: FastMatch[] = [
   {
     pattern: /^(?:send|route|take) (?:that |the )?(?:addendum|amendment|document|contract|agreement|PA) (?:we (?:just )?got )?(?:and )?(?:send (?:it )?)?(?:to (.+?) )?for signature(?:s)?$/i,
     intent: "send_document_for_signature",
-    extractEntities: (m) => (m[1] ? { recipient: m[1].trim() } : {}),
+    extractEntities: (m) => (m[1] ? { recipient: m[1].trim() } : ({} as Record<string, string>)),
   },
   {
     pattern: /^(?:send|take) (?:that |the )?(.+?) (?:on|for|from) (.+?) (?:and )?send (?:it )?(?:to (.+?) )?for signature(?:s)?$/i,

@@ -55,17 +55,19 @@ export async function POST(req: NextRequest) {
       const text = typeof bestDoc.filledData === "string"
         ? bestDoc.filledData
         : JSON.stringify(bestDoc.filledData)
-      mlsResult = await extractMLSFields(text, bestDoc.type || "document")
+      const docType = (["appraisal", "old_listing", "property_disclosure"].includes(bestDoc.type || "") ? bestDoc.type : "other") as "appraisal" | "old_listing" | "property_disclosure" | "other"
+      mlsResult = await extractMLSFields(text, docType)
     } else {
       // Build from transaction data
       mlsResult = {
         filled: [
-          { fieldName: "Address", value: txn.propertyAddress, confidence: "high" as const },
-          { fieldName: "ListPrice", value: String(listPrice), confidence: "high" as const },
+          { field: { fieldNumber: 0, name: "Address", section: "location" as const, type: "text" as const, required: true }, value: txn.propertyAddress, confidence: "high" as const, source: "transaction" },
+          { field: { fieldNumber: 0, name: "ListPrice", section: "property_details" as const, type: "number" as const, required: true }, value: String(listPrice), confidence: "high" as const, source: "transaction" },
         ],
         missing: [],
         totalFilled: 2,
         totalRequired: 45,
+        completionPct: Math.round((2 / 45) * 100),
       }
     }
 
