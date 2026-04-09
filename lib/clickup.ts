@@ -2,10 +2,12 @@
  * ClickUp API Client
  *
  * Creates tasks in ClickUp from structured task data.
- * Requires CLICKUP_API_TOKEN and CLICKUP_LIST_ID env vars.
+ * Credentials sourced from the ClickUp vault (lib/vaults/clickup.ts).
  *
  * Docs: https://clickup.com/api
  */
+
+import { getClickUpVault } from "@/lib/vaults/clickup"
 
 const CLICKUP_API = "https://api.clickup.com/api/v2"
 
@@ -27,10 +29,9 @@ export interface ClickUpCreateResult {
 }
 
 function getHeaders() {
-  const token = process.env.CLICKUP_API_TOKEN
-  if (!token) throw new Error("CLICKUP_API_TOKEN is not set")
+  const vault = getClickUpVault()
   return {
-    Authorization: token,
+    Authorization: vault.apiToken,
     "Content-Type": "application/json",
   }
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import { parseTranscript, toClickUpTasks } from "@/lib/transcript-to-tasks"
 import { createTasks } from "@/lib/clickup"
+import { getClickUpVault, isClickUpConfigured } from "@/lib/vaults/clickup"
 
 /**
  * POST /api/transcript/tasks
@@ -40,14 +41,17 @@ export async function POST(req: NextRequest) {
     }
 
     // Step 2: Convert to ClickUp format and create tasks
-    const targetListId = listId || process.env.CLICKUP_LIST_ID
+    const vault = isClickUpConfigured()
+    const targetListId = listId || (vault.configured ? getClickUpVault().listId : null)
     if (!targetListId) {
       // Return parsed tasks without pushing to ClickUp (no list configured)
       return NextResponse.json({
         summary: parsed.summary,
         tasks: parsed.tasks,
         clickup: null,
-        message: "Tasks extracted but CLICKUP_LIST_ID is not configured. Set it in env vars or pass listId in the request.",
+        message: vault.configured
+          ? "Tasks extracted but no list ID provided. Pass listId in the request or set CLICKUP_LIST_ID."
+          : `ClickUp not configured. Missing: ${vault.missing.join(", ")}`,
       })
     }
 
