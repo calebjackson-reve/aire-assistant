@@ -10,9 +10,9 @@
  * Then feeds into the existing ensemble engine for weighted reconciliation.
  */
 
-import { runEnsemble } from "@/lib/data/engines/ensemble"
-import { runDisagreement } from "@/lib/data/engines/disagreement"
-import { runPPS } from "@/lib/data/engines/pps"
+import { calculateEnsemble } from "@/lib/data/engines/ensemble"
+import { calculateDisagreement } from "@/lib/data/engines/disagreement"
+import { calculatePPS } from "@/lib/data/engines/pps"
 import { normalizeAddress } from "@/lib/data/engines/normalize"
 
 export interface CMASourceResult {
@@ -199,13 +199,13 @@ export async function runMultiSourceCMA(
     redfin_estimate: rpr.estimate, // RPR fills the redfin slot in the ensemble
   }
 
-  const ensemble = runEnsemble(ensembleInput)
-  const confidence = runDisagreement(ensembleInput)
+  const ensemble = calculateEnsemble(ensembleInput)
+  const confidence = calculateDisagreement(ensembleInput)
 
   // PPS only if we have a list price
   let pricingPosition = null
   if (listPrice && ensemble.aire_estimate) {
-    pricingPosition = runPPS({ list_price: listPrice, aire_estimate: ensemble.aire_estimate })
+    pricingPosition = calculatePPS({ list_price: listPrice, aire_estimate: ensemble.aire_estimate })
   }
 
   // Buyer perception gap analysis

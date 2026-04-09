@@ -1232,11 +1232,8 @@ async function sendDocumentForSignature(
     data: { status: "SENT", sentAt: new Date() },
   });
 
-  // Update signer statuses
-  await prisma.airSignSigner.updateMany({
-    where: { envelopeId: envelope.id },
-    data: { status: "PENDING" },
-  });
+  // Mark signers as notified by setting viewedAt to null (they haven't viewed yet)
+  // AirSignSigner tracks state via signedAt/declinedAt/viewedAt, not a status field
 
   // Build signer summary for response
   const signerNames = signers.map((s) => `${s.name} (${s.role})`).join(", ");
@@ -1250,7 +1247,7 @@ async function sendDocumentForSignature(
     data: {
       envelopeId: envelope.id,
       action: "VOICE_SENT",
-      detail: `Envelope created and sent via voice command. Signers: ${signerNames}`,
+      metadata: { message: `Envelope created and sent via voice command. Signers: ${signerNames}` },
     },
   });
 

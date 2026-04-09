@@ -51,10 +51,10 @@ export async function POST(req: NextRequest) {
     const bestDoc = appraisalDoc || listingDoc
 
     let mlsResult
-    if (bestDoc?.extractedData) {
-      const text = typeof bestDoc.extractedData === "string"
-        ? bestDoc.extractedData
-        : JSON.stringify(bestDoc.extractedData)
+    if (bestDoc?.filledData) {
+      const text = typeof bestDoc.filledData === "string"
+        ? bestDoc.filledData
+        : JSON.stringify(bestDoc.filledData)
       mlsResult = await extractMLSFields(text, bestDoc.type || "document")
     } else {
       // Build from transaction data

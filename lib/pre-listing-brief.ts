@@ -159,8 +159,8 @@ export async function generateBriefForTransaction(
   const sources: PreListingSource[] = []
 
   for (const doc of txn.documents) {
-    if (!doc.extractedData) continue
-    const data = doc.extractedData as Record<string, unknown>
+    if (!doc.filledData) continue
+    const data = doc.filledData as Record<string, unknown>
     const text = data.rawText || JSON.stringify(data)
 
     if (doc.type?.toLowerCase().includes("appraisal")) {

@@ -59,7 +59,7 @@ async function refreshAccessToken(refreshToken: string): Promise<string | null> 
  */
 async function getAccessToken(userId: string): Promise<string | null> {
   const account = await prisma.emailAccount.findFirst({
-    where: { userId, provider: "gmail", status: "active" },
+    where: { userId, provider: "gmail", isActive: true },
     select: { id: true, accessToken: true, refreshToken: true, tokenExpiry: true },
   })
 
