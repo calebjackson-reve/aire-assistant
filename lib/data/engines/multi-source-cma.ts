@@ -179,6 +179,9 @@ export async function runMultiSourceCMA(
   listPrice?: number
 ): Promise<MultiSourceCMA> {
   const normalized = normalizeAddress(address)
+  if (!normalized) {
+    throw new Error(`Could not normalize address: ${address}`)
+  }
   const propertyId = normalized.property_id
 
   // Fetch all sources in parallel
@@ -199,41 +202,52 @@ export async function runMultiSourceCMA(
     redfin_estimate: rpr.estimate, // RPR fills the redfin slot in the ensemble
   }
 
-  const ensemble = calculateEnsemble(ensembleInput)
+  const ensembleRaw = calculateEnsemble(ensembleInput)
+  const ensemble = ensembleRaw ?? { aire_estimate: 0, weights_used: { mls: 0, propstream: 0, zillow: 0, redfin: 0 } as import("@/lib/data/engines/ensemble").EnsembleWeights, sources_used: [] as string[], missing_sources: [] as string[], assessor_gap_pct: null }
   const confidence = calculateDisagreement(ensembleInput)
 
-  // PPS only if we have a list price
-  let pricingPosition = null
+  // PPS only if we have a list price and ensemble produced a result
+  let pricingPosition: { score: number; factors: { factor: string; score: number; note: string }[] } | null = null
   if (listPrice && ensemble.aire_estimate) {
-    pricingPosition = calculatePPS({ list_price: listPrice, aire_estimate: ensemble.aire_estimate })
+    const pps = calculatePPS({
+      list_price: listPrice,
+      aire_estimate: ensemble.aire_estimate,
+      sold_last_30_days: 0,
+      active_listings_in_zip: 0,
+      competing_listings: 0,
+      price_reductions: 0,
+    })
+    pricingPosition = { score: pps.pps_total, factors: pps.reason_codes }
   }
+
+  const aireEst = ensemble.aire_estimate || 0
 
   // Buyer perception gap analysis
   const buyerPerceptionGap = {
     zillowEstimate: zillow.estimate,
-    aireEstimate: ensemble.aire_estimate,
-    gapPct: zillow.estimate && ensemble.aire_estimate
-      ? Math.round(((zillow.estimate - ensemble.aire_estimate) / ensemble.aire_estimate) * 1000) / 10
+    aireEstimate: aireEst,
+    gapPct: zillow.estimate && aireEst
+      ? Math.round(((zillow.estimate - aireEst) / aireEst) * 1000) / 10
       : null,
-    explanation: zillow.estimate && ensemble.aire_estimate && zillow.estimate > ensemble.aire_estimate
-      ? `Zillow's Zestimate of $${zillow.estimate.toLocaleString()} is ${Math.round(((zillow.estimate - ensemble.aire_estimate) / ensemble.aire_estimate) * 100)}% higher than the local market supports. Zillow uses a national algorithm that doesn't account for Louisiana-specific factors like flood zone differences and parish-level pricing.`
+    explanation: zillow.estimate && aireEst && zillow.estimate > aireEst
+      ? `Zillow's Zestimate of $${zillow.estimate.toLocaleString()} is ${Math.round(((zillow.estimate - aireEst) / aireEst) * 100)}% higher than the local market supports. Zillow uses a national algorithm that doesn't account for Louisiana-specific factors like flood zone differences and parish-level pricing.`
       : "Zillow estimate aligns with local market data.",
   }
 
   return {
-    address: normalized.canonical || address,
+    address: normalized.address_canonical || address,
     propertyId,
     sources,
     ensemble: {
-      aireEstimate: ensemble.aire_estimate,
+      aireEstimate: aireEst,
       weights: ensemble.weights_used,
       sourcesUsed: ensemble.sources_used,
       missingSources: ensemble.missing_sources,
     },
     confidence: {
-      tier: confidence.confidence_tier,
-      disagreementPct: confidence.disagreement_pct,
-      flagForReview: confidence.flag_for_review,
+      tier: confidence?.confidence_tier || "LOW",
+      disagreementPct: confidence?.disagreement_pct || 0,
+      flagForReview: confidence?.flag_for_review || false,
     },
     pricingPosition,
     buyerPerceptionGap,

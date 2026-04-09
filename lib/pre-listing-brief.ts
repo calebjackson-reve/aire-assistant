@@ -69,7 +69,8 @@ export async function generatePreListingBrief(
   let mlsFields: MLSAutoFillResult | null = null
   if (bestSource) {
     try {
-      mlsFields = await extractMLSFields(bestSource.text, bestSource.type)
+      const docType = bestSource.type === "tax_record" || bestSource.type === "mls_history" ? "other" as const : bestSource.type
+      mlsFields = await extractMLSFields(bestSource.text, docType)
     } catch {
       console.error("[PreListing] MLS field extraction failed")
     }

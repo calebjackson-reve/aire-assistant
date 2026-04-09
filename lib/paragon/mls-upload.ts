@@ -61,7 +61,7 @@ function mapToParagonFields(fields: Record<string, string | number>): Record<str
              f.extractionKey === key
     )
     if (paragonField) {
-      mapped[`Field_${paragonField.paragonNumber}`] = String(value)
+      mapped[`Field_${paragonField.fieldNumber}`] = String(value)
     }
   }
 
@@ -180,7 +180,7 @@ export function buildUploadPayload(
   const fields: Record<string, string | number> = {}
 
   for (const field of mlsResult.filled) {
-    fields[field.fieldName] = field.value
+    fields[field.field.name] = field.value != null ? String(field.value) : ""
   }
 
   return {

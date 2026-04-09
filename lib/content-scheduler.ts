@@ -80,7 +80,7 @@ export async function schedulePost(post: {
       linkedinPost: post.platform === "linkedin" ? post.content : "",
       emailTemplate: post.platform === "email" ? post.content : "",
       smsTemplate: post.platform === "sms" ? post.content : "",
-      status: "scheduled",
+      status: "SCHEDULED",
       scheduledFor: post.scheduledFor,
     },
   })
@@ -129,7 +129,7 @@ export async function getWeeklyCalendar(userId: string): Promise<ContentCalendar
       content: c.instagramCaption || c.facebookPost || c.linkedinPost || c.mlsDescription || "",
       mediaUrls: [],
       hashtags: [],
-      status: c.status === "published" ? "published" : "scheduled",
+      status: c.status === "PUBLISHED" ? "published" : "scheduled",
       campaignId: c.id,
     })
   }
@@ -142,7 +142,7 @@ export async function getWeeklyCalendar(userId: string): Promise<ContentCalendar
 
   const totalScheduled = Object.values(days).flat().length
 
-  return { ...days, gaps, totalScheduled }
+  return { ...days, gaps, totalScheduled } as ContentCalendarWeek
 }
 
 // ─── PERFORMANCE TRACKING ───────────────────────────────────────
