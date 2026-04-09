@@ -15,11 +15,15 @@ import { researchContacts } from "@/lib/agents/morning-brief/researchers/contact
 import { validateBriefData } from "@/lib/agents/morning-brief/qa-validator"
 import { researchComms } from "@/lib/agents/morning-brief/researchers/comms-researcher"
 import { researchMarket } from "@/lib/agents/morning-brief/researchers/market-researcher"
+import { researchCalendar } from "@/lib/agents/morning-brief/researchers/calendar-researcher"
+import { researchSocial } from "@/lib/agents/morning-brief/researchers/social-researcher"
 import type { DeadlineResearchResult } from "@/lib/agents/morning-brief/researchers/deadline-researcher"
 import type { PipelineResearchResult } from "@/lib/agents/morning-brief/researchers/pipeline-researcher"
 import type { ContactResearchResult } from "@/lib/agents/morning-brief/researchers/contact-researcher"
 import type { CommsResearchResult } from "@/lib/agents/morning-brief/researchers/comms-researcher"
 import type { MarketResearchResult } from "@/lib/agents/morning-brief/researchers/market-researcher"
+import type { CalendarResearchResult } from "@/lib/agents/morning-brief/researchers/calendar-researcher"
+import type { SocialResearchResult } from "@/lib/agents/morning-brief/researchers/social-researcher"
 
 const CRON_SECRET = process.env.CRON_SECRET
 
@@ -57,13 +61,15 @@ export async function GET(req: NextRequest) {
           continue
         }
 
-        // Run all 4 researchers in parallel
+        // Run all 7 researchers in parallel
         const researchResults = await runResearchers<unknown>([
           { name: "deadlines", fn: () => researchDeadlines(user.clerkId) },
           { name: "pipeline", fn: () => researchPipeline(user.clerkId) },
           { name: "contacts", fn: () => researchContacts(user.clerkId) },
           { name: "comms", fn: () => researchComms(user.id) },
           { name: "market", fn: () => researchMarket() },
+          { name: "calendar", fn: () => researchCalendar(user.id) },
+          { name: "social", fn: () => researchSocial() },
         ])
 
         const deadlineData = (researchResults.find((r) => r.name === "deadlines")?.data ?? null) as DeadlineResearchResult | null
@@ -71,6 +77,8 @@ export async function GET(req: NextRequest) {
         const contactData = (researchResults.find((r) => r.name === "contacts")?.data ?? null) as ContactResearchResult | null
         const commsData = (researchResults.find((r) => r.name === "comms")?.data ?? null) as CommsResearchResult | null
         const marketData = (researchResults.find((r) => r.name === "market")?.data ?? null) as MarketResearchResult | null
+        const calendarData = (researchResults.find((r) => r.name === "calendar")?.data ?? null) as CalendarResearchResult | null
+        const socialData = (researchResults.find((r) => r.name === "social")?.data ?? null) as SocialResearchResult | null
 
         // Run QA validation
         const qaResult = validateBriefData(deadlineData, pipelineData, contactData)
@@ -95,7 +103,9 @@ Rules:
 - Never suggest contacting clients about protected-class topics (Fair Housing Act)
 - If QA flags are present, mention them prominently
 - If there are unanswered messages or missed calls, lead with those FIRST — they are the most time-sensitive items
-- Format: Start with a greeting using the agent's first name, then sections for Communications (if any), Deadlines, Pipeline, Intelligence Insights, and Outreach
+- If calendar events are available, show today's schedule with times and locations right after the greeting
+- If social media data is available, include a brief Social section with top performing content and posting recommendations
+- Format: Start with a greeting using the agent's first name, then sections for Calendar (if available), Communications (if any), Deadlines, Pipeline, Social Media (if available), Intelligence Insights, and Outreach
 - When AIRE intelligence data is available for deals, mention the AIRE estimate, confidence level, and PPS (Pricing Position Score) naturally — e.g. "AIRE values 123 Main at $195K (HIGH confidence, PPS 82/100)"
 - If any deal has LOW confidence, flag it as needing manual review — sources disagree significantly
 - If scoring health data is available, note any overall quality trends (e.g. "72% of this week's scores are HIGH confidence")
@@ -106,6 +116,10 @@ Rules:
             {
               role: "user",
               content: `Generate the morning brief for ${user.firstName || "Agent"} on ${todayStr}.
+
+TODAY'S CALENDAR:
+${calendarData?.hasCalendar ? calendarData.events.map(e => `- ${e.time} — ${e.title}${e.location ? ` (${e.location})` : ''}${e.isNext ? ' ← NEXT' : ''}`).join('\n') || 'No events today' : 'Google Calendar not connected'}
+${calendarData?.hasCalendar ? `Busy hours: ${calendarData.busyHours}h | Free slots: ${calendarData.freeSlots.length}` : ''}
 
 DEADLINE DATA:
 ${JSON.stringify(deadlineData, null, 2)}
@@ -132,6 +146,13 @@ ${marketData.lowConfidenceFlags.length > 0 ? `⚠ Low-confidence properties need
 DEAL INTELLIGENCE:
 ${pipelineData?.activeDeals.filter(d => d.intelligence).map(d => `- ${d.propertyAddress}: AIRE est $${d.intelligence!.aireEstimate?.toLocaleString() ?? 'N/A'}, confidence ${d.intelligence!.confidenceTier ?? 'N/A'}${d.intelligence!.ppsTotal != null ? `, PPS ${d.intelligence!.ppsTotal}/100` : ''}${d.intelligence!.assessorGapPct != null ? `, assessor gap ${(d.intelligence!.assessorGapPct * 100).toFixed(1)}%` : ''}`).join('\n') || 'No AIRE scores available for active deals'}
 ${pipelineData && pipelineData.lowConfidenceDeals > 0 ? `⚠ ${pipelineData.lowConfidenceDeals} deal(s) have LOW confidence AIRE estimates — sources disagree significantly` : ''}
+
+SOCIAL MEDIA PERFORMANCE:
+${socialData?.connected ? `Best content type: ${socialData.insights?.bestPostType || 'unknown'}
+Best posting time: ${socialData.insights?.bestPostTime || 'unknown'}
+Top post: ${socialData.insights?.topPosts[0]?.message || 'N/A'} (${socialData.insights?.topPosts[0]?.engagement || 0} engagements)
+Content gaps: ${socialData.insights?.contentGaps.join(', ') || 'None'}
+Recommendations: ${socialData.recommendations.join('; ')}` : 'Social media not connected — recommend connecting Meta Business Suite in Settings'}
 
 QA FLAGS:
 ${JSON.stringify(qaResult.flags, null, 2)}

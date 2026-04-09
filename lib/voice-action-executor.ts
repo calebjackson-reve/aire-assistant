@@ -34,6 +34,7 @@ const APPROVAL_REQUIRED_INTENTS = new Set([
   "create_addendum",
   "send_alert",
   "send_document",
+  "send_document_for_signature",
   "schedule_closing",
 ]);
 
@@ -83,6 +84,9 @@ export async function executeAction(req: ActionRequest): Promise<ActionResult> {
 
     case "send_document":
       return sendDocument(userId, entities);
+
+    case "send_document_for_signature":
+      return sendDocumentForSignature(userId, entities);
 
     case "run_compliance":
       return runComplianceScan(userId, entities);
@@ -1083,4 +1087,248 @@ async function fillMLS(
     message: `Opening the MLS auto-fill wizard for ${txn.propertyAddress}. Upload an appraisal or old listing to extract all Paragon fields.`,
     data: { transactionId: txn.id, redirectTo: `/aire/mls-input?txn=${txn.id}` },
   }
+}
+
+/**
+ * Voice → AirSign: auto-create envelope, auto-place fields, and SEND.
+ * "Send that addendum to our seller for signatures"
+ * "Take the purchase agreement and send it to the buyer for signature"
+ */
+async function sendDocumentForSignature(
+  userId: string,
+  entities: Record<string, string>
+): Promise<ActionResult> {
+  const address = entities.address;
+  const docType = entities.document_type; // "addendum", "purchase agreement", etc.
+  const recipientName = entities.buyer_name || entities.seller_name || entities.recipient;
+  const recipientRole = entities.seller_name ? "SELLER" : "BUYER";
+
+  // Find the transaction
+  let txn;
+  if (address) {
+    txn = await prisma.transaction.findFirst({
+      where: {
+        userId,
+        propertyAddress: { contains: address, mode: "insensitive" as const },
+      },
+    });
+  } else {
+    // Multi-turn: use most recent active transaction
+    txn = await prisma.transaction.findFirst({
+      where: { userId, status: { notIn: ["CLOSED", "CANCELLED"] } },
+      orderBy: { updatedAt: "desc" },
+    });
+  }
+
+  if (!txn) {
+    return {
+      success: false,
+      action: "send_document_for_signature",
+      message: address
+        ? `No transaction found matching "${address}".`
+        : "No active transactions found. Which property?",
+    };
+  }
+
+  // Find the most recent matching document
+  const docWhere: Record<string, unknown> = { transactionId: txn.id };
+  if (docType) {
+    docWhere.type = { contains: docType, mode: "insensitive" };
+  }
+
+  const doc = await prisma.document.findFirst({
+    where: docWhere,
+    orderBy: { createdAt: "desc" },
+  });
+
+  if (!doc || !doc.fileUrl) {
+    return {
+      success: false,
+      action: "send_document_for_signature",
+      message: `No ${docType || "document"} found for ${txn.propertyAddress}. Upload the document first.`,
+      data: { transactionId: txn.id },
+    };
+  }
+
+  // Determine signers from transaction parties
+  const signers: { name: string; email: string; role: string; order: number }[] = [];
+  const { randomUUID } = await import("crypto");
+
+  if (recipientName) {
+    // Specific recipient from voice command
+    signers.push({ name: recipientName, email: "", role: recipientRole, order: 1 });
+  } else {
+    // Add all parties from transaction
+    if (txn.sellerName) {
+      signers.push({ name: txn.sellerName, email: txn.sellerEmail || "", role: "SELLER", order: 1 });
+    }
+    if (txn.buyerName) {
+      signers.push({ name: txn.buyerName, email: txn.buyerEmail || "", role: "BUYER", order: 2 });
+    }
+  }
+
+  if (signers.length === 0) {
+    return {
+      success: false,
+      action: "send_document_for_signature",
+      message: `No signers found for ${txn.propertyAddress}. Who should sign this?`,
+    };
+  }
+
+  // Create AirSign envelope
+  const envelope = await prisma.airSignEnvelope.create({
+    data: {
+      userId,
+      name: `${doc.type || "Document"} — ${txn.propertyAddress}`,
+      status: "DRAFT",
+      documentUrl: doc.fileUrl,
+      transactionId: txn.id,
+    },
+  });
+
+  // Add signers with tokens
+  for (const signer of signers) {
+    await prisma.airSignSigner.create({
+      data: {
+        envelopeId: envelope.id,
+        name: signer.name,
+        email: signer.email,
+        role: signer.role,
+        signingOrder: signer.order,
+        token: randomUUID(),
+        tokenExpiresAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+      },
+    });
+  }
+
+  // Auto-place signature fields based on document type
+  // Detect form type from document name/type
+  const formType = detectFormType(doc.type || envelope.name);
+  const allSigners = await prisma.airSignSigner.findMany({ where: { envelopeId: envelope.id } });
+
+  if (formType) {
+    // Auto-place fields using form template
+    const fields = generateAutoFields(formType, allSigners);
+    for (const field of fields) {
+      await prisma.airSignField.create({
+        data: {
+          envelopeId: envelope.id,
+          signerId: field.signerId,
+          type: field.type,
+          page: field.page,
+          xPercent: field.x,
+          yPercent: field.y,
+          widthPercent: field.width,
+          heightPercent: field.height,
+          required: true,
+        },
+      });
+    }
+  }
+
+  // Transition to SENT and generate signing URLs
+  await prisma.airSignEnvelope.update({
+    where: { id: envelope.id },
+    data: { status: "SENT", sentAt: new Date() },
+  });
+
+  // Update signer statuses
+  await prisma.airSignSigner.updateMany({
+    where: { envelopeId: envelope.id },
+    data: { status: "PENDING" },
+  });
+
+  // Build signer summary for response
+  const signerNames = signers.map((s) => `${s.name} (${s.role})`).join(", ");
+  const signingLinks = allSigners.map((s) => ({
+    name: s.name,
+    url: `${process.env.NEXT_PUBLIC_APP_URL || "https://aireintel.org"}/sign/${s.token}`,
+  }));
+
+  // Log audit event
+  await prisma.airSignAuditEvent.create({
+    data: {
+      envelopeId: envelope.id,
+      action: "VOICE_SENT",
+      detail: `Envelope created and sent via voice command. Signers: ${signerNames}`,
+    },
+  });
+
+  return {
+    success: true,
+    action: "send_document_for_signature",
+    message: `${doc.type || "Document"} for ${txn.propertyAddress} has been prepared and sent to ${signerNames} for signature. They'll receive email + SMS with signing links.`,
+    data: {
+      transactionId: txn.id,
+      envelopeId: envelope.id,
+      signingLinks,
+      redirectTo: `/airsign/${envelope.id}`,
+    },
+  };
+}
+
+/**
+ * Detect LREC form type from document name/type string.
+ */
+function detectFormType(nameOrType: string): string | null {
+  const lower = nameOrType.toLowerCase();
+  if (lower.includes("purchase agreement") || lower.includes("lrec-101") || lower.includes("pa")) return "lrec-101";
+  if (lower.includes("disclosure") || lower.includes("lrec-102") || lower.includes("pdd")) return "lrec-102";
+  if (lower.includes("addendum") || lower.includes("amendment") || lower.includes("lrec-103")) return "lrec-103";
+  if (lower.includes("listing") || lower.includes("lrec-001")) return "lrec-001";
+  if (lower.includes("counter") || lower.includes("counter-offer")) return "lrec-103";
+  return null;
+}
+
+interface AutoField {
+  signerId: string
+  type: string
+  page: number
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
+/**
+ * Generate auto-placed fields based on form type and signers.
+ */
+function generateAutoFields(
+  formType: string,
+  signers: { id: string; role: string | null }[]
+): AutoField[] {
+  const fields: AutoField[] = [];
+  const buyerSigner = signers.find((s) => s.role === "BUYER") || signers[0];
+  const sellerSigner = signers.find((s) => s.role === "SELLER") || signers[signers.length - 1];
+
+  // Common Louisiana real estate form layout:
+  // Page 1 bottom: initials for both parties
+  // Last page: full signatures, printed names, dates
+
+  // Buyer initials - page 1 bottom-left
+  if (buyerSigner) {
+    fields.push({ signerId: buyerSigner.id, type: "INITIALS", page: 0, x: 10, y: 90, width: 8, height: 3 });
+  }
+
+  // Seller initials - page 1 bottom-right
+  if (sellerSigner) {
+    fields.push({ signerId: sellerSigner.id, type: "INITIALS", page: 0, x: 55, y: 90, width: 8, height: 3 });
+  }
+
+  // Signature page (page 2 for addendums, page 6+ for PA)
+  const sigPage = formType === "lrec-103" ? 1 : 5;
+
+  // Buyer signature block - left column
+  if (buyerSigner) {
+    fields.push({ signerId: buyerSigner.id, type: "SIGNATURE", page: sigPage, x: 5, y: 70, width: 30, height: 5 });
+    fields.push({ signerId: buyerSigner.id, type: "DATE", page: sigPage, x: 37, y: 70, width: 12, height: 3 });
+  }
+
+  // Seller signature block - right column
+  if (sellerSigner) {
+    fields.push({ signerId: sellerSigner.id, type: "SIGNATURE", page: sigPage, x: 52, y: 70, width: 30, height: 5 });
+    fields.push({ signerId: sellerSigner.id, type: "DATE", page: sigPage, x: 84, y: 70, width: 12, height: 3 });
+  }
+
+  return fields;
 }

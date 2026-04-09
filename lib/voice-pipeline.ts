@@ -288,6 +288,26 @@ const FAST_MATCHERS: FastMatch[] = [
     intent: "send_document",
     extractEntities: (m) => ({ document_type: m[1].trim(), buyer_name: m[2].trim() }),
   },
+  // ── SEND DOCUMENT FOR SIGNATURE (3 patterns) ──
+  {
+    pattern: /^(?:send|route|take) (?:that |the )?(?:addendum|amendment|document|contract|agreement|PA) (?:we (?:just )?got )?(?:and )?(?:send (?:it )?)?(?:to (.+?) )?for signature(?:s)?$/i,
+    intent: "send_document_for_signature",
+    extractEntities: (m) => (m[1] ? { recipient: m[1].trim() } : {}),
+  },
+  {
+    pattern: /^(?:send|take) (?:that |the )?(.+?) (?:on|for|from) (.+?) (?:and )?send (?:it )?(?:to (.+?) )?for signature(?:s)?$/i,
+    intent: "send_document_for_signature",
+    extractEntities: (m) => ({
+      document_type: m[1].trim(),
+      address: m[2].trim(),
+      ...(m[3] ? { recipient: m[3].trim() } : {}),
+    }),
+  },
+  {
+    pattern: /^send (?:the )?(.+?) to (?:our |the )?(.+?) for signature(?:s)?$/i,
+    intent: "send_document_for_signature",
+    extractEntities: (m) => ({ document_type: m[1].trim(), seller_name: m[2].trim() }),
+  },
   // ── CREATE ADDENDUM (2 patterns) ──
   {
     pattern: /^(?:create|write|draft) (?:an? )?(?:addendum|amendment) (?:for|on|to) (.+)$/i,
@@ -446,9 +466,10 @@ Parse voice commands into intent + entities. Be fast and precise.
 
 INTENTS: create_transaction, create_addendum, check_deadlines, update_status,
 show_pipeline, calculate_roi, send_alert, market_analysis, add_party,
-schedule_closing, send_document, run_compliance, write_contract, start_file,
-check_docs, fill_mls, needs_clarification
+schedule_closing, send_document, send_document_for_signature, run_compliance,
+write_contract, start_file, check_docs, fill_mls, needs_clarification
 
+send_document_for_signature: user wants to send a document to someone for signature via AirSign. Auto-creates envelope, places fields, and sends signing links. Use when user says things like "send that addendum for signatures", "take the PA and send it to the seller for signature", "route the contract for signing".
 start_file: user wants to start a new file/listing/buyer file. Extract address or buyer name.
 check_docs: user wants to know what documents are missing for a transaction.
 fill_mls: user wants to auto-fill or generate the MLS input sheet for a listing.
@@ -607,7 +628,7 @@ export async function runVoicePipeline(input: PipelineInput): Promise<PipelineRe
   // Intents that operate on a specific transaction and benefit from multi-turn context
   const ADDRESS_INTENTS = new Set([
     "add_party", "update_status", "check_deadlines", "write_contract",
-    "create_addendum", "send_document", "schedule_closing", "calculate_roi",
+    "create_addendum", "send_document", "send_document_for_signature", "schedule_closing", "calculate_roi",
   ])
 
   if (fastResult) {
