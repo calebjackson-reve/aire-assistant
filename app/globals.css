@@ -404,6 +404,81 @@ html {
   scroll-behavior: smooth;
 }
 
+/* ── Hero mesh gradient animation ─────────── */
+
+@keyframes mesh-shift {
+  0%, 100% {
+    background-position: 0% 50%, 100% 50%, 50% 100%;
+  }
+  25% {
+    background-position: 100% 0%, 0% 100%, 80% 20%;
+  }
+  50% {
+    background-position: 50% 100%, 50% 0%, 0% 50%;
+  }
+  75% {
+    background-position: 0% 100%, 100% 0%, 20% 80%;
+  }
+}
+
+.hero-mesh-gradient {
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 30%, rgba(154, 171, 126, 0.35) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 80% 70%, rgba(107, 125, 82, 0.25) 0%, transparent 70%),
+    radial-gradient(ellipse 70% 40% at 50% 50%, rgba(244, 241, 236, 0.3) 0%, transparent 70%);
+  background-size: 200% 200%, 200% 200%, 200% 200%;
+  animation: mesh-shift 20s ease-in-out infinite;
+}
+
+/* ── Hero word reveal animation ──────────── */
+
+@keyframes word-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.hero-word {
+  display: inline-block;
+  opacity: 0;
+  animation: word-reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.hero-word-1 { animation-delay: 0.1s; }
+.hero-word-2 { animation-delay: 0.2s; }
+.hero-word-3 { animation-delay: 0.3s; }
+.hero-word-4 { animation-delay: 0.4s; }
+.hero-word-5 { animation-delay: 0.5s; }
+
+/* ── Grain overlay via inline SVG ────────── */
+
+.grain-overlay-svg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+}
+
+/* ── Feature accent line ─────────────────── */
+
+.feature-accent::before {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 2px;
+  background: var(--color-sage);
+  margin-bottom: 1rem;
+}
+
 /* ── Brand skeleton shimmer ──────────────── */
 
 @keyframes skeleton-shimmer {

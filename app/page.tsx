@@ -8,6 +8,7 @@ import { ScrollProgress } from "./components/ui/scroll-progress"
 import { PricingToggle } from "./components/landing/PricingToggle"
 import { EmailCaptureSection } from "./components/landing/EmailCaptureSection"
 import { DeviceMockup } from "./components/landing/DeviceMockup"
+import { LouisianaGlobe } from "./components/landing/LouisianaGlobe"
 
 const FEATURES = [
   {
@@ -63,7 +64,7 @@ export default function HomePage() {
       <Navbar />
       <ScrollProgress />
 
-      {/* ═══ 1. HERO — Seed-inspired, muted sage bg, device mockup ═══ */}
+      {/* ═══ 1. HERO — Mesh gradient + grain + word reveal ═══ */}
       <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
         {/* Background video — atmospheric, lazy loaded */}
         <video
@@ -78,13 +79,19 @@ export default function HomePage() {
         </video>
         {/* Overlay to soften video and ensure text readability */}
         <div className="absolute inset-0 bg-[#c8ceb8]/75" />
-        {/* Subtle grain */}
-        <div className="absolute inset-0 grain-overlay" />
+        {/* Animated mesh gradient */}
+        <div className="absolute inset-0 hero-mesh-gradient" />
+        {/* Grain texture overlay */}
+        <div className="absolute inset-0 grain-overlay-svg" />
+        {/* Louisiana Globe — subtle background element */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] md:w-[520px] opacity-[0.18] z-[1] pointer-events-none">
+          <LouisianaGlobe />
+        </div>
 
         {/* Top announcement bar */}
         <div className="absolute top-0 left-0 right-0 z-20 bg-[#3a4a28] text-center py-2.5">
           <p className="text-[#f4f1ec]/70 text-xs tracking-wide">
-            18 deals closed. $3.38M in volume. 10 avg days on market. Now it's your turn.
+            18 deals closed. $3.38M in volume. 10 avg days on market. Now it&apos;s your turn.
             <span className="text-[#f4f1ec]/40 mx-2">&middot;</span>
             <Link href="#pricing" className="text-[#f4f1ec] underline underline-offset-2 hover:text-white transition-colors">
               See pricing →
@@ -99,19 +106,23 @@ export default function HomePage() {
             <span className="text-[#3a4a28] text-xs font-medium">Built by a Louisiana REALTOR. For Louisiana REALTORS.</span>
           </div>
 
-          {/* Headline */}
-          <h1 className="text-[#1e2416] mb-5 max-w-2xl mx-auto animate-fade-up [animation-delay:0.15s]">
-            Close more deals.<br className="hidden md:block" />
-            Miss nothing.
+          {/* Headline — large Cormorant italic with word reveal */}
+          <h1 className="text-[#1e2416] mb-5 max-w-3xl mx-auto !text-5xl md:!text-7xl !font-light !italic !tracking-[-0.02em] !leading-[1.05]">
+            <span className="hero-word hero-word-1">Close</span>{" "}
+            <span className="hero-word hero-word-2">more</span>{" "}
+            <span className="hero-word hero-word-3">deals.</span>
+            <br className="hidden md:block" />
+            <span className="hero-word hero-word-4">Miss</span>{" "}
+            <span className="hero-word hero-word-5">nothing.</span>
           </h1>
 
           {/* Subhead */}
-          <p className="text-[#3a4a28]/70 text-base md:text-lg leading-relaxed max-w-lg mx-auto mb-10 animate-fade-up [animation-delay:0.3s]">
+          <p className="text-[#3a4a28]/70 text-base md:text-lg leading-relaxed max-w-lg mx-auto mb-10 animate-fade-up [animation-delay:0.6s]">
             Seven AI agents handle your deadlines, signatures, briefs, and compliance — so you can focus on the conversations that actually close deals.
           </p>
 
           {/* CTAs */}
-          <div className="flex flex-wrap justify-center gap-4 mb-16 animate-fade-up [animation-delay:0.45s]">
+          <div className="flex flex-wrap justify-center gap-4 mb-16 animate-fade-up [animation-delay:0.75s]">
             <Link
               href={signedIn ? "/aire" : "/sign-up"}
               className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#1e2416] text-[#f4f1ec] text-sm font-medium tracking-wide rounded-full hover:bg-[#2a3320] transition-all duration-300 hover:translate-y-[-1px] hover:shadow-[0_8px_24px_rgba(30,36,22,0.3)]"
@@ -128,7 +139,7 @@ export default function HomePage() {
         </div>
 
         {/* Device mockup — laptop showing AIRE dashboard */}
-        <div className="relative z-10 w-full max-w-4xl mx-auto px-6 animate-fade-up [animation-delay:0.6s]">
+        <div className="relative z-10 w-full max-w-4xl mx-auto px-6 animate-fade-up [animation-delay:0.9s]">
           <DeviceMockup />
         </div>
 
@@ -136,22 +147,25 @@ export default function HomePage() {
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-cream to-transparent z-[5]" />
       </section>
 
-      {/* ═══ 2. PROOF BAR ═══ */}
+      {/* ═══ 2. PROOF BAR — Large mono numbers + Syncopate labels + dividers ═══ */}
       <section className="bg-cream">
         <div className="container-aire">
           <div className="divider" />
-          <div className="flex flex-wrap justify-center gap-x-16 gap-y-6 py-14 md:py-20">
-            <CountUpStat end={18} label="Deals Closed Q1 2026" />
-            <CountUpStat end={3.38} prefix="$" suffix="M" decimals={2} label="In Closed Volume" />
-            <CountUpStat end={10} label="Avg Days to Contract" />
-            <CountUpStat end={114} prefix="$" suffix="K+" label="Equity Created for Clients" />
+          <div className="flex flex-wrap justify-center gap-y-8 py-16 md:py-24">
+            <StatBlock value="18" label="Deals Closed Q1 2026" />
+            <StatDivider />
+            <StatBlock value="$3.38M" label="In Closed Volume" />
+            <StatDivider />
+            <StatBlock value="10" label="Avg Days to Contract" />
+            <StatDivider />
+            <StatBlock value="$114K+" label="Equity Created for Clients" />
           </div>
           <div className="divider" />
         </div>
       </section>
 
-      {/* ═══ 3. PRODUCT CARDS + PRICING TOGGLE — Seed-style grid ═══ */}
-      <section id="pricing" className="section-padding bg-cream">
+      {/* ═══ 3. PRICING ═══ */}
+      <section id="pricing" className="py-24 md:py-32 bg-gradient-to-b from-cream to-cream-warm">
         <div className="container-aire">
           <ScrollReveal className="text-center mb-6">
             <p className="section-label mb-4">Pricing</p>
@@ -171,34 +185,40 @@ export default function HomePage() {
         <EmailCaptureSection />
       </section>
 
-      {/* ═══ 5. PLATFORM FEATURES ═══ */}
-      <section id="platform" className="section-padding">
+      {/* ═══ 5. PLATFORM FEATURES — Alternating layout + accent lines ═══ */}
+      <section id="platform" className="py-24 md:py-32 lg:py-40">
         <div className="container-aire">
           <ScrollReveal className="text-center mb-20">
             <p className="section-label mb-4">The Platform</p>
             <h2 className="max-w-lg mx-auto">Four systems that work while you sleep</h2>
           </ScrollReveal>
 
-          <div className="space-y-24 md:space-y-32">
+          <div className="space-y-28 md:space-y-36">
             {FEATURES.map((feature, i) => (
               <ScrollReveal key={feature.label}>
                 <div
-                  className={`grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center ${
+                  className={`grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center ${
                     i % 2 === 1 ? "lg:[direction:rtl]" : ""
                   }`}
                 >
                   {/* Text */}
                   <div className={i % 2 === 1 ? "lg:[direction:ltr]" : ""}>
-                    <p className="section-label mb-3">{feature.label}</p>
-                    <h3 className="text-2xl md:text-3xl font-light italic text-ink mb-4 leading-tight">
+                    <div className="feature-accent">
+                      <p className="section-label mb-3">{feature.label}</p>
+                    </div>
+                    <h3 className="!text-3xl md:!text-4xl font-light italic text-ink mb-5 leading-tight font-[family-name:var(--font-display)]">
                       {feature.title}
                     </h3>
                     <p className="text-ink-muted text-[15px] leading-relaxed mb-8">{feature.body}</p>
                     <div className="flex gap-10">
                       {feature.stats.map((stat) => (
                         <div key={stat.label}>
-                          <p className="stat-number text-2xl">{stat.value}</p>
-                          <p className="text-ink-faint text-xs mt-0.5">{stat.label}</p>
+                          <p className="text-3xl font-[family-name:var(--font-mono)] font-light tracking-tight text-ink" style={{ fontFeatureSettings: '"tnum"' }}>
+                            {stat.value}
+                          </p>
+                          <p className="text-ink-faint text-xs mt-1 uppercase tracking-wider font-[family-name:var(--font-label)]" style={{ fontSize: '0.6rem' }}>
+                            {stat.label}
+                          </p>
                         </div>
                       ))}
                     </div>
@@ -216,7 +236,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══ 6. FREE TOOLS ═══ */}
-      <section id="tools" className="section-padding bg-cream-warm">
+      <section id="tools" className="py-24 md:py-32 bg-cream-warm">
         <div className="container-aire">
           <ScrollReveal className="text-center mb-14">
             <p className="section-label mb-4">Free Tools</p>
@@ -228,7 +248,7 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
             {FREE_TOOLS.map((tool) => (
-              <div key={tool.name} className="bg-white border border-champagne-light rounded-lg p-6 hover:shadow-[0_8px_32px_rgba(0,0,0,0.06)] hover:translate-y-[-2px] transition-all duration-300">
+              <div key={tool.name} className="bg-white border border-champagne-light rounded-2xl p-6 hover:shadow-[0_12px_40px_rgba(30,36,22,0.08)] hover:translate-y-[-3px] transition-all duration-300">
                 <div className="flex items-center justify-between mb-3">
                   <span className="badge">{tool.tag}</span>
                 </div>
@@ -250,11 +270,11 @@ export default function HomePage() {
       </section>
 
       {/* ═══ 7. ABOUT ═══ */}
-      <section id="about" className="section-padding">
+      <section id="about" className="py-24 md:py-32">
         <div className="container-aire">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-20 items-center max-w-5xl mx-auto">
             <div className="lg:col-span-2">
-              <div className="relative aspect-[3/4] overflow-hidden rounded-sm" style={{ boxShadow: "0 24px 64px rgba(0,0,0,0.08)" }}>
+              <div className="relative aspect-[3/4] overflow-hidden rounded-2xl" style={{ boxShadow: "0 24px 64px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.04)" }}>
                 <Image
                   src="/headshot-2.jpg"
                   alt="Caleb Jackson — REALTOR at Reve Realtors, Baton Rouge"
@@ -277,7 +297,7 @@ export default function HomePage() {
                   I closed 18 deals and $3.38M in Q1 2026 using the same tools every agent complains about — Dotloop, generic CMAs, spreadsheets for deadlines. So I built something better.
                 </p>
                 <p>
-                  Every feature in AIRE exists because I needed it at the closing table, on the phone with a lender, or reviewing my pipeline at 6 AM. This isn't a tech company guessing what agents need. This is what actually works.
+                  Every feature in AIRE exists because I needed it at the closing table, on the phone with a lender, or reviewing my pipeline at 6 AM. This isn&apos;t a tech company guessing what agents need. This is what actually works.
                 </p>
               </div>
               <div className="flex flex-wrap gap-4 mt-10">
@@ -303,26 +323,27 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ 8. FINAL CTA ═══ */}
-      <section className="py-24 md:py-32 bg-ink relative overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full bg-sage/[0.06] blur-[120px]" />
-        <div className="container-aire text-center max-w-xl mx-auto relative z-10">
-          <p className="section-label text-sage/50 mb-4">Get Started</p>
-          <h2 className="text-[#f4f1ec] mb-4">
-            Your next closing shouldn't keep you up at night.
+      {/* ═══ 8. FINAL CTA — Dramatic deep forest ═══ */}
+      <section className="py-32 md:py-40 bg-[#1e2416] relative overflow-hidden">
+        <div className="absolute inset-0 grain-overlay-svg" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] rounded-full bg-[#9aab7e]/[0.06] blur-[140px]" />
+        <div className="container-aire text-center max-w-2xl mx-auto relative z-10">
+          <p className="section-label text-[#9aab7e]/50 mb-6">Get Started</p>
+          <h2 className="text-[#f4f1ec] !text-4xl md:!text-5xl !italic !font-light mb-6 leading-tight">
+            Your next closing shouldn&apos;t keep you up at night.
           </h2>
-          <p className="text-[#f4f1ec]/40 text-sm mb-10 max-w-sm mx-auto">
+          <p className="text-[#f4f1ec]/40 text-sm mb-12 max-w-sm mx-auto">
             14 days free. No credit card. Cancel anytime.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href={signedIn ? "/aire" : "/sign-up"} className="inline-flex items-center px-8 py-3.5 bg-[#f4f1ec] text-ink text-sm font-medium tracking-wide rounded-full hover:bg-white hover:translate-y-[-1px] transition-all duration-300">
+            <Link href={signedIn ? "/aire" : "/sign-up"} className="inline-flex items-center px-10 py-4 bg-[#f4f1ec] text-[#1e2416] text-sm font-medium tracking-wide rounded-full hover:bg-white hover:translate-y-[-1px] hover:shadow-[0_8px_32px_rgba(244,241,236,0.2)] transition-all duration-300">
               {signedIn ? "Open Dashboard" : "Start Your Free Trial"}
             </Link>
             <a
               href="https://calendly.com/calebjackson"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center px-8 py-3.5 border border-[#f4f1ec]/15 text-[#f4f1ec]/60 text-sm font-medium tracking-wide rounded-full hover:text-[#f4f1ec] hover:border-[#f4f1ec]/30 transition-all duration-300"
+              className="inline-flex items-center px-10 py-4 border border-[#f4f1ec]/15 text-[#f4f1ec]/60 text-sm font-medium tracking-wide rounded-full hover:text-[#f4f1ec] hover:border-[#f4f1ec]/30 transition-all duration-300"
             >
               Talk to Caleb
             </a>
@@ -336,12 +357,37 @@ export default function HomePage() {
   )
 }
 
-/* ── Inline feature card (dark mockup style matching Seed product cards) ── */
+/* ── Stats bar components ── */
+function StatBlock({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="text-center px-6 md:px-10">
+      <p
+        className="text-4xl md:text-5xl font-[family-name:var(--font-mono)] font-light tracking-tight text-ink leading-none"
+        style={{ fontFeatureSettings: '"tnum"' }}
+      >
+        {value}
+      </p>
+      <p className="mt-2 uppercase tracking-[0.15em] text-ink-faint font-[family-name:var(--font-label)]" style={{ fontSize: '0.6rem' }}>
+        {label}
+      </p>
+    </div>
+  )
+}
+
+function StatDivider() {
+  return (
+    <div className="hidden md:flex items-center">
+      <div className="w-px h-12 bg-olive/20" />
+    </div>
+  )
+}
+
+/* ── Inline feature card (dark mockup style) ── */
 function FeatureCard({ feature }: { feature: typeof FEATURES[number] }) {
   return (
     <div
-      className="relative aspect-[4/3] rounded-xl overflow-hidden"
-      style={{ background: "#1e2416", boxShadow: "0 24px 64px rgba(30,36,22,0.35)" }}
+      className="relative aspect-[4/3] rounded-2xl overflow-hidden"
+      style={{ background: "#1e2416", boxShadow: "0 24px 64px rgba(30,36,22,0.35), 0 8px 24px rgba(30,36,22,0.15)" }}
     >
       {/* Window chrome */}
       <div className="flex items-center gap-1.5 px-5 py-3 border-b border-[#9aab7e]/10">

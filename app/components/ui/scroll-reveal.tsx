@@ -74,7 +74,13 @@ export function CountUpStat({
 
   return (
     <div ref={ref} className="text-center">
-      <p className="stat-number text-3xl md:text-[2.75rem] leading-none">
+      <p
+        className="stat-number text-3xl md:text-[2.75rem] leading-none transition-[filter] duration-700 ease-out"
+        style={{
+          fontFeatureSettings: '"tnum"',
+          filter: isVisible ? "blur(0px)" : "blur(2px)",
+        }}
+      >
         {prefix}{value.toFixed(decimals)}<span className="text-ink-faint">{suffix}</span>
       </p>
       <p className="section-label text-ink-faint text-[9px] mt-2">{label}</p>

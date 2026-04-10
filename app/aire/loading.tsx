@@ -1,6 +1,8 @@
 export default function AireLoading() {
   return (
-    <div className="p-6 md:p-8 space-y-6 animate-pulse">
+    <div className="p-6 md:p-8 space-y-6 animate-pulse relative">
+      {/* Branded spinner */}
+      <div className="absolute top-6 right-6 spinner-aire" />
       {/* Header bar */}
       <div className="flex items-center justify-between">
         <div className="h-8 w-48 rounded-lg skeleton-shimmer" />
