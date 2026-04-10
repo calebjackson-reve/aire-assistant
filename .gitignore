@@ -47,3 +47,6 @@ AIRE-KEY-SETUP-GUIDE.html
 # Claude Code settings (local only)
 .claude/
 .env*.local
+public/_unused/
+.playwright-mcp/
+*.png
