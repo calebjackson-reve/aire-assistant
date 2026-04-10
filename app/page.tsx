@@ -15,6 +15,7 @@ import { RotatingWords } from "./components/landing/RotatingWords"
 const WireframeGlobe = dynamic(() => import("./components/landing/WireframeGlobe").then(m => ({ default: m.WireframeGlobe })), { loading: () => <div className="w-full h-full" /> })
 const SparklesText = dynamic(() => import("./components/landing/SparklesText").then(m => ({ default: m.SparklesText })), { loading: () => <span /> })
 const LampSection = dynamic(() => import("./components/landing/LampSection").then(m => ({ default: m.LampSection })), { loading: () => <div className="h-[500px]" /> })
+import { CardFlip } from "./components/landing/CardFlip"
 
 const FEATURES = [
   {
@@ -56,10 +57,30 @@ const FEATURES = [
 ]
 
 const FREE_TOOLS = [
-  { name: "AIRE Estimate", description: "Know what a property is actually worth before you write the offer.", tag: "AVM" },
-  { name: "Market Pulse", description: "Live MLS data for Greater Baton Rouge — updated daily, not monthly.", tag: "Data" },
-  { name: "Flood Vision", description: "Flood zone and insurance cost by parish. No more surprises at closing.", tag: "Risk" },
-  { name: "Deal DNA", description: "Comps, price per square foot, and days on market — the full picture in one view.", tag: "Analysis" },
+  {
+    name: "AIRE Estimate",
+    subtitle: "Instant property valuations",
+    description: "Know what a property is actually worth before you write the offer.",
+    features: ["3 valuation models combined", "Parish-level adjustments", "Confidence scoring", "Comp analysis included"],
+  },
+  {
+    name: "Market Pulse",
+    subtitle: "Live Baton Rouge MLS data",
+    description: "Live MLS data for Greater Baton Rouge — updated daily, not monthly.",
+    features: ["Daily MLS feed", "Median price trends", "Inventory tracking", "Days on market by zip"],
+  },
+  {
+    name: "Flood Vision",
+    subtitle: "Flood zone risk analysis",
+    description: "Flood zone and insurance cost by parish. No more surprises at closing.",
+    features: ["FEMA zone lookup", "Insurance cost estimate", "Historical flood data", "Parish-level detail"],
+  },
+  {
+    name: "Deal DNA",
+    subtitle: "Full deal analysis",
+    description: "Comps, price per square foot, and days on market — the full picture in one view.",
+    features: ["Comparable sales", "Price per sqft analysis", "Investment ROI calc", "Neighborhood scoring"],
+  },
 ]
 
 export default function HomePage() {
@@ -328,15 +349,20 @@ export default function HomePage() {
             </p>
           </ScrollReveal>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-5xl mx-auto">
             {FREE_TOOLS.map((tool) => (
-              <div key={tool.name} className="bg-white border border-champagne-light rounded-2xl p-6 hover:shadow-[0_12px_40px_rgba(30,36,22,0.08)] hover:translate-y-[-3px] transition-all duration-300">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="badge">{tool.tag}</span>
-                </div>
-                <h3 className="text-base font-normal not-italic text-ink mb-2">{tool.name}</h3>
-                <p className="text-ink-muted text-sm leading-relaxed">{tool.description}</p>
-              </div>
+              <CardFlip
+                key={tool.name}
+                title={tool.name}
+                subtitle={tool.subtitle}
+                description={tool.description}
+                features={tool.features}
+                icon={
+                  <svg className="w-5 h-5 text-[#f5f2ea]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" />
+                  </svg>
+                }
+              />
             ))}
           </div>
 
