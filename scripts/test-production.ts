@@ -9,7 +9,9 @@
  *   npx tsx scripts/test-production.ts http://localhost:3000 5
  */
 
-const BASE_URL = process.argv[2] || "https://aireintel.org"
+let BASE_URL = process.argv[2] || "https://aireintel.org"
+// Auto-use www if hitting naked domain (Vercel redirects naked → www)
+if (BASE_URL === "https://aireintel.org") BASE_URL = "https://www.aireintel.org"
 const ITERATIONS = parseInt(process.argv[3] || "10", 10)
 
 interface TestResult {
@@ -31,14 +33,15 @@ async function testEndpoint(
 ): Promise<TestResult> {
   const url = `${BASE_URL}${path}`
   const start = Date.now()
-  const acceptable = expectStatus || [200, 401, 403] // 401/403 = auth working correctly
+  const acceptable = expectStatus || [200, 307, 308, 401, 403] // 307/308 = Clerk auth redirect, 401/403 = auth denied — all correct
 
   try {
     const res = await fetch(url, {
       method,
+      redirect: "manual", // Don't follow Clerk auth redirects — we want to see the actual status
       headers: {
         "Content-Type": "application/json",
-        // No auth header — we expect 401 for protected routes (that's correct behavior)
+        // No auth header — we expect 401/307 for protected routes (that's correct behavior)
       },
       body: body ? JSON.stringify(body) : undefined,
     })

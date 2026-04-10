@@ -15,6 +15,19 @@ const NAV_ITEMS = [
   { href: "/aire/transcript-tasks", label: "Tasks", icon: "list", desc: "Transcript to tasks" },
 ]
 
+const MORE_ITEMS = [
+  { href: "/aire/documents", label: "Documents", icon: "file", desc: "Upload & classify" },
+  { href: "/aire/contracts", label: "Contracts", icon: "file", desc: "Write & manage" },
+  { href: "/aire/compliance", label: "Compliance", icon: "shield", desc: "LA rules engine" },
+  { href: "/aire/communications", label: "Comms", icon: "mail", desc: "All communications" },
+  { href: "/aire/morning-brief", label: "Morning Brief", icon: "sun", desc: "Daily AI brief" },
+  { href: "/aire/monitoring", label: "Monitoring", icon: "monitor", desc: "Agent health" },
+  { href: "/aire/research", label: "Research", icon: "chart", desc: "Learning metrics" },
+  { href: "/aire/data-health", label: "Data Health", icon: "monitor", desc: "Pipeline status" },
+  { href: "/aire/voice-analytics", label: "Voice", icon: "mic", desc: "Voice analytics" },
+  { href: "/aire/mls-input", label: "MLS Input", icon: "file", desc: "Auto-fill Paragon" },
+]
+
 const SECONDARY_ITEMS = [
   { href: "/aire/settings", label: "Settings", icon: "settings" },
 ]
@@ -54,6 +67,26 @@ function NavIcon({ name, className }: { name: string; className?: string }) {
     list: (
       <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" />
+      </svg>
+    ),
+    file: (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" />
+      </svg>
+    ),
+    shield: (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      </svg>
+    ),
+    monitor: (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="3" width="20" height="14" rx="2" ry="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" />
+      </svg>
+    ),
+    mic: (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" y1="19" x2="12" y2="23" /><line x1="8" y1="23" x2="16" y2="23" />
       </svg>
     ),
     settings: (
@@ -122,6 +155,29 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
               </Link>
             )
           })}
+          {/* More section */}
+          <div className="mt-4 pt-3 border-t border-[#d4c8b8]/20">
+            <span className="px-3 text-[10px] font-mono uppercase tracking-wider text-[#9a9a90]">More</span>
+            <div className="mt-2 space-y-0.5">
+              {MORE_ITEMS.map((item) => {
+                const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-lg text-[12px] no-underline transition-all duration-200 ${
+                      isActive
+                        ? "bg-[#9aab7e]/15 text-[#1e2416] font-medium"
+                        : "text-[#9a9a90] hover:text-[#1e2416] hover:bg-[#9aab7e]/8"
+                    }`}
+                  >
+                    <NavIcon name={item.icon} className="w-4 h-4 shrink-0" />
+                    <span>{item.label}</span>
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
         </nav>
 
         {/* Secondary — Settings, Back */}
@@ -184,7 +240,7 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
 
       {/* ── Mobile bottom tab bar ── */}
       <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-xl border-t border-[#d4c8b8]/30 pb-[env(safe-area-inset-bottom)]">
-        <div className="grid grid-cols-6 h-16">
+        <div className="grid grid-cols-7 h-16">
           {NAV_ITEMS.map((item) => {
             const isActive =
               item.href === "/aire"

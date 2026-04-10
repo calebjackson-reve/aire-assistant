@@ -50,8 +50,8 @@ export default function ResearchPage() {
   if (loading) {
     return (
       <div className="p-8">
-        <h1 className="text-2xl font-bold text-[#e8e4d8] mb-4">Research Intelligence</h1>
-        <p className="text-[#e8e4d8]/60">Loading research data...</p>
+        <h1 className="text-2xl font-bold text-[#1e2416] mb-4">Research Intelligence</h1>
+        <p className="text-[#6b7d52]/60">Loading research data...</p>
       </div>
     )
   }
@@ -63,8 +63,8 @@ export default function ResearchPage() {
   return (
     <div className="p-8 space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-[#e8e4d8]">Research Intelligence</h1>
-        <p className="text-[#e8e4d8]/60 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-[#1e2416]">Research Intelligence</h1>
+        <p className="text-[#6b7d52]/60 text-sm mt-1">
           System learning metrics — updated {data?.generatedAt ? new Date(data.generatedAt).toLocaleString() : 'never'}
         </p>
       </div>
