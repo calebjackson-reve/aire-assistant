@@ -11,10 +11,10 @@ import { EmailCaptureSection } from "./components/landing/EmailCaptureSection"
 import { DeviceMockup } from "./components/landing/DeviceMockup"
 import { RotatingWords } from "./components/landing/RotatingWords"
 
-// Dynamic imports — heavy client components loaded after initial paint
-const WireframeGlobe = dynamic(() => import("./components/landing/WireframeGlobe").then(m => ({ default: m.WireframeGlobe })), { ssr: false })
-const SparklesText = dynamic(() => import("./components/landing/SparklesText").then(m => ({ default: m.SparklesText })), { ssr: false })
-const LampSection = dynamic(() => import("./components/landing/LampSection").then(m => ({ default: m.LampSection })), { ssr: false })
+// Dynamic imports — heavy client components loaded lazily
+const WireframeGlobe = dynamic(() => import("./components/landing/WireframeGlobe").then(m => ({ default: m.WireframeGlobe })), { loading: () => <div className="w-full h-full" /> })
+const SparklesText = dynamic(() => import("./components/landing/SparklesText").then(m => ({ default: m.SparklesText })), { loading: () => <span /> })
+const LampSection = dynamic(() => import("./components/landing/LampSection").then(m => ({ default: m.LampSection })), { loading: () => <div className="h-[500px]" /> })
 
 const FEATURES = [
   {
