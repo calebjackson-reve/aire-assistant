@@ -1,5 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
+import dynamic from "next/dynamic"
 import Navbar from "./components/layout/Navbar"
 import Footer from "./components/layout/Footer"
 import { ScrollReveal, CountUpStat } from "./components/ui/scroll-reveal"
@@ -8,11 +9,12 @@ import { ScrollProgress } from "./components/ui/scroll-progress"
 import { PricingToggle } from "./components/landing/PricingToggle"
 import { EmailCaptureSection } from "./components/landing/EmailCaptureSection"
 import { DeviceMockup } from "./components/landing/DeviceMockup"
-import { LouisianaGlobe } from "./components/landing/LouisianaGlobe"
-import { WireframeGlobe } from "./components/landing/WireframeGlobe"
-import { SparklesText } from "./components/landing/SparklesText"
 import { RotatingWords } from "./components/landing/RotatingWords"
-import { LampSection } from "./components/landing/LampSection"
+
+// Dynamic imports — heavy client components loaded after initial paint
+const WireframeGlobe = dynamic(() => import("./components/landing/WireframeGlobe").then(m => ({ default: m.WireframeGlobe })), { ssr: false })
+const SparklesText = dynamic(() => import("./components/landing/SparklesText").then(m => ({ default: m.SparklesText })), { ssr: false })
+const LampSection = dynamic(() => import("./components/landing/LampSection").then(m => ({ default: m.LampSection })), { ssr: false })
 
 const FEATURES = [
   {
