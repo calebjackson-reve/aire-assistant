@@ -51,6 +51,18 @@
     {
       "path": "/api/cron/app-scanner",
       "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/qa-test",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/deal-monitor",
+      "schedule": "0 11,15,19,23,3 * * *"
+    },
+    {
+      "path": "/api/cron/content-suggestions",
+      "schedule": "0 13 * * 1"
     }
   ]
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Webhook } from "svix";
 import { WebhookEvent } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
+import { runClientOnboarding } from "@/lib/agents/client-onboarding";
 
 export async function POST(req: NextRequest) {
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
@@ -73,6 +74,14 @@ export async function POST(req: NextRequest) {
     });
 
     console.log(`✅ User created in DB: ${primaryEmail} (tier=FREE)`);
+
+    // Trigger onboarding agent
+    try {
+      await runClientOnboarding(id, primaryEmail, first_name || null);
+    } catch (err) {
+      console.error("[ONBOARDING] Failed for new user:", err);
+      // Don't block webhook response — onboarding is best-effort
+    }
   }
 
   if (eventType === "user.updated") {
