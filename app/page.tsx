@@ -12,6 +12,7 @@ import { LouisianaGlobe } from "./components/landing/LouisianaGlobe"
 import { WireframeGlobe } from "./components/landing/WireframeGlobe"
 import { SparklesText } from "./components/landing/SparklesText"
 import { RotatingWords } from "./components/landing/RotatingWords"
+import { LampSection } from "./components/landing/LampSection"
 
 const FEATURES = [
   {
@@ -228,6 +229,32 @@ export default function HomePage() {
         <div className="absolute inset-0 grain-overlay" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[250px] rounded-full bg-[#9aab7e]/10 blur-[100px]" />
         <EmailCaptureSection />
+      </section>
+
+      {/* ═══ TC LAMP SHOWCASE ═══ */}
+      <section className="py-8 md:py-12">
+        <div className="container-aire">
+          <LampSection
+            label="Transaction Coordinator"
+            title="Your deals run themselves."
+            description="AIRE tracks every deadline, sends every reminder, and flags every risk — before you even think about it. 47 minutes saved per deal. Zero missed deadlines."
+          >
+            <div className="flex gap-8 mt-4">
+              <div className="text-center">
+                <p className="text-2xl font-light text-[#9aab7e]" style={{ fontFamily: "var(--font-ibm-mono)", fontFeatureSettings: '"tnum"' }}>47min</p>
+                <p className="text-[10px] text-[#e8e4d8]/40 uppercase tracking-wider mt-1" style={{ fontFamily: "var(--font-label)" }}>Saved per deal</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-light text-[#9aab7e]" style={{ fontFamily: "var(--font-ibm-mono)", fontFeatureSettings: '"tnum"' }}>0</p>
+                <p className="text-[10px] text-[#e8e4d8]/40 uppercase tracking-wider mt-1" style={{ fontFamily: "var(--font-label)" }}>Missed deadlines</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-light text-[#9aab7e]" style={{ fontFamily: "var(--font-ibm-mono)", fontFeatureSettings: '"tnum"' }}>24/7</p>
+                <p className="text-[10px] text-[#e8e4d8]/40 uppercase tracking-wider mt-1" style={{ fontFamily: "var(--font-label)" }}>Monitoring</p>
+              </div>
+            </div>
+          </LampSection>
+        </div>
       </section>
 
       {/* ═══ 5. PLATFORM FEATURES — Alternating layout + accent lines ═══ */}
