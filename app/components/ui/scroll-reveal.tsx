@@ -6,22 +6,36 @@ export function ScrollReveal({
   children,
   className = "",
   delay = 0,
+  direction = "up",
+  scale = false,
 }: {
   children: React.ReactNode
   className?: string
   delay?: number
+  direction?: "up" | "left" | "right" | "none"
+  scale?: boolean
 }) {
-  const { ref, isVisible } = useScrollReveal<HTMLDivElement>(0.12)
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>(0.1)
+
+  const hiddenTransform =
+    direction === "up" ? "translateY(40px)" :
+    direction === "left" ? "translateX(-60px)" :
+    direction === "right" ? "translateX(60px)" :
+    "none"
+
+  const hiddenScale = scale ? "scale(0.92)" : ""
 
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-        isVisible
-          ? "opacity-100 translate-y-0"
-          : "opacity-0 translate-y-6"
-      } ${className}`}
-      style={{ transitionDelay: `${delay}ms` }}
+      className={`${className}`}
+      style={{
+        transition: `opacity 800ms cubic-bezier(0.16, 1, 0.3, 1), transform 1000ms cubic-bezier(0.16, 1, 0.3, 1), filter 800ms ease`,
+        transitionDelay: `${delay}ms`,
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? "translateY(0) translateX(0) scale(1)" : `${hiddenTransform} ${hiddenScale}`,
+        filter: isVisible ? "blur(0px)" : "blur(4px)",
+      }}
     >
       {children}
     </div>

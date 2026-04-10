@@ -226,49 +226,57 @@ export default function HomePage() {
       {/* ═══ 5. PLATFORM FEATURES — Alternating layout + accent lines ═══ */}
       <section id="platform" className="py-24 md:py-32 lg:py-40">
         <div className="container-aire">
-          <ScrollReveal className="text-center mb-20">
+          <ScrollReveal className="text-center mb-20" scale>
             <p className="section-label mb-4">The Platform</p>
             <h2 className="max-w-lg mx-auto">Four systems that work while you sleep</h2>
           </ScrollReveal>
 
           <div className="space-y-28 md:space-y-36">
-            {FEATURES.map((feature, i) => (
-              <ScrollReveal key={feature.label}>
-                <div
-                  className={`grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center ${
-                    i % 2 === 1 ? "lg:[direction:rtl]" : ""
-                  }`}
-                >
-                  {/* Text */}
-                  <div className={i % 2 === 1 ? "lg:[direction:ltr]" : ""}>
-                    <div className="feature-accent">
-                      <p className="section-label mb-3">{feature.label}</p>
-                    </div>
-                    <h3 className="!text-3xl md:!text-4xl font-light italic text-ink mb-5 leading-tight font-[family-name:var(--font-display)]">
-                      {feature.title}
-                    </h3>
-                    <p className="text-ink-muted text-[15px] leading-relaxed mb-8">{feature.body}</p>
-                    <div className="flex gap-10">
-                      {feature.stats.map((stat) => (
-                        <div key={stat.label}>
-                          <p className="text-3xl font-[family-name:var(--font-mono)] font-light tracking-tight text-ink" style={{ fontFeatureSettings: '"tnum"' }}>
-                            {stat.value}
-                          </p>
-                          <p className="text-ink-faint text-xs mt-1 uppercase tracking-wider font-[family-name:var(--font-label)]" style={{ fontSize: '0.6rem' }}>
-                            {stat.label}
-                          </p>
+            {FEATURES.map((feature, i) => {
+              const textDirection = i % 2 === 0 ? "left" as const : "right" as const
+              const cardDirection = i % 2 === 0 ? "right" as const : "left" as const
+              return (
+                <div key={feature.label}>
+                  <div
+                    className={`grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center ${
+                      i % 2 === 1 ? "lg:[direction:rtl]" : ""
+                    }`}
+                  >
+                    {/* Text — slides in from the side */}
+                    <ScrollReveal direction={textDirection} delay={0}>
+                      <div className={i % 2 === 1 ? "lg:[direction:ltr]" : ""}>
+                        <div className="feature-accent">
+                          <p className="section-label mb-3">{feature.label}</p>
                         </div>
-                      ))}
-                    </div>
-                  </div>
+                        <h3 className="!text-3xl md:!text-4xl font-light italic text-ink mb-5 leading-tight font-[family-name:var(--font-display)]">
+                          {feature.title}
+                        </h3>
+                        <p className="text-ink-muted text-[15px] leading-relaxed mb-8">{feature.body}</p>
+                        <div className="flex gap-10">
+                          {feature.stats.map((stat) => (
+                            <div key={stat.label}>
+                              <p className="text-3xl font-[family-name:var(--font-mono)] font-light tracking-tight text-ink" style={{ fontFeatureSettings: '"tnum"' }}>
+                                {stat.value}
+                              </p>
+                              <p className="text-ink-faint text-xs mt-1 uppercase tracking-wider font-[family-name:var(--font-label)]" style={{ fontSize: '0.6rem' }}>
+                                {stat.label}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </ScrollReveal>
 
-                  {/* Feature card mockup */}
-                  <div className={`relative ${i % 2 === 1 ? "lg:[direction:ltr]" : ""}`}>
-                    <FeatureCard feature={feature} />
+                    {/* Feature card mockup — slides in from opposite side with scale */}
+                    <ScrollReveal direction={cardDirection} delay={200} scale>
+                      <div className={`relative ${i % 2 === 1 ? "lg:[direction:ltr]" : ""}`}>
+                        <FeatureCard feature={feature} />
+                      </div>
+                    </ScrollReveal>
                   </div>
                 </div>
-              </ScrollReveal>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
