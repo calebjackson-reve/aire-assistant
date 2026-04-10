@@ -34,8 +34,8 @@ export default function Footer() {
               AIRE
             </span>
             <p className="text-sm text-ink-muted leading-relaxed">
-              AI-powered transaction management for Louisiana real estate.
-              Built by an active agent, for agents.
+              The operating system for Louisiana real estate.
+              Built by a REALTOR who closed $3.38M in Q1 2026.
             </p>
           </div>
 

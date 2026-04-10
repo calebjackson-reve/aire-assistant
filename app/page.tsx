@@ -12,8 +12,8 @@ import { DeviceMockup } from "./components/landing/DeviceMockup"
 const FEATURES = [
   {
     label: "Transaction Coordinator",
-    title: "Every deadline tracked.",
-    body: "Auto-calculated deadlines from contract dates. Louisiana Act of Sale timelines, inspection periods, financing contingencies — all managed by AI.",
+    title: "Never miss a deadline again.",
+    body: "Every Act of Sale timeline, inspection period, and financing contingency auto-calculated from your contract dates. One missed deadline can kill a $200K deal — this makes sure it doesn't.",
     stats: [
       { value: "47 min", label: "saved per deal" },
       { value: "0", label: "missed deadlines" },
@@ -21,38 +21,38 @@ const FEATURES = [
   },
   {
     label: "AirSign",
-    title: "Send. Sign. Seal.",
-    body: "Upload any PDF, place signature fields, send signing links. Buyers and sellers sign from any device. Sealed PDF with full audit trail.",
+    title: "Signatures in seconds, not days.",
+    body: "Drop Dotloop. Upload a PDF, place fields, send a link. Your clients sign from their phone at the kitchen table. Sealed with a full audit trail.",
     stats: [
       { value: "8 sec", label: "to send" },
-      { value: "100%", label: "mobile" },
+      { value: "100%", label: "mobile ready" },
     ],
   },
   {
     label: "Morning Brief",
-    title: "Intelligence at 7AM.",
-    body: "Three AI researchers scan your transactions, communications, and market data overnight. Deadlines, new listings, follow-ups — ready before coffee.",
+    title: "Know everything before your first call.",
+    body: "Three AI researchers work overnight — scanning your deadlines, flagging unanswered emails, and surfacing new comps. Your full pipeline briefing lands at 7 AM.",
     stats: [
       { value: "3", label: "AI researchers" },
-      { value: "7 AM", label: "daily" },
+      { value: "7 AM", label: "on your desk" },
     ],
   },
   {
     label: "Voice Commands",
-    title: "Speak. It acts.",
-    body: "\"Create a transaction at 5834 Guice Drive.\" Natural language to action in under 4 seconds. Built for agents in the car.",
+    title: "Run your business from the driver's seat.",
+    body: "\"Create a transaction at 5834 Guice Drive.\" Speak it, and it's done — under 4 seconds. Built for agents who close deals between showings.",
     stats: [
-      { value: "<4s", label: "response" },
-      { value: "30+", label: "actions" },
+      { value: "<4s", label: "to action" },
+      { value: "30+", label: "voice commands" },
     ],
   },
 ]
 
 const FREE_TOOLS = [
-  { name: "AIRE Estimate", description: "AI-powered property valuations with local comp analysis.", tag: "AVM" },
-  { name: "Market Pulse", description: "Live GBRAR MLS data for Greater Baton Rouge.", tag: "Data" },
-  { name: "Flood Vision", description: "Flood zones and insurance estimates by parish.", tag: "Risk" },
-  { name: "Deal DNA", description: "Comps, price/sqft, DOM, and leverage points.", tag: "Analysis" },
+  { name: "AIRE Estimate", description: "Know what a property is actually worth before you write the offer.", tag: "AVM" },
+  { name: "Market Pulse", description: "Live MLS data for Greater Baton Rouge — updated daily, not monthly.", tag: "Data" },
+  { name: "Flood Vision", description: "Flood zone and insurance cost by parish. No more surprises at closing.", tag: "Risk" },
+  { name: "Deal DNA", description: "Comps, price per square foot, and days on market — the full picture in one view.", tag: "Analysis" },
 ]
 
 export default function HomePage() {
@@ -84,7 +84,7 @@ export default function HomePage() {
         {/* Top announcement bar */}
         <div className="absolute top-0 left-0 right-0 z-20 bg-[#3a4a28] text-center py-2.5">
           <p className="text-[#f4f1ec]/70 text-xs tracking-wide">
-            Built by an agent who closed $3.38M in Q1 2026
+            18 deals closed. $3.38M in volume. 10 avg days on market. Now it's your turn.
             <span className="text-[#f4f1ec]/40 mx-2">&middot;</span>
             <Link href="#pricing" className="text-[#f4f1ec] underline underline-offset-2 hover:text-white transition-colors">
               See pricing →
@@ -96,20 +96,18 @@ export default function HomePage() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#3a4a28]/20 border border-[#3a4a28]/15 rounded-full mb-8 animate-fade-up">
             <span className="w-1.5 h-1.5 rounded-full bg-[#5c6e2e]" />
-            <span className="text-[#3a4a28] text-xs font-medium">Real Estate Intelligence System</span>
+            <span className="text-[#3a4a28] text-xs font-medium">Built by a Louisiana REALTOR. For Louisiana REALTORS.</span>
           </div>
 
           {/* Headline */}
           <h1 className="text-[#1e2416] mb-5 max-w-2xl mx-auto animate-fade-up [animation-delay:0.15s]">
-            The operating system<br className="hidden md:block" />
-            for Louisiana agents
+            Close more deals.<br className="hidden md:block" />
+            Miss nothing.
           </h1>
 
           {/* Subhead */}
           <p className="text-[#3a4a28]/70 text-base md:text-lg leading-relaxed max-w-lg mx-auto mb-10 animate-fade-up [animation-delay:0.3s]">
-            Transaction coordination, e-signatures, morning briefs,
-            and voice commands — seven AI agents that understand
-            how we close in Baton Rouge.
+            Seven AI agents handle your deadlines, signatures, briefs, and compliance — so you can focus on the conversations that actually close deals.
           </p>
 
           {/* CTAs */}
@@ -118,13 +116,13 @@ export default function HomePage() {
               href={signedIn ? "/aire" : "/sign-up"}
               className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#1e2416] text-[#f4f1ec] text-sm font-medium tracking-wide rounded-full hover:bg-[#2a3320] transition-all duration-300 hover:translate-y-[-1px] hover:shadow-[0_8px_24px_rgba(30,36,22,0.3)]"
             >
-              {signedIn ? "Open Dashboard" : "Get Started Free"}
+              {signedIn ? "Open Dashboard" : "Start Your Free Trial"}
             </Link>
             <a
               href="#platform"
               className="inline-flex items-center gap-2 px-8 py-3.5 bg-white/50 text-[#3a4a28] text-sm font-medium tracking-wide rounded-full border border-[#3a4a28]/10 hover:bg-white/70 transition-all duration-300"
             >
-              See the Platform
+              See How It Works
             </a>
           </div>
         </div>
@@ -143,10 +141,10 @@ export default function HomePage() {
         <div className="container-aire">
           <div className="divider" />
           <div className="flex flex-wrap justify-center gap-x-16 gap-y-6 py-14 md:py-20">
-            <CountUpStat end={18} label="Transactions Closed" />
-            <CountUpStat end={3.38} prefix="$" suffix="M" decimals={2} label="Total Volume" />
-            <CountUpStat end={10} label="Avg Days on Market" />
-            <CountUpStat end={114} prefix="$" suffix="K+" label="Client Equity Created" />
+            <CountUpStat end={18} label="Deals Closed Q1 2026" />
+            <CountUpStat end={3.38} prefix="$" suffix="M" decimals={2} label="In Closed Volume" />
+            <CountUpStat end={10} label="Avg Days to Contract" />
+            <CountUpStat end={114} prefix="$" suffix="K+" label="Equity Created for Clients" />
           </div>
           <div className="divider" />
         </div>
@@ -157,10 +155,10 @@ export default function HomePage() {
         <div className="container-aire">
           <ScrollReveal className="text-center mb-6">
             <p className="section-label mb-4">Pricing</p>
-            <h2 className="max-w-lg mx-auto">Simple plans, built for agents</h2>
+            <h2 className="max-w-lg mx-auto">One saved deadline pays for the year</h2>
           </ScrollReveal>
           <p className="text-ink-muted text-sm text-center max-w-md mx-auto mb-12">
-            Start free with the tools. Upgrade when you want the full AI operating system.
+            $97/month is less than one hour of your time. The platform saves you 47 minutes per deal.
           </p>
           <PricingToggle signedIn={signedIn} />
         </div>
@@ -178,7 +176,7 @@ export default function HomePage() {
         <div className="container-aire">
           <ScrollReveal className="text-center mb-20">
             <p className="section-label mb-4">The Platform</p>
-            <h2 className="max-w-lg mx-auto">Four systems working while you sell</h2>
+            <h2 className="max-w-lg mx-auto">Four systems that work while you sleep</h2>
           </ScrollReveal>
 
           <div className="space-y-24 md:space-y-32">
@@ -222,9 +220,9 @@ export default function HomePage() {
         <div className="container-aire">
           <ScrollReveal className="text-center mb-14">
             <p className="section-label mb-4">Free Tools</p>
-            <h2 className="max-w-md mx-auto">Try before you commit</h2>
+            <h2 className="max-w-md mx-auto">See real value before you sign up</h2>
             <p className="text-ink-muted text-sm mt-4 max-w-sm mx-auto">
-              Real data for the Greater Baton Rouge market. No signup required.
+              Live Greater Baton Rouge data. No account needed. No strings.
             </p>
           </ScrollReveal>
 
@@ -245,7 +243,7 @@ export default function HomePage() {
               href={signedIn ? "/aire" : "/sign-up"}
               className="text-sage text-sm font-medium hover:text-olive transition-colors"
             >
-              Try all tools free →
+              Explore all free tools →
             </Link>
           </div>
         </div>
@@ -276,15 +274,10 @@ export default function HomePage() {
               </p>
               <div className="space-y-5 text-ink-muted text-[15px] leading-[1.85] max-w-lg">
                 <p>
-                  I built AIRE because the tools agents have today are broken — outdated data,
-                  generic national platforms, and zero Louisiana-specific intelligence.
-                  I closed 18 transactions and $3.38M in Q1 2026, and every one showed me
-                  what the industry still gets wrong.
+                  I closed 18 deals and $3.38M in Q1 2026 using the same tools every agent complains about — Dotloop, generic CMAs, spreadsheets for deadlines. So I built something better.
                 </p>
                 <p>
-                  Every feature exists because I needed it at the closing table, on the phone
-                  with a lender, or at 6 AM reviewing my pipeline. AIRE is built by an active
-                  agent, for agents who want an unfair advantage with real data.
+                  Every feature in AIRE exists because I needed it at the closing table, on the phone with a lender, or reviewing my pipeline at 6 AM. This isn't a tech company guessing what agents need. This is what actually works.
                 </p>
               </div>
               <div className="flex flex-wrap gap-4 mt-10">
@@ -294,7 +287,7 @@ export default function HomePage() {
                   rel="noopener noreferrer"
                   className="btn-pill btn-pill-primary"
                 >
-                  Book a Conversation
+                  Book a 15-Minute Call
                 </a>
                 <a
                   href="https://www.instagram.com/calebjackson_24/"
@@ -316,14 +309,14 @@ export default function HomePage() {
         <div className="container-aire text-center max-w-xl mx-auto relative z-10">
           <p className="section-label text-sage/50 mb-4">Get Started</p>
           <h2 className="text-[#f4f1ec] mb-4">
-            Your next deal deserves better tools.
+            Your next closing shouldn't keep you up at night.
           </h2>
           <p className="text-[#f4f1ec]/40 text-sm mb-10 max-w-sm mx-auto">
-            Start free. No credit card. Full platform access for 14 days.
+            14 days free. No credit card. Cancel anytime.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link href={signedIn ? "/aire" : "/sign-up"} className="inline-flex items-center px-8 py-3.5 bg-[#f4f1ec] text-ink text-sm font-medium tracking-wide rounded-full hover:bg-white hover:translate-y-[-1px] transition-all duration-300">
-              {signedIn ? "Open Dashboard" : "Start Free"}
+              {signedIn ? "Open Dashboard" : "Start Your Free Trial"}
             </Link>
             <a
               href="https://calendly.com/calebjackson"
@@ -331,7 +324,7 @@ export default function HomePage() {
               rel="noopener noreferrer"
               className="inline-flex items-center px-8 py-3.5 border border-[#f4f1ec]/15 text-[#f4f1ec]/60 text-sm font-medium tracking-wide rounded-full hover:text-[#f4f1ec] hover:border-[#f4f1ec]/30 transition-all duration-300"
             >
-              Book a Call
+              Talk to Caleb
             </a>
           </div>
         </div>

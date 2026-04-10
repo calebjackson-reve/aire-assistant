@@ -76,7 +76,7 @@ export default function Navbar() {
                   Sign In
                 </Link>
                 <Link href="/sign-up" className="btn-pill btn-pill-primary text-[10px]">
-                  Get Started
+                  Start Free Trial
                 </Link>
               </>
             )}
@@ -129,7 +129,7 @@ export default function Navbar() {
                   Sign In
                 </Link>
                 <Link href="/sign-up" onClick={() => setMobileOpen(false)} className="btn-pill btn-pill-primary px-10">
-                  Get Started
+                  Start Free Trial
                 </Link>
               </>
             )}

@@ -19,14 +19,13 @@ export function EmailCaptureSection() {
   return (
     <div className="relative z-10 container-aire max-w-2xl mx-auto text-center">
       <p className="text-[#9aab7e]/60 text-xs tracking-[0.2em] uppercase font-[family-name:var(--font-label)] mb-5">
-        Weekly Intelligence
+        Free Weekly Brief
       </p>
       <h2 className="text-[#f4f1ec] text-2xl md:text-3xl font-[family-name:var(--font-display)] font-light italic mb-4">
-        Get your market brief every Monday
+        Your ZIP code, every Monday morning
       </h2>
       <p className="text-[#f4f1ec]/40 text-sm leading-relaxed max-w-md mx-auto mb-10">
-        New listings, price changes, and deals in your ZIP — curated by AI, delivered free.
-        See real value before you ever sign up.
+        New listings, price drops, and closed deals in your market — curated by AI, delivered to your inbox. Free forever.
       </p>
 
       {submitted ? (
@@ -57,13 +56,13 @@ export function EmailCaptureSection() {
             type="submit"
             className="px-6 py-3.5 bg-[#f4f1ec] text-[#3a4a28] text-sm font-medium tracking-wide rounded-lg hover:bg-white transition-all duration-300 shrink-0"
           >
-            Get Briefed
+            Send Me the Brief
           </button>
         </form>
       )}
 
       <p className="text-[#f4f1ec]/20 text-xs mt-6">
-        Free forever. Unsubscribe anytime. No spam.
+        No spam. No pitch. Just data. Unsubscribe anytime.
       </p>
     </div>
   )
