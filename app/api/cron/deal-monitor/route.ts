@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
     // Get all active transactions with deadlines and documents
     const transactions = await prisma.transaction.findMany({
       where: {
-        status: { notIn: ["CLOSED", "CANCELLED", "TERMINATED"] },
+        status: { notIn: ["CLOSED", "CANCELLED"] },
       },
       include: {
         deadlines: true,

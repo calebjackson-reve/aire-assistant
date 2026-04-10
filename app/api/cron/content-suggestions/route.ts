@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
 
     // 2. Pipeline stats post (weekly)
     const activeDeals = await prisma.transaction.findMany({
-      where: { status: { notIn: ["CLOSED", "CANCELLED", "TERMINATED"] } },
+      where: { status: { notIn: ["CLOSED", "CANCELLED"] } },
     })
 
     if (activeDeals.length > 0) {
