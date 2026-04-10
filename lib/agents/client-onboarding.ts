@@ -45,7 +45,7 @@ export async function runClientOnboarding(
       data: {
         userId,
         propertyAddress: address,
-        status: "UNDER_CONTRACT",
+        status: "ACTIVE",
         listPrice: 225000,
         offerPrice: 218000,
         acceptedPrice: 220000,
@@ -69,6 +69,7 @@ export async function runClientOnboarding(
     for (const d of deadlines) {
       await prisma.deadline.create({
         data: {
+          userId,
           transactionId: txn.id,
           name: d.name,
           dueDate: new Date(now.getTime() + d.daysFromNow * 24 * 60 * 60 * 1000),

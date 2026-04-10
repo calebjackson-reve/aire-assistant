@@ -123,7 +123,7 @@ export async function GET(req: NextRequest) {
       const hasPropertyDisclosure = txn.documents.some(d =>
         d.type?.toLowerCase().includes("disclosure") || d.name?.toLowerCase().includes("disclosure")
       )
-      if (!hasPropertyDisclosure && txn.status !== "PRE_LISTING") {
+      if (!hasPropertyDisclosure && txn.status !== "DRAFT") {
         alerts.push({
           severity: "WATCH",
           address: addr,

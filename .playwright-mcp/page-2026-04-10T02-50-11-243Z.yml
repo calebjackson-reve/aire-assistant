@@ -1,0 +1,379 @@
+- generic [active] [ref=e1]:
+  - navigation:
+    - generic:
+      - link "AIRE":
+        - /url: /
+      - generic:
+        - link "Platform":
+          - /url: "#platform"
+        - link "Tools":
+          - /url: "#tools"
+        - link "Pricing":
+          - /url: "#pricing"
+        - link "About":
+          - /url: "#about"
+      - generic:
+        - link "Sign In":
+          - /url: /sign-in
+        - link "Start Free Trial":
+          - /url: /sign-up
+  - generic [ref=e2]:
+    - generic:
+      - generic:
+        - generic:
+          - img
+          - img
+          - generic:
+            - generic:
+              - paragraph: Baton Rouge
+              - paragraph: $3.38M Q1 Volume
+            - generic:
+              - paragraph: New Orleans
+            - generic:
+              - paragraph: Lafayette
+            - generic:
+              - paragraph: Shreveport
+    - paragraph [ref=e7]:
+      - text: 18 deals closed. $3.38M in volume. 10 avg days on market. Now it's your turn.·
+      - link "See pricing →" [ref=e8] [cursor=pointer]:
+        - /url: "#pricing"
+    - generic [ref=e9]:
+      - generic [ref=e12]: Built by a Louisiana REALTOR. For Louisiana REALTORS.
+      - heading "Close more deals. Miss nothing." [level=1] [ref=e13]:
+        - generic [ref=e14]: Close
+        - generic [ref=e15]: more
+        - generic [ref=e16]: deals.
+        - generic [ref=e17]: Miss
+        - generic [ref=e18]: nothing.
+      - paragraph [ref=e19]: Seven AI agents handle your deadlines, signatures, briefs, and compliance — so you can focus on the conversations that actually close deals.
+      - generic [ref=e20]:
+        - link "Start Your Free Trial" [ref=e21] [cursor=pointer]:
+          - /url: /sign-up
+        - link "See How It Works" [ref=e22] [cursor=pointer]:
+          - /url: "#platform"
+    - generic [ref=e24]:
+      - generic [ref=e25]:
+        - generic [ref=e31]: app.aireintel.org/aire
+        - generic [ref=e36]:
+          - generic [ref=e37]:
+            - generic [ref=e38]: AIRE
+            - generic [ref=e39]: Dashboard
+            - generic [ref=e40]: Transactions
+            - generic [ref=e41]: AirSign
+            - generic [ref=e42]: Morning Brief
+            - generic [ref=e43]: Contracts
+          - generic [ref=e44]:
+            - generic [ref=e46]:
+              - paragraph [ref=e47]: Dashboard
+              - paragraph [ref=e48]: Good morning, Caleb
+            - generic [ref=e51]:
+              - generic [ref=e52]:
+                - paragraph [ref=e53]: Active
+                - paragraph [ref=e54]: "7"
+              - generic [ref=e55]:
+                - paragraph [ref=e56]: Pipeline
+                - paragraph [ref=e57]: $1.2M
+              - generic [ref=e58]:
+                - paragraph [ref=e59]: Overdue
+                - paragraph [ref=e60]: "2"
+            - generic [ref=e61]:
+              - paragraph [ref=e63]: Active Transactions
+              - generic [ref=e64]:
+                - generic [ref=e66]: 5834 Guice Dr
+                - generic [ref=e67]: Active
+              - generic [ref=e68]:
+                - generic [ref=e70]: 1247 Perkins Rd
+                - generic [ref=e71]: Pending
+              - generic [ref=e72]:
+                - generic [ref=e74]: 892 Highland Rd
+                - generic [ref=e75]: Active
+      - generic [ref=e83]:
+        - paragraph [ref=e84]: Morning Brief
+        - paragraph [ref=e85]: April 7
+        - generic [ref=e86]:
+          - generic [ref=e89]: 2 overdue
+          - generic [ref=e92]: Appraisal today
+          - generic [ref=e95]: 3 follow-ups
+  - generic [ref=e100]:
+    - generic [ref=e101]:
+      - paragraph [ref=e102]: "18"
+      - paragraph [ref=e103]: Deals Closed Q1 2026
+    - generic [ref=e106]:
+      - paragraph [ref=e107]: $3.38M
+      - paragraph [ref=e108]: In Closed Volume
+    - generic [ref=e111]:
+      - paragraph [ref=e112]: "10"
+      - paragraph [ref=e113]: Avg Days to Contract
+    - generic [ref=e116]:
+      - paragraph [ref=e117]: $114K+
+      - paragraph [ref=e118]: Equity Created for Clients
+  - generic [ref=e121]:
+    - generic [ref=e122]:
+      - paragraph [ref=e123]: Pricing
+      - heading "One saved deadline pays for the year" [level=2] [ref=e124]
+    - paragraph [ref=e125]: $97/month is less than one hour of your time. The platform saves you 47 minutes per deal.
+    - generic [ref=e126]:
+      - generic [ref=e127]:
+        - generic [ref=e128]: Monthly
+        - button "Toggle annual pricing" [ref=e129]
+        - generic [ref=e131]: AnnualSave 20%
+      - generic [ref=e132]:
+        - generic [ref=e134]:
+          - paragraph [ref=e135]: Agent
+          - generic [ref=e136]:
+            - generic [ref=e137]: $197
+            - generic [ref=e138]: /mo
+          - paragraph [ref=e139]: Replace five subscriptions with one.
+          - list [ref=e140]:
+            - listitem [ref=e141]: Morning Brief — your pipeline at 7 AM
+            - listitem [ref=e143]: Transaction Coordinator — zero missed deadlines
+            - listitem [ref=e145]: AirSign — unlimited e-signatures
+            - listitem [ref=e147]: Voice Commands — run deals from the car
+            - listitem [ref=e149]: Document intelligence + LREC compliance
+            - listitem [ref=e151]: Market data + AIRE Estimate
+            - listitem [ref=e153]: Deadline alerts via email + SMS
+          - link "Start 14-Day Free Trial" [ref=e155] [cursor=pointer]:
+            - /url: /sign-up
+        - generic [ref=e156]:
+          - generic [ref=e158]: Most Popular
+          - generic [ref=e159]:
+            - paragraph [ref=e160]: Team
+            - generic [ref=e161]:
+              - generic [ref=e162]: $497
+              - generic [ref=e163]: /mo
+            - paragraph [ref=e164]: Your team coordinator that never calls in sick.
+            - list [ref=e165]:
+              - listitem [ref=e166]: Everything in Agent for up to 10 users
+              - listitem [ref=e168]: Broker dashboard — see every deal
+              - listitem [ref=e170]: Team pipeline + compliance view
+              - listitem [ref=e172]: Shared document templates
+              - listitem [ref=e174]: Agent onboarding + training
+              - listitem [ref=e176]: Priority support from Caleb
+            - link "Start 14-Day Free Trial" [ref=e178] [cursor=pointer]:
+              - /url: /sign-up
+        - generic [ref=e179]:
+          - generic [ref=e181]: Enterprise
+          - generic [ref=e182]:
+            - paragraph [ref=e183]: Brokerage
+            - generic [ref=e184]:
+              - generic [ref=e185]: $1,497
+              - generic [ref=e186]: /mo
+            - paragraph [ref=e187]: Replace your TC department.
+            - list [ref=e188]:
+              - listitem [ref=e189]: Everything in Team for up to 50 users
+              - listitem [ref=e191]: White-label option — your brand, your domain
+              - listitem [ref=e193]: Brokerage-wide compliance dashboard
+              - listitem [ref=e195]: Agent performance analytics
+              - listitem [ref=e197]: Custom LREC form library
+              - listitem [ref=e199]: Monthly strategy call with Caleb
+              - listitem [ref=e201]: API access for custom integrations
+            - link "Talk to Caleb" [ref=e203] [cursor=pointer]:
+              - /url: /sign-up
+  - generic [ref=e207]:
+    - paragraph [ref=e208]: Free Weekly Brief
+    - heading "Your ZIP code, every Monday morning" [level=2] [ref=e209]
+    - paragraph [ref=e210]: New listings, price drops, and closed deals in your market — curated by AI, delivered to your inbox. Free forever.
+    - generic [ref=e211]:
+      - textbox "you@email.com" [ref=e212]
+      - textbox "ZIP code" [ref=e213]
+      - button "Send Me the Brief" [ref=e214]
+    - paragraph [ref=e215]: No spam. No pitch. Just data. Unsubscribe anytime.
+  - generic [ref=e217]:
+    - generic [ref=e218]:
+      - paragraph [ref=e219]: The Platform
+      - heading "Four systems that work while you sleep" [level=2] [ref=e220]
+    - generic [ref=e221]:
+      - generic [ref=e223]:
+        - generic [ref=e224]:
+          - paragraph [ref=e226]: Transaction Coordinator
+          - heading "Never miss a deadline again." [level=3] [ref=e227]
+          - paragraph [ref=e228]: Every Act of Sale timeline, inspection period, and financing contingency auto-calculated from your contract dates. One missed deadline can kill a $200K deal — this makes sure it doesn't.
+          - generic [ref=e229]:
+            - generic [ref=e230]:
+              - paragraph [ref=e231]: 47 min
+              - paragraph [ref=e232]: saved per deal
+            - generic [ref=e233]:
+              - paragraph [ref=e234]: "0"
+              - paragraph [ref=e235]: missed deadlines
+        - generic [ref=e237]:
+          - generic [ref=e242]: aire / transaction-coordinator
+          - generic [ref=e243]:
+            - paragraph [ref=e244]: Transaction Coordinator
+            - paragraph [ref=e245]: Never miss a deadline again.
+            - generic [ref=e246]:
+              - generic [ref=e247]:
+                - generic [ref=e249]: saved per deal
+                - generic [ref=e250]: 47 min
+              - generic [ref=e251]:
+                - generic [ref=e253]: missed deadlines
+                - generic [ref=e254]: "0"
+            - generic [ref=e256]: View Details
+      - generic [ref=e258]:
+        - generic [ref=e259]:
+          - paragraph [ref=e261]: AirSign
+          - heading "Signatures in seconds, not days." [level=3] [ref=e262]
+          - paragraph [ref=e263]: Drop Dotloop. Upload a PDF, place fields, send a link. Your clients sign from their phone at the kitchen table. Sealed with a full audit trail.
+          - generic [ref=e264]:
+            - generic [ref=e265]:
+              - paragraph [ref=e266]: 8 sec
+              - paragraph [ref=e267]: to send
+            - generic [ref=e268]:
+              - paragraph [ref=e269]: 100%
+              - paragraph [ref=e270]: mobile ready
+        - generic [ref=e272]:
+          - generic [ref=e277]: aire / airsign
+          - generic [ref=e278]:
+            - paragraph [ref=e279]: AirSign
+            - paragraph [ref=e280]: Signatures in seconds, not days.
+            - generic [ref=e281]:
+              - generic [ref=e282]:
+                - generic [ref=e284]: to send
+                - generic [ref=e285]: 8 sec
+              - generic [ref=e286]:
+                - generic [ref=e288]: mobile ready
+                - generic [ref=e289]: 100%
+            - generic [ref=e291]: View Details
+      - generic [ref=e293]:
+        - generic [ref=e294]:
+          - paragraph [ref=e296]: Morning Brief
+          - heading "Know everything before your first call." [level=3] [ref=e297]
+          - paragraph [ref=e298]: Three AI researchers work overnight — scanning your deadlines, flagging unanswered emails, and surfacing new comps. Your full pipeline briefing lands at 7 AM.
+          - generic [ref=e299]:
+            - generic [ref=e300]:
+              - paragraph [ref=e301]: "3"
+              - paragraph [ref=e302]: AI researchers
+            - generic [ref=e303]:
+              - paragraph [ref=e304]: 7 AM
+              - paragraph [ref=e305]: on your desk
+        - generic [ref=e307]:
+          - generic [ref=e312]: aire / morning-brief
+          - generic [ref=e313]:
+            - paragraph [ref=e314]: Morning Brief
+            - paragraph [ref=e315]: Know everything before your first call.
+            - generic [ref=e316]:
+              - generic [ref=e317]:
+                - generic [ref=e319]: AI researchers
+                - generic [ref=e320]: "3"
+              - generic [ref=e321]:
+                - generic [ref=e323]: on your desk
+                - generic [ref=e324]: 7 AM
+            - generic [ref=e326]: View Details
+      - generic [ref=e328]:
+        - generic [ref=e329]:
+          - paragraph [ref=e331]: Voice Commands
+          - heading "Run your business from the driver's seat." [level=3] [ref=e332]
+          - paragraph [ref=e333]: "\"Create a transaction at 5834 Guice Drive.\" Speak it, and it's done — under 4 seconds. Built for agents who close deals between showings."
+          - generic [ref=e334]:
+            - generic [ref=e335]:
+              - paragraph [ref=e336]: <4s
+              - paragraph [ref=e337]: to action
+            - generic [ref=e338]:
+              - paragraph [ref=e339]: 30+
+              - paragraph [ref=e340]: voice commands
+        - generic [ref=e342]:
+          - generic [ref=e347]: aire / voice-commands
+          - generic [ref=e348]:
+            - paragraph [ref=e349]: Voice Commands
+            - paragraph [ref=e350]: Run your business from the driver's seat.
+            - generic [ref=e351]:
+              - generic [ref=e352]:
+                - generic [ref=e354]: to action
+                - generic [ref=e355]: <4s
+              - generic [ref=e356]:
+                - generic [ref=e358]: voice commands
+                - generic [ref=e359]: 30+
+            - generic [ref=e361]: View Details
+  - generic [ref=e363]:
+    - generic [ref=e364]:
+      - paragraph [ref=e365]: Free Tools
+      - heading "See real value before you sign up" [level=2] [ref=e366]
+      - paragraph [ref=e367]: Live Greater Baton Rouge data. No account needed. No strings.
+    - generic [ref=e368]:
+      - generic [ref=e369]:
+        - generic [ref=e371]: AVM
+        - heading "AIRE Estimate" [level=3] [ref=e372]
+        - paragraph [ref=e373]: Know what a property is actually worth before you write the offer.
+      - generic [ref=e374]:
+        - generic [ref=e376]: Data
+        - heading "Market Pulse" [level=3] [ref=e377]
+        - paragraph [ref=e378]: Live MLS data for Greater Baton Rouge — updated daily, not monthly.
+      - generic [ref=e379]:
+        - generic [ref=e381]: Risk
+        - heading "Flood Vision" [level=3] [ref=e382]
+        - paragraph [ref=e383]: Flood zone and insurance cost by parish. No more surprises at closing.
+      - generic [ref=e384]:
+        - generic [ref=e386]: Analysis
+        - heading "Deal DNA" [level=3] [ref=e387]
+        - paragraph [ref=e388]: Comps, price per square foot, and days on market — the full picture in one view.
+    - link "Explore all free tools →" [ref=e390] [cursor=pointer]:
+      - /url: /sign-up
+  - generic [ref=e393]:
+    - img "Caleb Jackson — REALTOR at Reve Realtors, Baton Rouge" [ref=e396]
+    - generic [ref=e398]:
+      - paragraph [ref=e399]: About
+      - heading "Caleb Jackson" [level=2] [ref=e400]
+      - paragraph [ref=e401]: REALTOR · Reve Realtors · Baton Rouge, Louisiana
+      - generic [ref=e402]:
+        - paragraph [ref=e403]: I closed 18 deals and $3.38M in Q1 2026 using the same tools every agent complains about — Dotloop, generic CMAs, spreadsheets for deadlines. So I built something better.
+        - paragraph [ref=e404]: Every feature in AIRE exists because I needed it at the closing table, on the phone with a lender, or reviewing my pipeline at 6 AM. This isn't a tech company guessing what agents need. This is what actually works.
+      - generic [ref=e405]:
+        - link "Book a 15-Minute Call" [ref=e406] [cursor=pointer]:
+          - /url: https://calendly.com/calebjackson
+        - link "Follow on Instagram" [ref=e407] [cursor=pointer]:
+          - /url: https://www.instagram.com/calebjackson_24/
+  - generic [ref=e410]:
+    - paragraph [ref=e411]: Get Started
+    - heading "Your next closing shouldn't keep you up at night." [level=2] [ref=e412]
+    - paragraph [ref=e413]: 14 days free. No credit card. Cancel anytime.
+    - generic [ref=e414]:
+      - link "Start Your Free Trial" [ref=e415] [cursor=pointer]:
+        - /url: /sign-up
+      - link "Talk to Caleb" [ref=e416] [cursor=pointer]:
+        - /url: https://calendly.com/calebjackson
+  - contentinfo [ref=e417]:
+    - generic [ref=e418]:
+      - generic [ref=e419]:
+        - generic [ref=e420]:
+          - generic [ref=e421]: AIRE
+          - paragraph [ref=e422]: The operating system for Louisiana real estate. Built by a REALTOR who closed $3.38M in Q1 2026.
+        - generic [ref=e423]:
+          - generic [ref=e424]:
+            - paragraph [ref=e425]: Navigate
+            - generic [ref=e426]:
+              - link "Platform" [ref=e427] [cursor=pointer]:
+                - /url: "#platform"
+              - link "Tools" [ref=e428] [cursor=pointer]:
+                - /url: "#tools"
+              - link "Pricing" [ref=e429] [cursor=pointer]:
+                - /url: "#pricing"
+              - link "About" [ref=e430] [cursor=pointer]:
+                - /url: "#about"
+              - link "Privacy" [ref=e431] [cursor=pointer]:
+                - /url: /privacy
+          - generic [ref=e432]:
+            - paragraph [ref=e433]: Connect
+            - generic [ref=e434]:
+              - link "Book a call" [ref=e435] [cursor=pointer]:
+                - /url: https://calendly.com/calebjackson
+              - link "Instagram" [ref=e436] [cursor=pointer]:
+                - /url: https://www.instagram.com/calebjackson_24/
+                - img [ref=e437]
+                - text: Instagram
+              - link "TikTok" [ref=e441] [cursor=pointer]:
+                - /url: https://www.tiktok.com/@calebjackson
+                - img [ref=e442]
+                - text: TikTok
+              - link "LinkedIn" [ref=e444] [cursor=pointer]:
+                - /url: https://www.linkedin.com/in/caleb-jackson-22b627270
+                - img [ref=e445]
+                - text: LinkedIn
+              - link "X / Twitter" [ref=e449] [cursor=pointer]:
+                - /url: https://x.com/calebjackson24
+                - img [ref=e450]
+                - text: X / Twitter
+      - generic [ref=e453]:
+        - generic [ref=e454]: © 2026 AIRE Intelligence. Baton Rouge, Louisiana.
+        - generic [ref=e455]: Caleb Jackson · Reve REALTORS
+  - button "Scroll to top":
+    - img
+  - alert [ref=e456]

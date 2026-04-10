@@ -1,0 +1,5 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - paragraph [ref=e4]: AIRE Intelligence
+    - heading "Sign in to AIRE" [level=1] [ref=e5]
+  - alert [ref=e6]

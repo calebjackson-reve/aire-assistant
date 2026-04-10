@@ -1,0 +1,151 @@
+[     629ms] [WARNING] iso_swr: SSR fetch failed for "/v1/dashboard/projects/aire-assistant?teamId=calebjackson-9984s-projects" {error: iso_swr_fetch_error, message: The request is missing an authentication token} @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:622
+[     633ms] [WARNING] iso_swr: SSR fetch failed for "/api/v8/projects?includePermissions=false&latestDeployments=0&limit=10&search=&slug=calebjackson-9984s-projects" {error: iso_swr_fetch_error, message: The request is missing an authentication token} @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:622
+[     633ms] [WARNING] iso_swr: SSR fetch failed for "/api/v2/teams/calebjackson-9984s-projects" {error: iso_swr_fetch_error, message: The request is missing an authentication token} @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:622
+[     692ms] [WARNING] iso_swr: SSR fetch failed for "/api/v6/deployments?limit=10&projectId=aire-assistant&rollbackCandidate=true&teamId=calebjackson-9984s-projects" {error: iso_swr_fetch_error, message: The request is missing an authentication token} @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:701
+[     698ms] [WARNING] iso_swr: SSR fetch failed for "/api/v9/projects/aire-assistant?activeBranches=1&latestDeployments=1&rollbackInfo=true&teamId=calebjackson-9984s-projects" {error: iso_swr_fetch_error, message: The request is missing an authentication token} @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:780
+[     712ms] [WARNING] iso_swr: SSR fetch failed for "/dashboard/projects/aire-assistant/production-checklist?teamId=calebjackson-9984s-projects" {error: iso_swr_fetch_error, message: The request is missing an authentication token} @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:870
+[     713ms] [WARNING] iso_swr: SSR fetch failed for "/api/v6/deployments?limit=10&projectId=aire-assistant&state=INITIALIZING%2CREADY%2CERROR%2CBUILDING%2CQUEUED&target=preview&teamId=calebjackson-9984s-projects" {error: iso_swr_fetch_error, message: The request is missing an authentication token} @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:870
+[    1293ms] [LOG] %c
+▲
+
+    ________   _ __ _          ____           __
+   /  _/ __/  (_) /( )_____   / __/___ ______/ /_
+   / // /_   / / __/// ___/  / /_/ __ `/ ___/ __/
+ _/ // __/  / / /_  (__  )  / __/ /_/ (__  ) /_
+/___/_/    /_/\__/ /____/  /_/  \__,_/____/\__/
+    _ __ _                         _    __                    __
+   (_) /( )_____   ____  ____     | |  / /__  _____________  / /
+  / / __/// ___/  / __ \/ __ \    | | / / _ \/ ___/ ___/ _ \/ /
+ / / /_  (__  )  / /_/ / / / /    | |/ /  __/ /  / /__/  __/ /
+/_/\__/ /____/   \____/_/ /_/     |___/\___/_/   \___/\___/_/
+  
+
+Hello!
+
+- Open Source https://vercel.com/oss
+- Careers https://vercel.com/careers
+- Status https://vercel-status.com
+
+ font-family: "Geist Mono", monospace; white-space: pre; line-height: 1; @ https://vercel.com/_next/static/chunks/0xh9bq0sly8ew.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:72
+[    2731ms] [WARNING] iso_swr[warn] [client] fallback error for key: "/api/v2/teams/calebjackson-9984s-projects" {error: iso_swr_fetch_error, message: The request is missing an authentication token} @ https://vercel.com/_next/static/chunks/0nskexh7snw8r.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:2
+[    3423ms] [WARNING] iso_swr[warn] [client] fallback error for key: "/v1/dashboard/projects/aire-assistant?teamId=calebjackson-9984s-projects" {error: iso_swr_fetch_error, message: The request is missing an authentication token} @ https://vercel.com/_next/static/chunks/0nskexh7snw8r.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:2
+[    4541ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://vercel.com/api/v1/dashboard/projects/aire-assistant?teamId=calebjackson-9984s-projects:0
+[    4541ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://vercel.com/api/jwt:0
+[    4542ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://vercel.com/api/v1/notifications/push:0
+[    4548ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://vercel.com/api/dashboard/projects/aire-assistant/activity?teamId=calebjackson-9984s-projects:0
+[    4764ms] [LOG] Ignored request error TypeError: Failed to fetch @ https://vercel.com/_next/static/chunks/3wirxut299xxc.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:4
+[    4782ms] [LOG] Ignored request error TypeError: A network error has occurred. Please check your connection and try again.
+    at b (https://vercel.com/_next/static/chunks/3x72h3ai9hvk9.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:2:18711)
+    at async revalidateIfStale (https://vercel.com/_next/static/chunks/246f25j1cpr_5.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:3:79866)
+    at async https://vercel.com/_next/static/chunks/0801yjspqfcg7.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:2:11862 @ https://vercel.com/_next/static/chunks/3wirxut299xxc.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:4
+[    4976ms] [LOG] %c
+▲
+
+    ____                               _ __
+   / __ \________  ____ _____ ___     (_) /_
+  / / / / ___/ _ \/ __ `/ __ `__ \   / / __/
+ / /_/ / /  /  __/ /_/ / / / / / /  / / /__
+/_____/_/   \___/\__,_/_/ /_/ /_/  /_/\__( )
+   _____ __    _          _ __           |/
+  / ___// /_  (_)___     (_) /_
+  \__ \/ __ \/ / __ \   / / __/
+ ___/ / / / / / /_/ /  / / /_
+/____/_/ /_/_/ .___/  /_/\__/
+            /_/
+  
+
+Hello!
+
+- Open Source https://vercel.com/oss
+- Careers https://vercel.com/careers
+- Status https://vercel-status.com
+
+ font-family: "Geist Mono", monospace; white-space: pre; line-height: 1; @ https://vercel.com/_next/static/chunks/0xh9bq0sly8ew.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:72
+[    5765ms] [WARNING] [GSI_LOGGER]: Your client application uses one of the Google One Tap prompt UI status methods that may stop functioning when FedCM becomes mandatory. Refer to the migration guide to update your code accordingly and opt-in to FedCM to test your changes. Learn more: https://developers.google.com/identity/gsi/web/guides/fedcm-migration?s=dc#display_moment and https://developers.google.com/identity/gsi/web/guides/fedcm-migration?s=dc#skipped_moment @ https://accounts.google.com/gsi/client:84
+[    5797ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://vercel.com/api/jwt:0
+[    6097ms] [WARNING] Deprecated API for given entry type. @ https://vercel.com/_next/static/chunks/1l6s1qr1y1hev.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:18
+[    9286ms] [WARNING] The resource https://vercel.com/_next/static/media/ebay-dark.34mho2a18qqlt.svg?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fcalebjackson-9984s-projects%2Faire-assistant:0
+[    9286ms] [WARNING] The resource https://vercel.com/_next/static/chunks/1zu4it92_-znk.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fcalebjackson-9984s-projects%2Faire-assistant:0
+[    9286ms] [WARNING] The resource https://vercel.com/_next/static/chunks/1r_md_pa5drig.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fcalebjackson-9984s-projects%2Faire-assistant:0
+[    9286ms] [WARNING] The resource https://vercel.com/_next/static/media/stripe-dark.16ozjth2vgb_3.svg?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fcalebjackson-9984s-projects%2Faire-assistant:0
+[    9286ms] [WARNING] The resource https://vercel.com/_next/static/media/stripe-light.2l_1jctpe6k_4.svg?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fcalebjackson-9984s-projects%2Faire-assistant:0
+[    9286ms] [WARNING] The resource https://vercel.com/_next/static/chunks/02r66pg8nyt75.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fcalebjackson-9984s-projects%2Faire-assistant:0
+[    9286ms] [WARNING] The resource https://vercel.com/_next/static/media/ebay-light.3ft_ki8203ov0.svg?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fcalebjackson-9984s-projects%2Faire-assistant:0
+[    9286ms] [WARNING] The resource https://vercel.com/_next/static/media/adobe-light.406_7oryl71va.svg?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fcalebjackson-9984s-projects%2Faire-assistant:0
+[   22204ms] [WARNING] The resource https://vercel.com/_next/static/media/ebay-dark.34mho2a18qqlt.svg?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fcalebjackson-9984s-projects%2Faire-assistant:0
+[   22204ms] [WARNING] The resource https://vercel.com/_next/static/chunks/1zu4it92_-znk.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fcalebjackson-9984s-projects%2Faire-assistant:0
+[   22204ms] [WARNING] The resource https://vercel.com/_next/static/chunks/1r_md_pa5drig.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fcalebjackson-9984s-projects%2Faire-assistant:0
+[   22204ms] [WARNING] The resource https://vercel.com/_next/static/media/stripe-dark.16ozjth2vgb_3.svg?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fcalebjackson-9984s-projects%2Faire-assistant:0
+[   22204ms] [WARNING] The resource https://vercel.com/_next/static/media/stripe-light.2l_1jctpe6k_4.svg?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fcalebjackson-9984s-projects%2Faire-assistant:0
+[   22204ms] [WARNING] The resource https://vercel.com/_next/static/chunks/02r66pg8nyt75.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fcalebjackson-9984s-projects%2Faire-assistant:0
+[   22204ms] [WARNING] The resource https://vercel.com/_next/static/media/ebay-light.3ft_ki8203ov0.svg?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fcalebjackson-9984s-projects%2Faire-assistant:0
+[   22204ms] [WARNING] The resource https://vercel.com/_next/static/media/adobe-light.406_7oryl71va.svg?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/login?next=%2Fcalebjackson-9984s-projects%2Faire-assistant:0
+[   66365ms] [ERROR] The request has been aborted. @ https://vercel.com/login?next=%2Fcalebjackson-9984s-projects%2Faire-assistant:0
+[   66380ms] [ERROR] [GSI_LOGGER]: FedCM get() rejects with AbortError: signal is aborted without reason @ https://vercel.com/_next/static/chunks/0nskexh7snw8r.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:2
+[   68830ms] [LOG] %c
+▲
+
+  ________            ___    ____   ________                __
+ /_  __/ /_  ___     /   |  /  _/  / ____/ /___  __  ______/ /
+  / / / __ \/ _ \   / /| |  / /   / /   / / __ \/ / / / __  /
+ / / / / / /  __/  / ___ |_/ /   / /___/ / /_/ / /_/ / /_/ /
+/_/ /_/ /_/\___/  /_/  |_/___/   \____/_/\____/\__,_/\__,_/
+  
+
+Hello!
+
+- Open Source https://vercel.com/oss
+- Careers https://vercel.com/careers
+- Status https://vercel-status.com
+
+ font-family: "Geist Mono", monospace; white-space: pre; line-height: 1; @ https://vercel.com/_next/static/chunks/2t65cewca2u6e.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:72
+[   69210ms] [WARNING] Deprecated API for given entry type. @ https://vercel.com/_next/static/chunks/303n0plsd3gkr.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:18
+[   69304ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://vercel.com/api/jwt:0
+[   70373ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://vercel.com/_next/data/build-TfctsWXpff2fKS/calebjackson-9984s-projects/aire-assistant.json:0
+[   71402ms] [LOG] %c
+▲
+
+  ________            ___    ____   ________                __
+ /_  __/ /_  ___     /   |  /  _/  / ____/ /___  __  ______/ /
+  / / / __ \/ _ \   / /| |  / /   / /   / / __ \/ / / / __  /
+ / / / / / /  __/  / ___ |_/ /   / /___/ / /_/ / /_/ / /_/ /
+/_/ /_/ /_/\___/  /_/  |_/___/   \____/_/\____/\__,_/\__,_/
+  
+
+Hello!
+
+- Open Source https://vercel.com/oss
+- Careers https://vercel.com/careers
+- Status https://vercel-status.com
+
+ font-family: "Geist Mono", monospace; white-space: pre; line-height: 1; @ https://vercel.com/_next/static/chunks/0xh9bq0sly8ew.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:72
+[   73582ms] Error: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at r1 (https://vercel.com/_next/static/chunks/0xh9bq0sly8ew.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:73:44334)
+    at iE (https://vercel.com/_next/static/chunks/0xh9bq0sly8ew.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:73:98346)
+    at sV (https://vercel.com/_next/static/chunks/0xh9bq0sly8ew.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:73:139277)
+    at https://vercel.com/_next/static/chunks/0xh9bq0sly8ew.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:73:139122
+    at sB (https://vercel.com/_next/static/chunks/0xh9bq0sly8ew.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:73:139130)
+    at sO (https://vercel.com/_next/static/chunks/0xh9bq0sly8ew.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:73:134187)
+    at cm (https://vercel.com/_next/static/chunks/0xh9bq0sly8ew.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:73:168911)
+    at cs (https://vercel.com/_next/static/chunks/0xh9bq0sly8ew.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:73:166814)
+    at s4 (https://vercel.com/_next/static/chunks/0xh9bq0sly8ew.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:73:164959)
+    at https://vercel.com/_next/static/chunks/0xh9bq0sly8ew.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:73:156156
+[   77166ms] [WARNING] Deprecated API for given entry type. @ https://vercel.com/_next/static/chunks/1l6s1qr1y1hev.js?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf:18
+[   78547ms] [WARNING] The resource https://vercel.com/_next/static/chunks/1zu4it92_-znk.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:0
+[   78547ms] [WARNING] The resource https://vercel.com/_next/static/chunks/1r_md_pa5drig.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:0
+[   78547ms] [WARNING] The resource https://vercel.com/_next/static/chunks/15z6hqmqioxmw.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:0
+[   78547ms] [WARNING] The resource https://vercel.com/_next/static/chunks/02r66pg8nyt75.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:0
+[   78547ms] [WARNING] The resource https://vercel.com/_next/static/chunks/2e1o-5r8yh1-c.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:0
+[   78547ms] [WARNING] The resource https://vercel.com/_next/static/chunks/0nibh5ij53fts.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:0
+[   78547ms] [WARNING] The resource https://vercel.com/_next/static/chunks/25nnd13fh_4k5.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:0
+[   78547ms] [WARNING] The resource https://vercel.com/_next/static/chunks/09fd2re-f94a3.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:0
+[   78547ms] [WARNING] The resource https://vercel.com/_next/static/chunks/3trafgdyw6a92.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:0
+[  156984ms] [WARNING] The resource https://vercel.com/_next/static/chunks/1zu4it92_-znk.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:0
+[  156984ms] [WARNING] The resource https://vercel.com/_next/static/chunks/1r_md_pa5drig.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:0
+[  156984ms] [WARNING] The resource https://vercel.com/_next/static/chunks/15z6hqmqioxmw.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:0
+[  156984ms] [WARNING] The resource https://vercel.com/_next/static/chunks/02r66pg8nyt75.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:0
+[  156984ms] [WARNING] The resource https://vercel.com/_next/static/chunks/2e1o-5r8yh1-c.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:0
+[  156984ms] [WARNING] The resource https://vercel.com/_next/static/chunks/0nibh5ij53fts.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:0
+[  156984ms] [WARNING] The resource https://vercel.com/_next/static/chunks/25nnd13fh_4k5.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:0
+[  156984ms] [WARNING] The resource https://vercel.com/_next/static/chunks/09fd2re-f94a3.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:0
+[  156984ms] [WARNING] The resource https://vercel.com/_next/static/chunks/3trafgdyw6a92.css?dpl=dpl_8ueNQZrbWSnvfGLyCJHJBn33shvf was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://vercel.com/calebjackson-9984s-projects/aire-assistant:0

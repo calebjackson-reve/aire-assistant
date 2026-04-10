@@ -1,0 +1,6 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - paragraph [ref=e4]: AIRE Intelligence
+    - heading "Create your AIRE account" [level=1] [ref=e5]
+    - paragraph [ref=e6]: Start free. No credit card required.
+  - alert [ref=e7]

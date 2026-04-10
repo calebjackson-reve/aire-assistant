@@ -88,7 +88,7 @@ export async function GET(req: NextRequest) {
     // 3. Upcoming closings (excitement post)
     const upcomingClosings = await prisma.transaction.findMany({
       where: {
-        status: "UNDER_CONTRACT",
+        status: "CLOSING",
         closingDate: {
           gte: now,
           lte: new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000),
