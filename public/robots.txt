@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /aire/
+Disallow: /airsign/
+Disallow: /sign/
+Disallow: /onboarding
+Disallow: /billing
+
+Sitemap: https://aireintel.org/sitemap.xml
