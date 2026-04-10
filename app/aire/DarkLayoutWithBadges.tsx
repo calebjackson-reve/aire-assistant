@@ -2,6 +2,7 @@
 
 import { DarkLayout } from "@/components/layouts/DarkLayout"
 import { PageTransition } from "@/components/ui/PageTransition"
+import { AireChat } from "@/components/AireChat"
 
 export function DarkLayoutWithBadges({
   children,
@@ -15,6 +16,7 @@ export function DarkLayoutWithBadges({
   return (
     <DarkLayout activeCount={activeCount} overdueCount={overdueCount}>
       <PageTransition>{children}</PageTransition>
+      <AireChat />
     </DarkLayout>
   )
 }
