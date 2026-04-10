@@ -54,10 +54,10 @@ export default async function AirePage() {
       {/* Header */}
       <div className="flex items-start justify-between mb-8">
         <div>
-          <p className="font-mono text-[10px] text-cream-dim/50 tracking-[0.2em] uppercase">{dateStr}</p>
-          <h1 className="font-[family-name:var(--font-cormorant)] italic text-cream text-2xl sm:text-3xl mt-1 font-light">
+          <h1 className="font-[family-name:var(--font-cormorant)] italic text-[#1e2416] text-3xl sm:text-4xl font-light leading-tight">
             {timeGreeting}, {firstName}.
           </h1>
+          <p className="font-[family-name:var(--font-ibm-mono)] text-[10px] text-[#9a9a90] tracking-[0.2em] uppercase mt-2">{dateStr}</p>
           {urgentCount > 0 && (
             <p className="text-[#c45c5c] text-sm mt-2 flex items-center gap-2">
               <span className="relative flex h-2 w-2">
@@ -69,8 +69,8 @@ export default async function AirePage() {
           )}
         </div>
         <div className="text-right shrink-0 ml-4">
-          <p className="font-mono text-[10px] text-cream-dim/40 tracking-wider uppercase">Pipeline</p>
-          <p className="font-mono text-2xl sm:text-3xl text-cream font-light tracking-tight mt-0.5">
+          <p className="font-[family-name:var(--font-ibm-mono)] text-[10px] text-[#9a9a90] tracking-wider uppercase">Pipeline</p>
+          <p className="font-[family-name:var(--font-ibm-mono)] text-2xl sm:text-3xl text-[#1e2416] font-light tracking-tight mt-0.5">
             ${pipelineValue >= 1_000_000
               ? `${(pipelineValue / 1_000_000).toFixed(2)}M`
               : `${(pipelineValue / 1000).toFixed(0)}K`}
@@ -95,25 +95,25 @@ export default async function AirePage() {
 
       {/* Welcome card for first-time users */}
       {user.transactions.length === 0 && (
-        <div className="border border-brown-border rounded-xl p-6 mb-6">
-          <h3 className="font-[family-name:var(--font-cormorant)] italic text-cream text-xl mb-2">
+        <div className="bg-white border border-[#6b7d52]/15 rounded-xl p-6 mb-6">
+          <h3 className="font-[family-name:var(--font-cormorant)] italic text-[#1e2416] text-xl mb-2">
             Welcome to AIRE, {firstName}
           </h3>
-          <p className="text-cream-dim text-sm mb-4">
+          <p className="text-[#6a6a60] text-sm mb-4">
             Here&apos;s how to get started in the next 5 minutes:
           </p>
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <span className="w-6 h-6 rounded-full bg-copper/20 text-copper text-xs flex items-center justify-center font-medium">1</span>
-              <span className="text-cream text-sm">Create your first transaction</span>
+              <span className="w-6 h-6 rounded-full bg-[#6b7d52]/15 text-[#6b7d52] text-xs flex items-center justify-center font-medium">1</span>
+              <span className="text-[#1e2416] text-sm">Create your first transaction</span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="w-6 h-6 rounded-full bg-copper/20 text-copper text-xs flex items-center justify-center font-medium">2</span>
-              <span className="text-cream text-sm">Upload a document to auto-classify it</span>
+              <span className="w-6 h-6 rounded-full bg-[#6b7d52]/15 text-[#6b7d52] text-xs flex items-center justify-center font-medium">2</span>
+              <span className="text-[#1e2416] text-sm">Upload a document to auto-classify it</span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="w-6 h-6 rounded-full bg-copper/20 text-copper text-xs flex items-center justify-center font-medium">3</span>
-              <span className="text-cream text-sm">Try a voice command: &quot;Show my pipeline&quot;</span>
+              <span className="w-6 h-6 rounded-full bg-[#6b7d52]/15 text-[#6b7d52] text-xs flex items-center justify-center font-medium">3</span>
+              <span className="text-[#1e2416] text-sm">Try a voice command: &quot;Show my pipeline&quot;</span>
             </div>
           </div>
         </div>
@@ -126,30 +126,33 @@ export default async function AirePage() {
           {/* Morning brief */}
           {brief && (
             <Link href="/aire/morning-brief" className="block group">
-              <div className="bg-forest-card border border-brown-border rounded-xl p-5 hover:border-warm/25 transition-colors">
+              <div className="bg-[#f5f2ea] border border-[#d4c8b8]/50 rounded-xl p-5 hover:border-[#6b7d52]/30 transition-all duration-200 hover:shadow-sm">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2.5">
                     <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-warm opacity-50" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-warm" />
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#6b7d52] opacity-50" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#6b7d52]" />
                     </span>
-                    <span className="font-mono text-[10px] text-cream-dim/60 tracking-[0.15em] uppercase">
+                    <span className="font-mono text-[10px] text-[#9a9a90] tracking-[0.15em] uppercase">
                       Morning Brief
                     </span>
                   </div>
                   <span className={`font-mono text-[10px] px-2 py-0.5 rounded-full ${
                     brief.status === "pending"
-                      ? "bg-[#d4944c]/15 text-[#d4944c]"
-                      : "bg-warm/10 text-warm/60"
+                      ? "bg-[#E8B44C]/15 text-[#E8B44C]"
+                      : "bg-[#6b7d52]/10 text-[#6b7d52]/60"
                   }`}>
                     {brief.status}
                   </span>
                 </div>
-                <p className="text-cream/70 text-sm leading-relaxed line-clamp-3">
+                <h3 className="font-[family-name:var(--font-cormorant)] italic text-[#1e2416] text-lg leading-snug mb-1">
+                  Today&apos;s Intelligence
+                </h3>
+                <p className="text-[#6a6a60] text-sm leading-relaxed line-clamp-3">
                   {brief.summary || "Brief ready for review."}
                 </p>
-                <p className="text-warm text-xs mt-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                  Read full brief
+                <p className="text-[#6b7d52] text-xs mt-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                  Read full brief &rarr;
                 </p>
               </div>
             </Link>
@@ -157,8 +160,8 @@ export default async function AirePage() {
 
           {/* Urgent deadlines */}
           {allUrgentDeadlines.length > 0 && (
-            <div className="bg-forest-card border border-brown-border rounded-xl p-5">
-              <p className="font-mono text-[10px] text-cream-dim/50 tracking-[0.15em] uppercase mb-4">
+            <div className="bg-white border border-[#6b7d52]/15 rounded-xl p-5">
+              <p className="font-mono text-[10px] text-[#9a9a90] tracking-[0.15em] uppercase mb-4">
                 Upcoming Deadlines
               </p>
               <div className="space-y-3">
@@ -170,15 +173,15 @@ export default async function AirePage() {
                     <div key={i} className="flex items-start gap-3 group/item">
                       <div className="shrink-0 mt-1.5">
                         <span className={`w-2 h-2 rounded-full block ${
-                          isOverdue ? "bg-[#c45c5c]" : isToday ? "bg-[#d4944c]" : "bg-warm"
+                          isOverdue ? "bg-[#D45B5B]" : isToday ? "bg-[#E8B44C]" : "bg-[#6b7d52]"
                         }`} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-cream text-sm truncate">{d.name}</p>
-                        <p className="text-cream-dim/40 text-xs truncate">{d.address}</p>
+                        <p className="text-[#1e2416] text-sm truncate">{d.name}</p>
+                        <p className="text-[#9a9a90] text-xs truncate">{d.address}</p>
                       </div>
                       <span className={`font-mono text-[11px] shrink-0 ${
-                        isOverdue ? "text-[#c45c5c]" : isToday ? "text-[#d4944c]" : "text-cream-dim/50"
+                        isOverdue ? "text-[#D45B5B]" : isToday ? "text-[#E8B44C]" : "text-[#9a9a90]"
                       }`}>
                         {isOverdue ? "Overdue" : isToday ? "Today" : due.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                       </span>
@@ -191,9 +194,9 @@ export default async function AirePage() {
 
           {/* No deadlines? Show system status */}
           {allUrgentDeadlines.length === 0 && (
-            <div className="bg-forest-card border border-brown-border rounded-xl p-5 text-center">
-              <p className="text-warm/60 text-sm">No urgent deadlines</p>
-              <p className="text-cream-dim/30 text-xs mt-1">All clear for the next 3 days</p>
+            <div className="bg-white border border-[#6b7d52]/15 rounded-xl p-5 text-center">
+              <p className="text-[#6a6a60] text-sm">No urgent deadlines</p>
+              <p className="text-[#9a9a90] text-xs mt-1">All clear for the next 3 days</p>
             </div>
           )}
         </div>
@@ -201,26 +204,26 @@ export default async function AirePage() {
         {/* RIGHT COLUMN — Transactions */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-cream text-sm font-medium tracking-wide" style={{ fontFamily: "var(--font-body)", fontStyle: "normal" }}>
+            <h2 className="text-[#1e2416] text-sm font-medium tracking-wide" style={{ fontFamily: "var(--font-body)", fontStyle: "normal" }}>
               Active Transactions
             </h2>
-            <Link href="/aire/transactions" className="font-mono text-[10px] text-warm/60 tracking-wider uppercase hover:text-warm transition-colors">
+            <Link href="/aire/transactions" className="font-mono text-[10px] text-[#6b7d52]/60 tracking-wider uppercase hover:text-[#6b7d52] transition-colors">
               View all
             </Link>
           </div>
 
           {user.transactions.length === 0 ? (
-            <div className="bg-forest-card border border-brown-border rounded-xl p-12 text-center">
-              <div className="w-12 h-12 rounded-full bg-warm/10 flex items-center justify-center mx-auto mb-4">
-                <svg className="w-5 h-5 text-warm/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <div className="bg-white border border-[#6b7d52]/15 rounded-xl p-12 text-center">
+              <div className="w-12 h-12 rounded-full bg-[#9aab7e]/10 flex items-center justify-center mx-auto mb-4">
+                <svg className="w-5 h-5 text-[#6b7d52]/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
                 </svg>
               </div>
-              <p className="text-cream/60 text-sm mb-1">No active transactions</p>
-              <p className="text-cream-dim/30 text-xs">Create your first deal to get started</p>
+              <p className="text-[#6a6a60] text-sm mb-1">No active transactions</p>
+              <p className="text-[#9a9a90] text-xs">Create your first deal to get started</p>
               <Link
                 href="/aire/transactions/new"
-                className="inline-block mt-5 bg-warm/15 text-warm text-xs font-medium px-4 py-2 rounded-lg hover:bg-warm/25 transition-colors"
+                className="inline-block mt-5 bg-[#6b7d52]/15 text-[#6b7d52] text-xs font-medium px-4 py-2 rounded-lg hover:bg-[#6b7d52]/25 transition-all duration-200"
               >
                 + New Transaction
               </Link>
@@ -232,41 +235,42 @@ export default async function AirePage() {
                 const daysToClose = txn.closingDate
                   ? Math.ceil((new Date(txn.closingDate).getTime() - Date.now()) / 86400000)
                   : null
+                const borderClass = urgent.length > 0 ? "txn-border-overdue" : (txn.status === "PENDING_INSPECTION" || txn.status === "PENDING_APPRAISAL" || txn.status === "PENDING_FINANCING") ? "txn-border-pending" : "txn-border-active"
 
                 return (
                   <Link
                     key={txn.id}
                     href={`/aire/transactions/${txn.id}`}
-                    className="block bg-forest-card border border-brown-border rounded-xl p-4 hover:border-warm/20 hover:bg-forest-card/80 transition-colors group/txn"
+                    className={`block bg-white border border-[#6b7d52]/15 rounded-xl p-4 hover:border-[#6b7d52]/30 hover:shadow-sm transition-all duration-200 group/txn ${borderClass}`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="text-cream text-sm font-medium truncate group-hover/txn:text-warm transition-colors">
+                          <p className="text-[#1e2416] text-sm font-medium truncate group-hover/txn:text-[#6b7d52] transition-colors">
                             {txn.propertyAddress}
                           </p>
                           {urgent.length > 0 && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#c45c5c]/15 text-[#c45c5c] shrink-0 font-mono">
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#D45B5B]/15 text-[#D45B5B] shrink-0 font-mono">
                               {urgent.length} due
                             </span>
                           )}
                         </div>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="text-cream-dim/40 text-xs">
+                          <span className="text-[#9a9a90] text-xs">
                             {txn.buyerName || txn.sellerName || "\u2014"}
                           </span>
-                          <span className="text-cream-dim/15 text-xs">&middot;</span>
-                          <span className="font-mono text-[10px] text-cream-dim/30 uppercase tracking-wider">
+                          <span className="text-[#d4c8b8] text-xs">&middot;</span>
+                          <span className="font-mono text-[10px] text-[#9a9a90] uppercase tracking-wider">
                             {txn.status.replace(/_/g, " ").toLowerCase()}
                           </span>
                         </div>
                       </div>
                       <div className="text-right shrink-0 ml-4">
-                        <p className="font-mono text-sm text-cream">
+                        <p className="font-mono text-sm text-[#1e2416]">
                           {txn.acceptedPrice ? `$${(txn.acceptedPrice / 1000).toFixed(0)}K` : "TBD"}
                         </p>
                         {daysToClose !== null && daysToClose >= 0 && (
-                          <p className="font-mono text-[10px] text-cream-dim/30 mt-0.5">{daysToClose}d to close</p>
+                          <p className="font-mono text-[10px] text-[#9a9a90] mt-0.5">{daysToClose}d to close</p>
                         )}
                       </div>
                     </div>
@@ -283,26 +287,26 @@ export default async function AirePage() {
 
 function StatCard({ label, value, highlight, icon }: { label: string; value: string; highlight?: boolean; icon: string }) {
   return (
-    <div className="bg-forest-card border border-brown-border rounded-xl p-4 hover:border-warm/15 transition-colors">
+    <div className="bg-white border border-[#6b7d52]/15 rounded-xl p-4 stat-card-hover">
       <div className="flex items-center gap-2 mb-2">
         {icon === "folder" && (
-          <svg className="w-3.5 h-3.5 text-warm/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg className="w-3.5 h-3.5 text-[#6b7d52]/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
           </svg>
         )}
         {icon === "alert" && (
-          <svg className="w-3.5 h-3.5 text-warm/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg className="w-3.5 h-3.5 text-[#6b7d52]/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
         )}
         {icon === "dollar" && (
-          <svg className="w-3.5 h-3.5 text-warm/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg className="w-3.5 h-3.5 text-[#6b7d52]/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
           </svg>
         )}
-        <p className="font-mono text-[10px] text-cream-dim/40 tracking-wider uppercase">{label}</p>
+        <p className="font-mono text-[10px] text-[#9a9a90] tracking-wider uppercase">{label}</p>
       </div>
-      <p className={`font-mono text-2xl font-light tracking-tight ${highlight ? "text-[#c45c5c]" : "text-cream"}`}>
+      <p className={`font-mono text-2xl font-light tracking-tight ${highlight ? "text-[#D45B5B]" : "text-[#1e2416]"}`}>
         {value}
       </p>
     </div>
@@ -313,10 +317,10 @@ function QuickAction({ href, label, shortcut }: { href: string; label: string; s
   return (
     <Link
       href={href}
-      className="group bg-forest-card border border-brown-border rounded-xl p-3 text-center hover:border-warm/25 hover:bg-forest-card/80 transition-colors"
+      className="group bg-white border border-[#6b7d52]/15 rounded-xl p-3 text-center hover:border-[#6b7d52]/30 hover:shadow-sm transition-all duration-200"
     >
-      <p className="text-cream/80 text-xs font-medium group-hover:text-warm transition-colors">{label}</p>
-      <p className="font-mono text-[9px] text-cream-dim/25 mt-0.5 tracking-wider">{shortcut}</p>
+      <p className="text-[#1e2416]/80 text-xs font-medium group-hover:text-[#6b7d52] transition-colors">{label}</p>
+      <p className="font-mono text-[9px] text-[#9a9a90] mt-0.5 tracking-wider">{shortcut}</p>
     </Link>
   )
 }

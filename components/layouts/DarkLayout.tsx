@@ -105,11 +105,11 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
   return (
     <div className="min-h-screen flex bg-[#f5f2ea]">
       {/* ── Sidebar ── */}
-      <aside className="hidden md:flex flex-col w-[240px] fixed inset-y-0 left-0 z-40 bg-white border-r border-[#d4c8b8]/40">
+      <aside className="hidden md:flex flex-col w-[240px] fixed inset-y-0 left-0 z-40 border-r border-[#d4c8b8]/40" style={{ background: 'linear-gradient(to bottom, #ffffff, #f5f2ea)' }}>
         {/* Logo */}
         <div className="h-16 flex items-center px-5 border-b border-[#d4c8b8]/20">
           <Link href="/aire" className="flex items-center gap-3 no-underline group">
-            <div className="w-8 h-8 rounded-lg bg-[#6b7d52] flex items-center justify-center font-display text-sm italic text-[#f5f2ea] group-hover:bg-[#5a6c44] transition-colors">
+            <div className="w-9 h-9 rounded-lg bg-[#6b7d52] flex items-center justify-center font-display text-sm italic text-[#f5f2ea] group-hover:bg-[#5a6c44] transition-colors" style={{ boxShadow: '0 2px 8px rgba(107, 125, 82, 0.3)' }}>
               A
             </div>
             <div>
@@ -121,6 +121,7 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
 
         {/* Primary nav */}
         <nav className="flex-1 py-3 px-3 space-y-0.5 overflow-y-auto">
+          <span className="px-3 text-[10px] font-mono uppercase tracking-wider text-[#9a9a90] mb-1 block">Core</span>
           {NAV_ITEMS.map((item) => {
             const isActive =
               item.href === "/aire"
@@ -136,7 +137,7 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
                 href={item.href}
                 className={`nav-link-hover relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] no-underline transition-all duration-200 ${
                   isActive
-                    ? "bg-[#9aab7e]/15 text-[#1e2416] font-medium nav-link-active"
+                    ? "bg-[#9aab7e]/15 text-[#1e2416] font-medium nav-link-active nav-active-glow"
                     : "text-[#6a6a60] hover:text-[#1e2416]"
                 }`}
               >
@@ -182,6 +183,7 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
 
         {/* Secondary — Settings, Back */}
         <div className="px-3 py-3 border-t border-[#d4c8b8]/20 space-y-0.5">
+          <span className="px-3 text-[10px] font-mono uppercase tracking-wider text-[#9a9a90] mb-1 block">System</span>
           {SECONDARY_ITEMS.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
             return (
@@ -239,7 +241,7 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
       </nav>
 
       {/* ── Mobile bottom tab bar ── */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-xl border-t border-[#d4c8b8]/30 pb-[env(safe-area-inset-bottom)]">
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/80 backdrop-blur-2xl border-t border-[#d4c8b8]/30 pb-[env(safe-area-inset-bottom)]">
         <div className="grid grid-cols-7 h-16">
           {NAV_ITEMS.map((item) => {
             const isActive =
@@ -261,7 +263,9 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
                 {isActive && (
                   <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[2px] rounded-b bg-[#6b7d52]" />
                 )}
-                <NavIcon name={item.icon} className="w-5 h-5" />
+                <span className={isActive ? "mobile-tab-active-icon" : "mobile-tab-icon"}>
+                  <NavIcon name={item.icon} className="w-5 h-5" />
+                </span>
                 <span className="text-[10px] tracking-wide">{item.label}</span>
                 {badge !== null && (
                   <span className={`absolute top-1 right-[22%] text-[9px] px-1 py-0.5 rounded-full min-w-[14px] text-center font-mono text-white ${

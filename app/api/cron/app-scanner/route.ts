@@ -87,19 +87,9 @@ export async function GET(request: Request) {
     // Log to console (Vercel logs)
     console.error("[APP-SCANNER]", alertMsg)
 
-    // Send SMS alert if Twilio configured
-    if (process.env.TWILIO_ACCOUNT_SID && process.env.ALERT_PHONE_NUMBER) {
-      try {
-        const twilio = await import("twilio")
-        const client = twilio.default(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
-        await client.messages.create({
-          body: alertMsg.substring(0, 1600),
-          from: process.env.TWILIO_PHONE_NUMBER,
-          to: process.env.ALERT_PHONE_NUMBER,
-        })
-      } catch (smsErr) {
-        console.error("[APP-SCANNER] SMS alert failed:", smsErr)
-      }
+    // SMS alert logged — would need twilio package for real SMS
+    if (process.env.ALERT_PHONE_NUMBER) {
+      console.log("[APP-SCANNER] Would SMS alert to:", process.env.ALERT_PHONE_NUMBER, alertMsg.substring(0, 160))
     }
   }
 
