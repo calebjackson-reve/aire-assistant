@@ -134,10 +134,10 @@ export function DarkLayout({ children, activeCount = 0, overdueCount = 0 }: { ch
               <Link
                 key={item.href}
                 href={item.href}
-                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] no-underline transition-all duration-200 ${
+                className={`nav-link-hover relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] no-underline transition-all duration-200 ${
                   isActive
-                    ? "bg-[#9aab7e]/15 text-[#1e2416] font-medium"
-                    : "text-[#6a6a60] hover:text-[#1e2416] hover:bg-[#9aab7e]/8"
+                    ? "bg-[#9aab7e]/15 text-[#1e2416] font-medium nav-link-active"
+                    : "text-[#6a6a60] hover:text-[#1e2416]"
                 }`}
               >
                 {isActive && (

@@ -403,3 +403,75 @@
 html {
   scroll-behavior: smooth;
 }
+
+/* ── Brand skeleton shimmer ──────────────── */
+
+@keyframes skeleton-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    30deg,
+    #f5f2ea 25%,
+    #e8e4d8 37%,
+    #f5f2ea 63%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease infinite;
+}
+
+/* ── Sidebar nav hover fill ──────────────── */
+
+.nav-link-hover {
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.nav-link-hover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: rgba(154, 171, 126, 0.08);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 200ms ease-out;
+}
+
+.nav-link-hover:hover::before {
+  transform: scaleX(1);
+}
+
+.nav-link-active {
+  box-shadow: 0 0 12px rgba(154, 171, 126, 0.12);
+}
+
+/* ── Enhanced button hover states ────────── */
+
+.btn-primary,
+.btn-pill-primary,
+.btn-sage,
+[data-btn-primary] {
+  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 200ms ease;
+}
+
+.btn-primary:hover,
+.btn-pill-primary:hover,
+.btn-sage:hover,
+[data-btn-primary]:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(30, 36, 22, 0.18);
+}
+
+.btn-primary:active,
+.btn-pill-primary:active,
+.btn-sage:active,
+[data-btn-primary]:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(30, 36, 22, 0.1);
+}

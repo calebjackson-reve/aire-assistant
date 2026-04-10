@@ -1,6 +1,7 @@
 "use client"
 
 import { DarkLayout } from "@/components/layouts/DarkLayout"
+import { PageTransition } from "@/components/ui/PageTransition"
 
 export function DarkLayoutWithBadges({
   children,
@@ -13,7 +14,7 @@ export function DarkLayoutWithBadges({
 }) {
   return (
     <DarkLayout activeCount={activeCount} overdueCount={overdueCount}>
-      {children}
+      <PageTransition>{children}</PageTransition>
     </DarkLayout>
   )
 }

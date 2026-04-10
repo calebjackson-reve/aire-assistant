@@ -231,9 +231,11 @@ export async function processDeadlineReminders(
 
     // SMS notification (dev mode -> console.log if Twilio not configured)
     const smsBody = formatDeadlineAlert(calc, dl.transaction.propertyAddress);
-    const smsResult = await sendSMS(user.email, smsBody);
+    // TODO: Add phone field to User model for real SMS delivery
+    // For now, skip SMS — user.email is not a valid phone number
+    const smsResult = { ok: false, error: "No phone number on User model" };
     notifications.push({
-      channel: process.env.TWILIO_ACCOUNT_SID ? "sms" : "console",
+      channel: "console",
       recipient: user.email,
       deadline: `${dl.name} (${days}d)`,
       propertyAddress: dl.transaction.propertyAddress,
