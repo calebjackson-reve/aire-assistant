@@ -9,6 +9,7 @@ import { PricingToggle } from "./components/landing/PricingToggle"
 import { EmailCaptureSection } from "./components/landing/EmailCaptureSection"
 import { DeviceMockup } from "./components/landing/DeviceMockup"
 import { LouisianaGlobe } from "./components/landing/LouisianaGlobe"
+import { WireframeGlobe } from "./components/landing/WireframeGlobe"
 
 const FEATURES = [
   {
@@ -83,11 +84,6 @@ export default function HomePage() {
         <div className="absolute inset-0 hero-mesh-gradient" />
         {/* Grain texture overlay */}
         <div className="absolute inset-0 grain-overlay-svg" />
-        {/* Louisiana Globe — subtle background element */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] md:w-[520px] opacity-[0.18] z-[1] pointer-events-none">
-          <LouisianaGlobe />
-        </div>
-
         {/* Top announcement bar */}
         <div className="absolute top-0 left-0 right-0 z-20 bg-[#3a4a28] text-center py-2.5">
           <p className="text-[#f4f1ec]/70 text-xs tracking-wide">
@@ -99,47 +95,89 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="relative z-10 container-aire text-center pt-28 pb-8 md:pt-32 md:pb-12">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#3a4a28]/20 border border-[#3a4a28]/15 rounded-full mb-8 animate-fade-up">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#5c6e2e]" />
-            <span className="text-[#3a4a28] text-xs font-medium">Built by a Louisiana REALTOR. For Louisiana REALTORS.</span>
+        {/* SVG filter for glass distortion effect */}
+        <svg style={{ display: "none" }}>
+          <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox">
+            <feTurbulence type="fractalNoise" baseFrequency="0.001 0.005" numOctaves="1" seed="17" result="turbulence" />
+            <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap" />
+            <feSpecularLighting in="softMap" surfaceScale="5" specularConstant="1" specularExponent="100" lightingColor="white" result="specLight">
+              <fePointLight x="-200" y="-200" z="300" />
+            </feSpecularLighting>
+            <feComposite in="specLight" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litImage" />
+            <feDisplacementMap in="SourceGraphic" in2="softMap" scale="200" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+        </svg>
+
+        {/* Hero split layout — text LEFT, globe RIGHT */}
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 pt-28 pb-8 md:pt-32 md:pb-12 flex flex-col md:flex-row items-center gap-8 md:gap-0">
+          {/* Left side — text content */}
+          <div className="flex-1 text-center md:text-left md:pr-8">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#3a4a28]/20 border border-[#3a4a28]/15 rounded-full mb-8 animate-fade-up">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#5c6e2e]" />
+              <span className="text-[#3a4a28] text-xs font-medium">Built by a Louisiana REALTOR. For Louisiana REALTORS.</span>
+            </div>
+
+            {/* Headline */}
+            <h1 className="text-[#1e2416] mb-5 !text-5xl md:!text-7xl !font-light !italic !tracking-[-0.02em] !leading-[1.05]" style={{ fontFamily: "var(--font-cormorant)" }}>
+              <span className="hero-word hero-word-1">Close</span>{" "}
+              <span className="hero-word hero-word-2">more</span>{" "}
+              <span className="hero-word hero-word-3">deals.</span>
+              <br />
+              <span className="hero-word hero-word-4">Miss</span>{" "}
+              <span className="hero-word hero-word-5">nothing.</span>
+            </h1>
+
+            {/* Subhead */}
+            <p className="text-[#3a4a28]/70 text-base md:text-lg leading-relaxed max-w-lg mb-10 animate-fade-up [animation-delay:0.6s]">
+              Seven AI agents handle your deadlines, signatures, briefs, and compliance — so you can focus on the conversations that actually close deals.
+            </p>
+
+            {/* Liquid Glass CTAs */}
+            <div className="flex flex-wrap justify-center md:justify-start gap-4 mb-8 animate-fade-up [animation-delay:0.75s]">
+              <Link
+                href={signedIn ? "/aire" : "/sign-up"}
+                className="group relative inline-flex items-center gap-2 px-8 py-4 rounded-2xl text-sm font-semibold tracking-wide transition-all duration-700 hover:px-9 hover:py-[18px] overflow-hidden"
+                style={{ transitionTimingFunction: "cubic-bezier(0.175, 0.885, 0.32, 2.2)" }}
+              >
+                {/* Glass layers */}
+                <span className="absolute inset-0 rounded-2xl overflow-hidden" style={{ backdropFilter: "blur(3px)", filter: "url(#glass-distortion)", isolation: "isolate" }} />
+                <span className="absolute inset-0 rounded-2xl bg-[#1e2416]/80" />
+                <span className="absolute inset-0 rounded-2xl" style={{ boxShadow: "inset 2px 2px 1px 0 rgba(154, 171, 126, 0.3), inset -1px -1px 1px 1px rgba(154, 171, 126, 0.2)" }} />
+                <span className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#9aab7e]/20 via-transparent to-[#6b7d52]/20" />
+                <span className="relative z-10 text-[#f4f1ec]">
+                  {signedIn ? "Open Dashboard" : "Start Your Free Trial"}
+                </span>
+              </Link>
+              <a
+                href="#platform"
+                className="group relative inline-flex items-center gap-2 px-8 py-4 rounded-2xl text-sm font-semibold tracking-wide transition-all duration-700 hover:px-9 hover:py-[18px] overflow-hidden"
+                style={{ transitionTimingFunction: "cubic-bezier(0.175, 0.885, 0.32, 2.2)" }}
+              >
+                {/* Glass layers — lighter version */}
+                <span className="absolute inset-0 rounded-2xl overflow-hidden" style={{ backdropFilter: "blur(6px)", filter: "url(#glass-distortion)", isolation: "isolate" }} />
+                <span className="absolute inset-0 rounded-2xl bg-white/30" />
+                <span className="absolute inset-0 rounded-2xl" style={{ boxShadow: "inset 2px 2px 1px 0 rgba(255, 255, 255, 0.5), inset -1px -1px 1px 1px rgba(255, 255, 255, 0.3)" }} />
+                <span className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#9aab7e]/10 via-transparent to-[#f5f2ea]/20" />
+                <span className="relative z-10 text-[#1e2416]">
+                  See How It Works
+                </span>
+              </a>
+            </div>
           </div>
 
-          {/* Headline — large Cormorant italic with word reveal */}
-          <h1 className="text-[#1e2416] mb-5 max-w-3xl mx-auto !text-5xl md:!text-7xl !font-light !italic !tracking-[-0.02em] !leading-[1.05]">
-            <span className="hero-word hero-word-1">Close</span>{" "}
-            <span className="hero-word hero-word-2">more</span>{" "}
-            <span className="hero-word hero-word-3">deals.</span>
-            <br className="hidden md:block" />
-            <span className="hero-word hero-word-4">Miss</span>{" "}
-            <span className="hero-word hero-word-5">nothing.</span>
-          </h1>
-
-          {/* Subhead */}
-          <p className="text-[#3a4a28]/70 text-base md:text-lg leading-relaxed max-w-lg mx-auto mb-10 animate-fade-up [animation-delay:0.6s]">
-            Seven AI agents handle your deadlines, signatures, briefs, and compliance — so you can focus on the conversations that actually close deals.
-          </p>
-
-          {/* CTAs */}
-          <div className="flex flex-wrap justify-center gap-4 mb-16 animate-fade-up [animation-delay:0.75s]">
-            <Link
-              href={signedIn ? "/aire" : "/sign-up"}
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#1e2416] text-[#f4f1ec] text-sm font-medium tracking-wide rounded-full hover:bg-[#2a3320] transition-all duration-300 hover:translate-y-[-1px] hover:shadow-[0_8px_24px_rgba(30,36,22,0.3)]"
-            >
-              {signedIn ? "Open Dashboard" : "Start Your Free Trial"}
-            </Link>
-            <a
-              href="#platform"
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-white/50 text-[#3a4a28] text-sm font-medium tracking-wide rounded-full border border-[#3a4a28]/10 hover:bg-white/70 transition-all duration-300"
-            >
-              See How It Works
-            </a>
+          {/* Right side — Wireframe dotted globe */}
+          <div className="flex-1 flex items-center justify-center md:justify-end relative">
+            <div className="relative w-[400px] h-[400px] md:w-[500px] md:h-[500px]">
+              <WireframeGlobe className="w-full h-full" />
+              {/* Subtle glow behind globe */}
+              <div className="absolute inset-0 rounded-full bg-[#9aab7e]/5 blur-3xl -z-10 scale-110" />
+            </div>
           </div>
         </div>
 
-        {/* Device mockup — laptop showing AIRE dashboard */}
-        <div className="relative z-10 w-full max-w-4xl mx-auto px-6 animate-fade-up [animation-delay:0.9s]">
+        {/* Device mockup — below the hero split */}
+        <div className="relative z-10 w-full max-w-4xl mx-auto px-6 -mt-8 animate-fade-up [animation-delay:0.9s]">
           <DeviceMockup />
         </div>
 
