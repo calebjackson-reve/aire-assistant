@@ -619,3 +619,42 @@ html {
 .mobile-tab-icon {
   transition: transform 200ms ease, color 200ms ease;
 }
+
+/* ── Aurora Background ───────────────────── */
+
+@keyframes aurora-shift {
+  0% { background-position: 0% 50%, 0% 50%; }
+  25% { background-position: 100% 50%, 50% 100%; }
+  50% { background-position: 50% 100%, 100% 50%; }
+  75% { background-position: 0% 100%, 50% 0%; }
+  100% { background-position: 0% 50%, 0% 50%; }
+}
+
+.aurora-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.12;
+  background-image:
+    repeating-linear-gradient(
+      100deg,
+      rgba(154, 171, 126, 0.3) 0%,
+      rgba(107, 125, 82, 0.2) 7%,
+      transparent 10%,
+      transparent 12%,
+      rgba(154, 171, 126, 0.15) 16%
+    ),
+    repeating-linear-gradient(
+      100deg,
+      rgba(154, 171, 126, 0.4) 10%,
+      rgba(232, 228, 216, 0.3) 15%,
+      rgba(107, 125, 82, 0.25) 20%,
+      rgba(245, 242, 234, 0.2) 25%,
+      rgba(154, 171, 126, 0.35) 30%
+    );
+  background-size: 300% 200%;
+  filter: blur(40px);
+  animation: aurora-shift 15s ease infinite;
+  mix-blend-mode: multiply;
+}

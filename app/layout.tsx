@@ -53,7 +53,10 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" className={`${cormorant.variable} ${spaceGrotesk.variable} ${ibmPlexMono.variable} ${syncopate.variable} antialiased`}>
-        <body>{children}</body>
+        <body>
+          <div className="aurora-bg" aria-hidden="true" />
+          {children}
+        </body>
       </html>
     </ClerkProvider>
   )

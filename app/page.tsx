@@ -10,6 +10,8 @@ import { EmailCaptureSection } from "./components/landing/EmailCaptureSection"
 import { DeviceMockup } from "./components/landing/DeviceMockup"
 import { LouisianaGlobe } from "./components/landing/LouisianaGlobe"
 import { WireframeGlobe } from "./components/landing/WireframeGlobe"
+import { SparklesText } from "./components/landing/SparklesText"
+import { RotatingWords } from "./components/landing/RotatingWords"
 
 const FEATURES = [
   {
@@ -118,15 +120,20 @@ export default function HomePage() {
               <span className="text-[#3a4a28] text-xs font-medium">Built by a Louisiana REALTOR. For Louisiana REALTORS.</span>
             </div>
 
-            {/* Headline */}
-            <h1 className="text-[#1e2416] mb-5 !text-5xl md:!text-7xl !font-light !italic !tracking-[-0.02em] !leading-[1.05]" style={{ fontFamily: "var(--font-cormorant)" }}>
-              <span className="hero-word hero-word-1">Close</span>{" "}
-              <span className="hero-word hero-word-2">more</span>{" "}
-              <span className="hero-word hero-word-3">deals.</span>
-              <br />
-              <span className="hero-word hero-word-4">Miss</span>{" "}
-              <span className="hero-word hero-word-5">nothing.</span>
-            </h1>
+            {/* AIRE with sparkles */}
+            <SparklesText
+              text="AIRE"
+              className="block text-[#1e2416] text-7xl md:text-9xl font-light italic tracking-[-0.03em] leading-none mb-4"
+            />
+
+            {/* Rotating description */}
+            <h2 className="text-[#3a4a28] text-2xl md:text-3xl font-light mb-3" style={{ fontFamily: "var(--font-cormorant)" }}>
+              Real estate{" "}
+              <RotatingWords
+                words={["intelligence", "clarity", "precision", "confidence", "automation"]}
+                className="text-[#6b7d52] font-medium italic"
+              />
+            </h2>
 
             {/* Subhead */}
             <p className="text-[#3a4a28]/70 text-base md:text-lg leading-relaxed max-w-lg mb-10 animate-fade-up [animation-delay:0.6s]">
