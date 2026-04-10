@@ -47,6 +47,10 @@
     {
       "path": "/api/cron/kpi-tracker",
       "schedule": "0 3 1 * *"
+    },
+    {
+      "path": "/api/cron/app-scanner",
+      "schedule": "0 */6 * * *"
     }
   ]
 }
