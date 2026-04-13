@@ -1677,14 +1677,33 @@ export async function paragonHarvestSavedCMAs(
     const { context, page } = session
     await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
     await dismissDashboardModal(page)
-    const popup = await openParagonPopup(page, context)
-    await dismissUserPreferencesWizard(popup)
-    await popup.waitForTimeout(800)
 
-    // Initial nav to Saved Presentations
-    await returnToSavedList(popup)
+    // Helper: open a fresh popup, dismiss wizard, navigate to Saved list.
+    // Used between iterations to discard stale Comparable.mvc frames that
+    // Paragon retains across CMA navigations and that caused a state leak
+    // (every batched CMA got the previous CMA's comps in the first run).
+    const openFreshPopup = async (): Promise<Page> => {
+      const p = await openParagonPopup(page, context)
+      await dismissUserPreferencesWizard(p)
+      await p.waitForTimeout(800)
+      await returnToSavedList(p)
+      return p
+    }
+
+    let popup = await openFreshPopup()
+    let isFirst = true
 
     for (const target of targets) {
+      // Tear down + reopen popup BEFORE each iteration after the first.
+      // Guarantees the new CMA's wizard loads into a clean DOM with no
+      // residual Comparable.mvc frames from the previous CMA.
+      if (!isFirst) {
+        await popup.close().catch(() => {})
+        popup = await openFreshPopup()
+        await popup.waitForTimeout(politePauseMs)
+      }
+      isFirst = false
+
       const snapPath = snapshotPathFor(target.cmaId, target.name)
       if (resume) {
         const exists = await fs.stat(snapPath).then(() => true).catch(() => false)
@@ -1714,7 +1733,7 @@ export async function paragonHarvestSavedCMAs(
       }
       if (!cmaFrame) {
         results.push({ cmaId: target.cmaId, name: target.name, status: "FAIL", reason: "saved-list frame not found", compCount: 0 })
-        continue
+        continue  // popup will be torn down at top of next iteration
       }
       await injectNameShim(cmaFrame)
       await setCMAPageSizeMax(cmaFrame).catch(() => null)
@@ -1724,7 +1743,6 @@ export async function paragonHarvestSavedCMAs(
       const clicked = await clickSavedCMAByName(cmaFrame, target.name, target.cmaId)
       if (!clicked.ok) {
         results.push({ cmaId: target.cmaId, name: target.name, status: "FAIL", reason: "row not found by cmaId", compCount: 0 })
-        await returnToSavedList(popup)
         continue
       }
 
@@ -1748,7 +1766,6 @@ export async function paragonHarvestSavedCMAs(
       }
       if (!compsClicked.ok) {
         results.push({ cmaId: target.cmaId, name: target.name, status: "FAIL", reason: "Comparables click missed", compCount: 0 })
-        await returnToSavedList(popup)
         continue
       }
 
@@ -1789,10 +1806,6 @@ export async function paragonHarvestSavedCMAs(
         snapshotPath: snapPath,
       })
       console.log(`[harvest] ${extract.rows.length > 0 ? "OK  " : "FAIL"} ${target.cmaId} ${target.name} → ${extract.rows.length} comps`)
-
-      // Polite pause + return to list for next iteration
-      await popup.waitForTimeout(politePauseMs)
-      await returnToSavedList(popup)
     }
 
     recordSuccess(VENDOR)
