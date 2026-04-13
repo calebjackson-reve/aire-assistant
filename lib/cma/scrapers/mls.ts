@@ -1683,29 +1683,24 @@ export async function paragonHarvestSavedCMAs(
     await popup.waitForTimeout(800)
     await returnToSavedList(popup)
 
-    // Detach stale Comparable.mvc iframes across all frames. Paragon retains
-    // them across CMA navigations; removing them prevents extractWizardComps
-    // from reading prior-CMA data. Walks main frame + nested frames.
-    const detachStaleCompFrames = async () => {
-      const frames = [popup.mainFrame(), ...popup.frames().filter((f) => f !== popup.mainFrame())]
-      for (const f of frames) {
-        await f.evaluate(() => {
-          // Remove iframes whose src references CMA comparable lists
-          document.querySelectorAll("iframe").forEach((el) => {
-            const src = (el as HTMLIFrameElement).src || ""
-            if (/Comparable\.mvc/i.test(src)) {
-              try { el.remove() } catch {}
-            }
-          })
-        }).catch(() => {})
-      }
+    // Hard-nav the popup to Paragon home between iterations. This fully
+    // resets the popup DOM (all frames, including cached wizard + stale
+    // Comparable.mvc iframes) without closing/reopening the popup tab
+    // (which was flaky — context.waitForEvent timed out after 4-5 cycles).
+    const hardResetPopup = async () => {
+      await popup.goto("https://mlsbox.paragonrels.com/ParagonLS/Default.mvc", {
+        timeout: 20000,
+        waitUntil: "domcontentloaded",
+      }).catch(() => {})
+      await popup.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
+      await dismissUserPreferencesWizard(popup).catch(() => {})
+      await popup.waitForTimeout(1200)
+      await returnToSavedList(popup)
     }
 
-    for (const target of targets) {
-      // Detach stale Comparable.mvc frames BEFORE each iteration.
-      await detachStaleCompFrames()
-      await popup.waitForTimeout(500)
+    let needsResetBeforeNextHarvest = false
 
+    for (const target of targets) {
       const snapPath = snapshotPathFor(target.cmaId, target.name)
       if (resume) {
         const exists = await fs.stat(snapPath).then(() => true).catch(() => false)
@@ -1715,6 +1710,13 @@ export async function paragonHarvestSavedCMAs(
           continue
         }
       }
+
+      // Only hard-reset when we're actually going to harvest, and not for the
+      // very first harvest (popup was just opened fresh).
+      if (needsResetBeforeNextHarvest) {
+        await hardResetPopup()
+      }
+      needsResetBeforeNextHarvest = true
 
       // Captcha guard each iteration
       const cap = await detectCaptcha(popup)
