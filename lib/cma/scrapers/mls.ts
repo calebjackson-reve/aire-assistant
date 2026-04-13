@@ -82,10 +82,24 @@ async function paragonLogin(page: Page, creds: VendorCredentials): Promise<void>
   await humanType(page, passSel, creds.password)
   await humanPause(500, 1100)
 
-  const submitSel = (await page.$('button[type="submit"]')) ? 'button[type="submit"]'
-    : (await page.$('input[type="submit"]')) ? 'input[type="submit"]'
-    : 'button:has-text("Log In"), button:has-text("Sign In")'
-
+  // Clareity IAM (ROAM MLS) uses a <button> with visible text "Password Login"
+  // and no type="submit" attribute. Keep generic fallbacks for other skins.
+  const submitCandidates = [
+    'button:has-text("Password Login")',
+    'button[type="submit"]',
+    'input[type="submit"]',
+    'button:has-text("Log In")',
+    'button:has-text("Sign In")',
+    'button:has-text("Login")',
+  ]
+  let submitSel: string | null = null
+  for (const sel of submitCandidates) {
+    if (await page.$(sel)) { submitSel = sel; break }
+  }
+  if (!submitSel) {
+    const shot = await captureLandingScreenshot(page, "submit_selector_not_found")
+    throw new Error(`Submit button not found on login page (screenshot: ${shot})`)
+  }
   await page.click(submitSel)
   await page.waitForLoadState("domcontentloaded", { timeout: 45000 }).catch(() => {})
   await humanPause(1200, 2400)
