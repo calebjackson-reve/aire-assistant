@@ -1341,7 +1341,9 @@ async function extractWizardComps(frame: import("playwright").Frame): Promise<{ 
     const iArea = idx("area")
     const iBeds = bestHeader.findIndex((h) => /\bbeds?\b|bedrooms/i.test(h))
     const iBaths = bestHeader.findIndex((h) => /\bbaths?\b|bathrooms/i.test(h))
-    const iSqft = bestHeader.findIndex((h) => /sqft living|sq ?ft living|living area|sqft$|sq ?ft$/i.test(h))
+    // Must NOT match "Price Per SQFT" or "List Price/SqFt Liv" — those are
+    // unit prices. "SqFt Living" / "Living Area" / "Living SqFt" only.
+    const iSqft = bestHeader.findIndex((h) => /sqft living|sq ?ft living|living sqft|living sq ?ft|living area/i.test(h))
     const iDom = bestHeader.findIndex((h) => /\bdom\b/i.test(h))
     const iStatus = idx("status")
 
