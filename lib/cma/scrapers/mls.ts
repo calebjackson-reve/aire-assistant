@@ -903,22 +903,39 @@ async function readCMAListPage(frame: import("playwright").Frame): Promise<{
   }
 }
 
-/** Advances the jqGrid to the next page via the pager's "next" button.
- *  jqGrid pagers render "#pg_..." with .ui-pg-button children bearing
- *  span.ui-icon-seek-next. Clicking that advances the page. */
+/** Forces jqGrid page size to the largest option (30). Paragon's saved-CMA
+ *  grid exposes "10 20 30" page sizes. Setting 30 is cleaner than pager
+ *  clicks when total ≤ 30. Returns the selected size or null if no select. */
+async function setCMAPageSizeMax(frame: import("playwright").Frame): Promise<number | null> {
+  return await frame.evaluate(() => {
+    const selects = Array.from(document.querySelectorAll("select")) as HTMLSelectElement[]
+    // jqGrid page-size select typically has class "ui-pg-selbox" and options 10/20/30
+    const pager = selects.find((s) => {
+      const opts = Array.from(s.options).map((o) => o.value)
+      return opts.includes("10") && opts.includes("20") && opts.includes("30")
+    })
+    if (!pager) return null
+    pager.value = "30"
+    pager.dispatchEvent(new Event("change", { bubbles: true }))
+    return 30
+  })
+}
+
+/** Advances the jqGrid to the next page. Tries multiple jqGrid pager
+ *  selector shapes (ui-icon-seek-next, pg_next buttons, sp_next_* ids). */
 async function gotoNextCMAPage(frame: import("playwright").Frame): Promise<boolean> {
   return await frame.evaluate(() => {
-    // jqGrid next-page button
-    const nextBtn = document.querySelector(
-      '.ui-pg-button span.ui-icon-seek-next, .ui-pg-button .ui-icon-seek-next',
-    ) as HTMLElement | null
-    if (!nextBtn) return false
-    // Disabled check — jqGrid adds .ui-state-disabled to the parent when
-    // no further page exists.
-    const parent = nextBtn.closest(".ui-pg-button") as HTMLElement | null
-    if (parent?.classList.contains("ui-state-disabled")) return false
-    ;(parent || nextBtn).click()
-    return true
+    const candidates = Array.from(document.querySelectorAll(
+      '.ui-pg-button .ui-icon-seek-next, [id^="next_"], [id^="sp_next_"], td[id*="next"] .ui-pg-button, .pg-next',
+    )) as HTMLElement[]
+    for (const btn of candidates) {
+      const parent = btn.closest(".ui-pg-button") as HTMLElement | null
+      const container = parent || btn
+      if (container.classList.contains("ui-state-disabled") || container.getAttribute("aria-disabled") === "true") continue
+      container.click()
+      return true
+    }
+    return false
   })
 }
 
@@ -1007,25 +1024,32 @@ export async function paragonEnumerateSavedCMAs(): Promise<SavedCMAEnumerateResu
     }
     if (!cmaFrame) return finish("FAIL", "CMA/Main.mvc frame not found", null, 0)
 
-    // Page 1
+    // Strategy A: bump page size to 30 so all 28 fit on one page.
+    const sizeSet = await setCMAPageSizeMax(cmaFrame).catch(() => null)
+    if (sizeSet) {
+      await popup.waitForTimeout(2000)
+      await popup.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {})
+    }
+
+    // Page 1 (after size bump, this may contain all rows)
     const page1 = await readCMAListPage(cmaFrame)
     allRows.push(...page1.rows)
     let pagesVisited = 1
     const totalCount = page1.totalCount
     const totalPages = page1.totalPages ?? 1
 
-    // Paginate while we haven't exhausted and we're making progress
-    for (let p = 2; p <= totalPages; p += 1) {
+    // Strategy B fallback — if still paginated, click next up to totalPages.
+    for (let p = 2; p <= totalPages && allRows.length < (totalCount ?? Infinity); p += 1) {
       const advanced = await gotoNextCMAPage(cmaFrame).catch(() => false)
       if (!advanced) break
       await popup.waitForTimeout(1500)
       await popup.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {})
       const nextPage = await readCMAListPage(cmaFrame)
-      // Guard: if same rows as previous page, stop
       const firstNew = nextPage.rows[0]?.cmaId
-      const prevFirst = allRows[(pagesVisited - 1) * 10]?.cmaId ?? null
-      if (firstNew && firstNew === prevFirst) break
-      allRows.push(...nextPage.rows)
+      const existingIds = new Set(allRows.map((r) => r.cmaId))
+      const freshRows = nextPage.rows.filter((r) => !existingIds.has(r.cmaId))
+      if (freshRows.length === 0 || (firstNew && existingIds.has(firstNew) && freshRows.length === 0)) break
+      allRows.push(...freshRows)
       pagesVisited += 1
       screenshots.push(await captureLandingScreenshot(popup, `day4p2_page${p}`))
     }
