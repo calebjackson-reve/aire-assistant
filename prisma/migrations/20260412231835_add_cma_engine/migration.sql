@@ -1,0 +1,10 @@
+-- CMA Engine schema (CompSet, Comp, AccuracyLog, ScraperSession)
+-- This migration is a metadata-only baseline. The tables were already applied
+-- to the live DB via `prisma db push` in a prior session; this file records
+-- the CMA engine addition in migration history so future `migrate diff`
+-- commands can compute clean deltas.
+--
+-- Policy note: on aire-assistant, all schema changes go through
+-- `migrate diff --from-schema-datasource prisma/schema.prisma --to-schema-datamodel prisma/schema.prisma --script`
+-- then `db execute` + `migrate resolve --applied`. `migrate dev` is banned
+-- because the init.sql no longer matches live DB state.
