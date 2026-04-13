@@ -309,6 +309,19 @@ async function dismissDashboardModal(page: Page): Promise<boolean> {
   return false
 }
 
+/** Injects a `__name` shim into the page context. tsx/esbuild adds
+ *  `__name(fn, "name")` calls around named function expressions when
+ *  emitting .evaluate() callbacks — the browser has no such global and
+ *  throws ReferenceError. Shim is a no-op that returns the function. */
+async function injectNameShim(target: Page | import("playwright").Frame): Promise<void> {
+  await target.evaluate(() => {
+    const w = window as unknown as Record<string, unknown>
+    if (typeof w.__name !== "function") {
+      w.__name = (fn: unknown) => fn
+    }
+  }).catch(() => {})
+}
+
 /** Opens the Paragon app by clicking the "Paragon" favorites tile icon.
  *  The label is text "Paragon"; the clickable tile is the icon ~50px above it.
  *  Returns the popup page once it loads, or throws. */
@@ -331,6 +344,10 @@ async function openParagonPopup(
   await target.waitForLoadState("domcontentloaded", { timeout: 30000 }).catch(() => {})
   await target.waitForLoadState("networkidle", { timeout: 20000 }).catch(() => {})
   await target.waitForTimeout(1500)
+  // Inject __name shim in main + every existing frame to survive tsx-emitted
+  // evaluate() callbacks with named helper expressions.
+  await injectNameShim(target)
+  for (const f of target.frames()) await injectNameShim(f)
   return target
 }
 
@@ -1332,6 +1349,7 @@ export async function paragonDrillSavedCMA(nameSubstring: string): Promise<Saved
     await popup.waitForTimeout(800)
 
     // Nav to Saved Presentations
+    await injectNameShim(popup)
     const navResult = await popup.evaluate(() => {
       const all = Array.from(document.querySelectorAll("a, li, span, td, div")) as HTMLElement[]
       const saved = all.find((el) => {
@@ -1359,6 +1377,8 @@ export async function paragonDrillSavedCMA(nameSubstring: string): Promise<Saved
     }
     if (!cmaFrame) return finish("FAIL", "CMA list frame not found")
 
+    await injectNameShim(cmaFrame)
+
     // Expand page size so all rows are reachable
     await setCMAPageSizeMax(cmaFrame).catch(() => null)
     await popup.waitForTimeout(1500)
@@ -1366,6 +1386,7 @@ export async function paragonDrillSavedCMA(nameSubstring: string): Promise<Saved
     screenshots.push(await captureLandingScreenshot(popup, "day4p3_01_list"))
 
     // Click into the target CMA
+    await injectNameShim(cmaFrame)
     const clicked = await clickSavedCMAByName(cmaFrame, nameSubstring)
     if (!clicked.ok) {
       return finish("FAIL", `No CMA row matched "${nameSubstring}"`)
@@ -1391,6 +1412,10 @@ export async function paragonDrillSavedCMA(nameSubstring: string): Promise<Saved
       )
     }
 
+    // Inject shim in all current frames (new frames may have attached)
+    await injectNameShim(popup)
+    for (const f of popup.frames()) await injectNameShim(f)
+
     // Click Step 2: Comparables in the wizard sidebar
     // Try the wizardFrame first, fall back to popup top frame
     const compsClicked =
@@ -1412,12 +1437,21 @@ export async function paragonDrillSavedCMA(nameSubstring: string): Promise<Saved
     await popup.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
     screenshots.push(await captureLandingScreenshot(popup, "day4p3_03_comparables_view"))
 
+    // Shim all frames again — comparables click likely spawned new content frames
+    for (const f of popup.frames()) await injectNameShim(f)
+
     // Extract comps from the most likely frame — re-check after Comparables click
     const postClickWizFrame = findCMAWizardFrame(popup) || wizardFrame
     let extract = await extractWizardComps(postClickWizFrame).catch(() => ({ header: [], rows: [] }))
     if (extract.rows.length === 0) {
-      // Try main frame as fallback
-      extract = await extractWizardComps(popup.mainFrame()).catch(() => ({ header: [], rows: [] }))
+      // Try every frame
+      for (const f of popup.frames()) {
+        const r = await extractWizardComps(f).catch(() => ({ header: [], rows: [] }))
+        if (r.rows.length > 0) {
+          extract = r
+          break
+        }
+      }
     }
 
     const domDumpPath = await captureListDomOutline(popup, "day4p3_comparables_dom")
