@@ -98,6 +98,50 @@ export const ADJUSTMENTS = {
   overAdjustedWeightPenalty: 0.5,
 }
 
+// ── Multi-source ensemble weights (Louisiana-tuned, added 2026-04-13) ───
+//
+// See lib/cma/SOURCE_INTELLIGENCE.md for the derivation. These weights
+// feed calculateEnsemble() as an override when Louisiana tuning is desired.
+// The existing DEFAULT_WEIGHTS in lib/data/engines/ensemble.ts remain the
+// fallback for non-LA markets.
+//
+// Recalibration: scripts/recalibrate-cma.ts may rewrite SOURCE_WEIGHTS but
+// MUST NOT touch the engine logic in ensemble.ts.
+
+export const SOURCE_WEIGHTS = {
+  // Ensemble base weights — sum to 1.0
+  mls: 0.45,        // ROAM MLS: sold-price ground truth, agent-verified
+  propstream: 0.25, // PropStream: AVM + distressed signals + liens
+  rpr: 0.20,        // RPR: confidence-banded AVM + neighborhood context
+  zillow: 0.10,     // Zillow: consumer anchor (weakest in LA flood zones)
+
+  // Confidence multipliers applied before ensembling (see ensemble.ts)
+  confidenceMultipliers: {
+    high: 1.00,
+    medium: 0.70,
+    low: 0.35,
+    missing: 0.00,
+  } as const,
+
+  // RPR's native AVM band overrides tier: if ±% > threshold, cap at
+  // base × the capMultiplier for that band.
+  rprBandThresholds: [
+    { maxBandPct: 0.10, capMultiplier: 1.00 },
+    { maxBandPct: 0.20, capMultiplier: 0.70 },
+    { maxBandPct: 1.00, capMultiplier: 0.35 },
+  ] as const,
+
+  // Disagreement policy — if pairwise diff > threshold, reduce lowest-confidence
+  // source by lowestConfidencePenalty before finalizing.
+  disagreementThresholdPct: 0.15,
+  lowestConfidencePenalty: 0.50,
+
+  // Outlier trim on ROAM comps: drop comps > N stddev from median PPSF.
+  roamCompStddevTrim: 2.0,
+} as const
+
+export type SourceKey = "mls" | "propstream" | "rpr" | "zillow"
+
 // ── Vendor degradation bands (locked 2026-04-12) ─────────────────────────
 
 export const DEGRADATION_BANDS = {
