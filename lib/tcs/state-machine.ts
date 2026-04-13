@@ -76,11 +76,14 @@ export async function maybeAdvanceStage(
   // ─ Compliance gate ────────────────────────────────────────────────────────
   // HIGH-severity issues block advance and surface as a silent action.
   // MEDIUM/LOW issues are surfaced but allow the advance to proceed.
+  let gateIssues: GateIssue[] = []
   if (session.transactionId) {
     const gate = await evaluateStageGate({
       transactionId: session.transactionId,
       fromStage,
+      userId: session.userId,
     })
+    gateIssues = gate.issues
     const summary = summarizeGate(gate)
     if (summary) {
       await logAction(sessionId, summary)
@@ -92,7 +95,7 @@ export async function maybeAdvanceStage(
         toStage: null,
         error: `Compliance gate blocked advance from ${fromStage}`,
         blocked: true,
-        gateIssues: gate.issues,
+        gateIssues,
       }
     }
   }
@@ -108,7 +111,7 @@ export async function maybeAdvanceStage(
   // triggeredBy is currently used as a breadcrumb only; logged for audit hooks later.
   if (triggeredBy) void triggeredBy
 
-  return { advanced: true, fromStage, toStage }
+  return { advanced: true, fromStage, toStage, gateIssues }
 }
 
 /**
