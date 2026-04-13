@@ -1678,31 +1678,33 @@ export async function paragonHarvestSavedCMAs(
     await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
     await dismissDashboardModal(page)
 
-    // Helper: open a fresh popup, dismiss wizard, navigate to Saved list.
-    // Used between iterations to discard stale Comparable.mvc frames that
-    // Paragon retains across CMA navigations and that caused a state leak
-    // (every batched CMA got the previous CMA's comps in the first run).
-    const openFreshPopup = async (): Promise<Page> => {
-      const p = await openParagonPopup(page, context)
-      await dismissUserPreferencesWizard(p)
-      await p.waitForTimeout(800)
-      await returnToSavedList(p)
-      return p
+    const popup = await openParagonPopup(page, context)
+    await dismissUserPreferencesWizard(popup)
+    await popup.waitForTimeout(800)
+    await returnToSavedList(popup)
+
+    // Detach stale Comparable.mvc iframes across all frames. Paragon retains
+    // them across CMA navigations; removing them prevents extractWizardComps
+    // from reading prior-CMA data. Walks main frame + nested frames.
+    const detachStaleCompFrames = async () => {
+      const frames = [popup.mainFrame(), ...popup.frames().filter((f) => f !== popup.mainFrame())]
+      for (const f of frames) {
+        await f.evaluate(() => {
+          // Remove iframes whose src references CMA comparable lists
+          document.querySelectorAll("iframe").forEach((el) => {
+            const src = (el as HTMLIFrameElement).src || ""
+            if (/Comparable\.mvc/i.test(src)) {
+              try { el.remove() } catch {}
+            }
+          })
+        }).catch(() => {})
+      }
     }
 
-    let popup = await openFreshPopup()
-    let isFirst = true
-
     for (const target of targets) {
-      // Tear down + reopen popup BEFORE each iteration after the first.
-      // Guarantees the new CMA's wizard loads into a clean DOM with no
-      // residual Comparable.mvc frames from the previous CMA.
-      if (!isFirst) {
-        await popup.close().catch(() => {})
-        popup = await openFreshPopup()
-        await popup.waitForTimeout(politePauseMs)
-      }
-      isFirst = false
+      // Detach stale Comparable.mvc frames BEFORE each iteration.
+      await detachStaleCompFrames()
+      await popup.waitForTimeout(500)
 
       const snapPath = snapshotPathFor(target.cmaId, target.name)
       if (resume) {
@@ -1766,17 +1768,41 @@ export async function paragonHarvestSavedCMAs(
       }
       if (!compsClicked.ok) {
         results.push({ cmaId: target.cmaId, name: target.name, status: "FAIL", reason: "Comparables click missed", compCount: 0 })
+        // Return to list for next iteration
+        await returnToSavedList(popup)
         continue
       }
+
+      // Snapshot Comparable.mvc frame URLs that existed BEFORE the click
+      const preClickCompUrls = new Set(
+        popup.frames().filter((f) => /Comparable\.mvc/i.test(f.url())).map((f) => f.url()),
+      )
 
       await popup.waitForTimeout(5000)
       await popup.waitForLoadState("networkidle", { timeout: 25000 }).catch(() => {})
 
-      // Re-shim, then extract from any frame
+      // Re-shim
       for (const f of popup.frames()) await injectNameShim(f)
+
+      // Find NEW Comparable.mvc frames that appeared during this click
+      const freshCompFrames = popup
+        .frames()
+        .filter((f) => /Comparable\.mvc/i.test(f.url()) && !preClickCompUrls.has(f.url()))
+
       let extract: { header: string[]; rows: SavedCMAComp[] } = { header: [], rows: [] }
-      const wizardFrame = findCMAWizardFrame(popup)
-      if (wizardFrame) extract = await extractWizardComps(wizardFrame).catch(() => ({ header: [], rows: [] }))
+      // Prefer FRESH frames (newly loaded for this CMA)
+      for (const f of freshCompFrames) {
+        const r = await extractWizardComps(f).catch(() => ({ header: [], rows: [] }))
+        if (r.rows.length > 0) {
+          extract = r
+          break
+        }
+      }
+      // Fallback to generic wizard frame search if no fresh frames produced data
+      if (extract.rows.length === 0) {
+        const wizardFrame = findCMAWizardFrame(popup)
+        if (wizardFrame) extract = await extractWizardComps(wizardFrame).catch(() => ({ header: [], rows: [] }))
+      }
       if (extract.rows.length === 0) {
         for (const f of popup.frames()) {
           const r = await extractWizardComps(f).catch(() => ({ header: [], rows: [] }))
@@ -1805,7 +1831,11 @@ export async function paragonHarvestSavedCMAs(
         compCount: extract.rows.length,
         snapshotPath: snapPath,
       })
-      console.log(`[harvest] ${extract.rows.length > 0 ? "OK  " : "FAIL"} ${target.cmaId} ${target.name} → ${extract.rows.length} comps`)
+      console.log(`[harvest] ${extract.rows.length > 0 ? "OK  " : "FAIL"} ${target.cmaId} ${target.name} → ${extract.rows.length} comps  [freshFrames=${freshCompFrames.length}]`)
+
+      // Return to list for next iteration + polite pause
+      await popup.waitForTimeout(politePauseMs)
+      await returnToSavedList(popup)
     }
 
     recordSuccess(VENDOR)
