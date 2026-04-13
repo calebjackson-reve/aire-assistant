@@ -819,6 +819,234 @@ async function captureListDomOutline(page: Page, label: string): Promise<string>
   }
 }
 
+// ── Day 4 Phase 2: enumerate all saved CMAs across paginated list ─────
+
+export interface SavedCMARow {
+  cmaId: string
+  name: string
+  assignedContact: string
+  subjectMls: string
+  lastUpdated: string
+  comparables: number
+}
+
+export interface SavedCMAEnumerateResult {
+  status: "PASS" | "FAIL" | "HALT"
+  reason?: string
+  loginPath: "fresh" | "reused"
+  totalCount: number | null          // "View 1 - 10 of 28" → 28
+  pagesVisited: number
+  rows: SavedCMARow[]
+  screenshots: string[]
+  durationMs: number
+}
+
+/** Locates the nested frame whose URL contains `CMA/Main.mvc`. That's where
+ *  #cmaList lives, per Day 4 DOM outline. */
+function findCMAFrame(page: Page): import("playwright").Frame | null {
+  const frames = [page.mainFrame(), ...page.frames().filter((f) => f !== page.mainFrame())]
+  for (const f of frames) {
+    if (f.url().includes("/CMA/Main.mvc")) return f
+  }
+  return null
+}
+
+/** Read one page of the #cmaList grid — returns row data + total count
+ *  and whether a "next page" control exists. */
+async function readCMAListPage(frame: import("playwright").Frame): Promise<{
+  rows: SavedCMARow[]
+  totalCount: number | null
+  currentPage: number | null
+  totalPages: number | null
+}> {
+  return await frame.evaluate(() => {
+    const grid = document.querySelector("#cmaList") as HTMLTableElement | null
+    if (!grid) return { rows: [], totalCount: null, currentPage: null, totalPages: null }
+
+    // #cmaList is a jqGrid ui-jqgrid-btable. The HEADER columns live in the
+    // sibling ui-jqgrid-htable. Column order (verified via DOM outline):
+    // ["", "", "CMAID", "Saved CMA Name", "Assigned Contact",
+    //  "Subject Property", "Last Updated", "Comparables"]
+    const rows: Array<Record<string, string | number>> = []
+    const trs = Array.from(grid.querySelectorAll("tbody tr")) as HTMLTableRowElement[]
+    for (const tr of trs) {
+      const cells = Array.from(tr.querySelectorAll("td")).map((c) => (c.textContent || "").trim())
+      if (cells.length < 8) continue
+      const [_sel, _col2, cmaId, name, assignedContact, subjectMls, lastUpdated, comparables] = cells
+      if (!cmaId || !name) continue
+      rows.push({
+        cmaId,
+        name,
+        assignedContact: assignedContact || "",
+        subjectMls: subjectMls || "",
+        lastUpdated: lastUpdated || "",
+        comparables: Number(comparables) || 0,
+      })
+    }
+
+    // Pagination text: "View 1 - 10 of 28" + "Page X of Y"
+    const pageInfo = (document.body.textContent || "").replace(/\s+/g, " ")
+    const viewMatch = pageInfo.match(/View\s+\d+\s*-\s*\d+\s+of\s+(\d+)/i)
+    const pageMatch = pageInfo.match(/Page\s+(\d+)\s+of\s+(\d+)/i)
+
+    return {
+      rows: rows as unknown as SavedCMARow[],
+      totalCount: viewMatch ? parseInt(viewMatch[1], 10) : null,
+      currentPage: pageMatch ? parseInt(pageMatch[1], 10) : null,
+      totalPages: pageMatch ? parseInt(pageMatch[2], 10) : null,
+    }
+  }) as {
+    rows: SavedCMARow[]
+    totalCount: number | null
+    currentPage: number | null
+    totalPages: number | null
+  }
+}
+
+/** Advances the jqGrid to the next page via the pager's "next" button.
+ *  jqGrid pagers render "#pg_..." with .ui-pg-button children bearing
+ *  span.ui-icon-seek-next. Clicking that advances the page. */
+async function gotoNextCMAPage(frame: import("playwright").Frame): Promise<boolean> {
+  return await frame.evaluate(() => {
+    // jqGrid next-page button
+    const nextBtn = document.querySelector(
+      '.ui-pg-button span.ui-icon-seek-next, .ui-pg-button .ui-icon-seek-next',
+    ) as HTMLElement | null
+    if (!nextBtn) return false
+    // Disabled check — jqGrid adds .ui-state-disabled to the parent when
+    // no further page exists.
+    const parent = nextBtn.closest(".ui-pg-button") as HTMLElement | null
+    if (parent?.classList.contains("ui-state-disabled")) return false
+    ;(parent || nextBtn).click()
+    return true
+  })
+}
+
+/** Phase 2 — enumerate every saved CMA across all pages. Read-only.
+ *  Does NOT open individual CMAs. Phase 3 drills in per-CMA. */
+export async function paragonEnumerateSavedCMAs(): Promise<SavedCMAEnumerateResult> {
+  const started = Date.now()
+  const screenshots: string[] = []
+  const allRows: SavedCMARow[] = []
+  let session: VendorSession | null = null
+
+  const finish = (
+    status: SavedCMAEnumerateResult["status"],
+    reason: string | undefined,
+    totalCount: number | null,
+    pagesVisited: number,
+  ): SavedCMAEnumerateResult => ({
+    status,
+    reason,
+    loginPath: session?.refreshed ? "fresh" : "reused",
+    totalCount,
+    pagesVisited,
+    rows: allRows,
+    screenshots,
+    durationMs: Date.now() - started,
+  })
+
+  try {
+    session = await rateLimited(VENDOR, () =>
+      openVendorSession({
+        vendor: VENDOR,
+        probeUrl: "https://roam.clareity.net/layouts",
+        login: paragonLogin,
+        isLoggedIn: isParagonLoggedIn,
+        sessionMaxAgeDays: 7,
+      }),
+    )
+    const { context, page } = session
+    await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
+    await page.waitForTimeout(600)
+
+    await dismissDashboardModal(page)
+    const popup = await openParagonPopup(page, context)
+    await dismissUserPreferencesWizard(popup)
+    await popup.waitForTimeout(800)
+
+    // Same JS-dispatch fix that worked in Phase 1 for navigating to Saved Presentations
+    const navResult = await popup.evaluate(() => {
+      const all = Array.from(document.querySelectorAll("a, li, span, td, div")) as HTMLElement[]
+      const candidates = all.filter((el) => {
+        const own = Array.from(el.childNodes)
+          .filter((n) => n.nodeType === 3)
+          .map((n) => (n.textContent || "").trim())
+          .join(" ")
+          .trim()
+        return /^\s*Saved Presentations\s*$/i.test(own)
+      })
+      const saved = candidates.find((e) => e.tagName === "A") || candidates[0]
+      if (!saved) return { ok: false }
+      saved.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }))
+      return { ok: true }
+    })
+    if (!navResult?.ok) return finish("FAIL", "Could not dispatch Saved Presentations click", null, 0)
+
+    await popup.waitForTimeout(2500)
+    await popup.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
+
+    const cap = await detectCaptcha(popup)
+    if (cap.present) {
+      throw new ScraperHaltError(
+        `Captcha detected on Saved Presentations list (${cap.kind ?? "unknown"})`,
+        VENDOR,
+        await captureLandingScreenshot(popup, "day4p2_captcha"),
+      )
+    }
+
+    screenshots.push(await captureLandingScreenshot(popup, "day4p2_page1"))
+
+    // Locate the CMA frame
+    let cmaFrame = findCMAFrame(popup)
+    // Wait up to 10s for the frame to attach if not immediate
+    const frameDeadline = Date.now() + 10000
+    while (!cmaFrame && Date.now() < frameDeadline) {
+      await popup.waitForTimeout(500)
+      cmaFrame = findCMAFrame(popup)
+    }
+    if (!cmaFrame) return finish("FAIL", "CMA/Main.mvc frame not found", null, 0)
+
+    // Page 1
+    const page1 = await readCMAListPage(cmaFrame)
+    allRows.push(...page1.rows)
+    let pagesVisited = 1
+    const totalCount = page1.totalCount
+    const totalPages = page1.totalPages ?? 1
+
+    // Paginate while we haven't exhausted and we're making progress
+    for (let p = 2; p <= totalPages; p += 1) {
+      const advanced = await gotoNextCMAPage(cmaFrame).catch(() => false)
+      if (!advanced) break
+      await popup.waitForTimeout(1500)
+      await popup.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {})
+      const nextPage = await readCMAListPage(cmaFrame)
+      // Guard: if same rows as previous page, stop
+      const firstNew = nextPage.rows[0]?.cmaId
+      const prevFirst = allRows[(pagesVisited - 1) * 10]?.cmaId ?? null
+      if (firstNew && firstNew === prevFirst) break
+      allRows.push(...nextPage.rows)
+      pagesVisited += 1
+      screenshots.push(await captureLandingScreenshot(popup, `day4p2_page${p}`))
+    }
+
+    recordSuccess(VENDOR)
+    await logScrapeRun({ vendor: VENDOR, subject: "saved_cmas_enumerate", status: "success", durationMs: Date.now() - started })
+
+    return finish("PASS", undefined, totalCount, pagesVisited)
+  } catch (err) {
+    if (err instanceof ScraperHaltError) return finish("HALT", err.reason, null, 0)
+    const message = err instanceof Error ? err.message : String(err)
+    recordFailure(VENDOR)
+    await logScrapeRun({ vendor: VENDOR, subject: "saved_cmas_enumerate", status: "failure", durationMs: Date.now() - started, error: message })
+    return finish("FAIL", message, null, 0)
+  } finally {
+    if (session?.context) {
+      await session.context.close().catch(() => {})
+    }
+  }
+}
+
 /** Phase 1 recon for saved CMA harvest. Single shot, list view only. */
 export async function paragonListSavedPresentations(): Promise<SavedPresentationsReconResult> {
   const started = Date.now()
