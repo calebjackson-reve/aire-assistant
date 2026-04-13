@@ -627,6 +627,71 @@ export interface SavedPresentationsReconResult {
  *   - 4 click positions tried (icon-30, icon-15, label-center, tab-below)
  *   - Probe ANY of {Saved Presentations, Create Presentation, EasyCMA,
  *     Create an EasyCMA} — not just one label */
+/** Read-only diagnostic — dumps every DOM element containing "CMA" text
+ *  across every frame. Zero account risk (no clicks, no navigation).
+ *  Writes JSON to debug dir so we can write an EXACT selector next run. */
+async function dumpCMAElementCandidates(page: Page, label: string): Promise<string> {
+  try {
+    const allFrames = [page.mainFrame(), ...page.frames().filter((f) => f !== page.mainFrame())]
+    const dump: Record<string, unknown> = { frames: [] }
+    for (const frame of allFrames) {
+      const found = await frame.evaluate(() => {
+        const hits: Array<Record<string, unknown>> = []
+        const all = document.querySelectorAll("*")
+        for (const el of all) {
+          const text = (el.textContent || "").trim()
+          // direct text, not descendants
+          const ownText = Array.from(el.childNodes)
+            .filter((n) => n.nodeType === 3)
+            .map((n) => (n.textContent || "").trim())
+            .join(" ")
+            .trim()
+          if (/\bCMA\b/i.test(ownText) && ownText.length < 60) {
+            const r = (el as HTMLElement).getBoundingClientRect()
+            hits.push({
+              tag: el.tagName.toLowerCase(),
+              id: (el as HTMLElement).id || null,
+              className: (el as HTMLElement).className?.toString?.() || null,
+              ownText,
+              fullText: text.slice(0, 80),
+              visible: r.width > 0 && r.height > 0,
+              rect: { x: r.x, y: r.y, w: r.width, h: r.height },
+              title: el.getAttribute("title"),
+              alt: el.getAttribute("alt"),
+              href: (el as HTMLAnchorElement).href || null,
+              onclick: !!el.getAttribute("onclick"),
+              role: el.getAttribute("role"),
+            })
+          }
+        }
+        // Also: img alt/title containing CMA (icon-only tabs)
+        const imgs = Array.from(document.querySelectorAll("img"))
+        const imgHits = imgs
+          .filter((i) => /\bCMA\b/i.test(i.alt || "") || /\bCMA\b/i.test(i.title || ""))
+          .map((i) => ({
+            tag: "img",
+            alt: i.alt,
+            title: i.title,
+            src: i.src,
+            rect: (() => {
+              const r = i.getBoundingClientRect()
+              return { x: r.x, y: r.y, w: r.width, h: r.height }
+            })(),
+          }))
+        return { hits: hits.slice(0, 50), imgHits: imgHits.slice(0, 10), url: location.href, frameCount: window.frames.length }
+      }).catch((e) => ({ error: String(e) }))
+      ;(dump.frames as unknown[]).push({ url: frame.url(), data: found })
+    }
+    await fs.mkdir(DEBUG_DIR, { recursive: true })
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-")
+    const filepath = path.join(DEBUG_DIR, `${VENDOR}_${stamp}_${label}_cma_dom.json`)
+    await fs.writeFile(filepath, JSON.stringify(dump, null, 2), "utf8")
+    return filepath
+  } catch {
+    return ""
+  }
+}
+
 async function openCMATabDropdown(page: Page): Promise<boolean> {
   const frames = [page.mainFrame(), ...page.frames().filter((f) => f !== page.mainFrame())]
   const dropdownProbe = async (frame: import("playwright").Frame) => {
@@ -800,10 +865,16 @@ export async function paragonListSavedPresentations(): Promise<SavedPresentation
     await popup.waitForTimeout(1000)
     screenshots.push(await captureLandingScreenshot(popup, "day4_03_post_wizard"))
 
+    // Read-only DOM dump BEFORE click — captures all CMA candidate elements
+    // (tag, class, rect, visibility, icon alts) so we can write an exact
+    // selector without burning more selector-restart budget.
+    const cmaDumpPath = await dumpCMAElementCandidates(popup, "day4_pre_cma_click")
+    if (cmaDumpPath) screenshots.push(cmaDumpPath)
+
     const cmaOpened = await openCMATabDropdown(popup)
     if (!cmaOpened) {
       screenshots.push(await captureLandingScreenshot(popup, "day4_04_cma_dropdown_FAIL"))
-      return finish("FAIL", "CMA dropdown did not open — 'Saved Presentations' label not visible after click/hover attempts", popup.url())
+      return finish("FAIL", `CMA dropdown did not open. DOM dump: ${cmaDumpPath}`, popup.url())
     }
     step = "cma_tab_open"
     screenshots.push(await captureLandingScreenshot(popup, "day4_04_cma_dropdown_open"))
