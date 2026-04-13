@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { href: "/aire", label: "Brief", icon: "sun", desc: "Daily overview" },
   { href: "/aire/email", label: "Inbox", icon: "mail", desc: "Email triage" },
   { href: "/aire/transactions", label: "Deals", icon: "folder", desc: "Transaction pipeline" },
+  { href: "/aire/tcs/new", label: "TCS", icon: "compass", desc: "Guided deal walkthrough" },
   { href: "/airsign", label: "AirSign", icon: "pen", desc: "Electronic signing" },
   { href: "/aire/relationships", label: "Contacts", icon: "users", desc: "Relationship intel" },
   { href: "/aire/intelligence", label: "Market", icon: "chart", desc: "Market data" },
