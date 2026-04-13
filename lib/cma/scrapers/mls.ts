@@ -1071,6 +1071,394 @@ export async function paragonEnumerateSavedCMAs(): Promise<SavedCMAEnumerateResu
   }
 }
 
+// ── Day 4 Phase 3: drill into one saved CMA, extract its comps ─────────
+
+export interface SavedCMAComp {
+  mlsNumber: string | null
+  address: string | null
+  city: string | null
+  state: string | null
+  propertyClass: string | null
+  propertyType: string | null
+  area: string | null
+  price: number | null
+  beds: number | null
+  baths: number | null
+  sqft: number | null
+  dom: number | null
+  status: string | null
+  rawCells: string[]
+}
+
+export interface SavedCMADrillResult {
+  status: "PASS" | "FAIL" | "HALT"
+  reason?: string
+  loginPath: "fresh" | "reused"
+  cmaId: string | null
+  cmaName: string | null
+  subjectMls: string | null
+  comps: SavedCMAComp[]
+  compTableHeader: string[]
+  wizardUrl?: string
+  screenshots: string[]
+  domDumpPath?: string
+  durationMs: number
+  stepReached:
+    | "list"
+    | "row_found"
+    | "wizard_opened"
+    | "comparables_nav"
+    | "comps_extracted"
+}
+
+/** Clicks into one CMA from the saved-list jqGrid. Matches the row by
+ *  name (case-insensitive substring). Returns the row's CMAID + subject
+ *  MLS# on success. Uses JS dispatch — same pattern as Phase 1. */
+async function clickSavedCMAByName(
+  frame: import("playwright").Frame,
+  nameSubstring: string,
+): Promise<{ ok: boolean; cmaId: string | null; subjectMls: string | null; name: string | null }> {
+  return await frame.evaluate((needle) => {
+    const grid = document.querySelector("#cmaList") as HTMLTableElement | null
+    if (!grid) return { ok: false, cmaId: null, subjectMls: null, name: null }
+    const trs = Array.from(grid.querySelectorAll("tbody tr")) as HTMLTableRowElement[]
+    for (const tr of trs) {
+      const cells = Array.from(tr.querySelectorAll("td")) as HTMLTableCellElement[]
+      if (cells.length < 8) continue
+      // Column order: [sel, col2, CMAID, Name, AssignedContact, Subject, LastUpdated, Comparables]
+      const cmaId = (cells[2].textContent || "").trim()
+      const name = (cells[3].textContent || "").trim()
+      const subjectMls = (cells[5].textContent || "").trim()
+      if (!name.toLowerCase().includes(String(needle).toLowerCase())) continue
+
+      // Try strategies in order:
+      // 1) Click the Name <td> directly
+      // 2) Click any <a> inside the Name cell
+      // 3) Double-click the row (jqGrid default action)
+      const nameCell = cells[3]
+      const anchor = nameCell.querySelector("a") as HTMLElement | null
+
+      const dispatch = (el: HTMLElement, type: "click" | "dblclick") => {
+        el.scrollIntoView?.({ block: "center" })
+        const evt = new MouseEvent(type, { bubbles: true, cancelable: true, view: window, button: 0 })
+        el.dispatchEvent(evt)
+      }
+
+      if (anchor) {
+        dispatch(anchor, "click")
+      } else {
+        dispatch(nameCell, "click")
+        dispatch(tr, "dblclick")
+      }
+
+      return { ok: true, cmaId, subjectMls, name }
+    }
+    return { ok: false, cmaId: null, subjectMls: null, name: null }
+  }, nameSubstring) as Promise<{
+    ok: boolean
+    cmaId: string | null
+    subjectMls: string | null
+    name: string | null
+  }>
+}
+
+/** Clicks the "Comparables" step in the CMA Wizard left sidebar. */
+async function clickWizardComparables(frame: import("playwright").Frame): Promise<boolean> {
+  return await frame.evaluate(() => {
+    const all = Array.from(document.querySelectorAll("a, li, span, td, div")) as HTMLElement[]
+    const candidates = all.filter((el) => {
+      const own = Array.from(el.childNodes)
+        .filter((n) => n.nodeType === 3)
+        .map((n) => (n.textContent || "").trim())
+        .join(" ")
+        .trim()
+      return /^\s*Comparables\s*$/i.test(own)
+    })
+    const target = candidates.find((e) => e.tagName === "A") || candidates[0]
+    if (!target) return false
+    target.scrollIntoView?.({ block: "center" })
+    target.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }))
+    return true
+  })
+}
+
+/** Extracts comps from the Step-2 Comparables grid in the CMA Wizard. */
+async function extractWizardComps(frame: import("playwright").Frame): Promise<{ header: string[]; rows: SavedCMAComp[] }> {
+  return await frame.evaluate(() => {
+    const toNum = (s: string): number | null => {
+      if (!s) return null
+      const cleaned = s.replace(/[$,]/g, "").trim()
+      const n = parseFloat(cleaned)
+      return Number.isFinite(n) ? n : null
+    }
+    const toInt = (s: string): number | null => {
+      const n = toNum(s)
+      return n == null ? null : Math.round(n)
+    }
+
+    // Heuristic: find the largest table with header cells containing "MLS" + "Price" + "Address"
+    let bestTable: HTMLTableElement | null = null
+    let bestHeader: string[] = []
+    const tables = Array.from(document.querySelectorAll("table")) as HTMLTableElement[]
+    for (const t of tables) {
+      const hdrCells = Array.from(t.querySelectorAll("thead th, thead td"))
+      const hdrText = hdrCells.map((c) => (c.textContent || "").trim())
+      const joined = hdrText.join(" | ").toLowerCase()
+      if (joined.includes("mls") && joined.includes("price") && joined.includes("address")) {
+        const bodyRows = t.querySelectorAll("tbody tr").length
+        if (!bestTable || bodyRows > bestTable.querySelectorAll("tbody tr").length) {
+          bestTable = t
+          bestHeader = hdrText
+        }
+      }
+    }
+
+    // Fallback: jqGrid header (ui-jqgrid-htable) lives in a sibling; find
+    // any table whose first header includes a "MLS#" text.
+    if (!bestTable) {
+      for (const t of tables) {
+        const all = Array.from(t.querySelectorAll("th, td")).slice(0, 30).map((c) => (c.textContent || "").trim().toLowerCase())
+        if (all.some((s) => s.includes("mls")) && all.some((s) => s.includes("price")) && all.some((s) => s.includes("address"))) {
+          bestTable = t
+          bestHeader = Array.from(t.querySelectorAll("th")).map((c) => (c.textContent || "").trim())
+          break
+        }
+      }
+    }
+
+    if (!bestTable) return { header: [], rows: [] }
+
+    // Column-index resolver by header name (case-insensitive contains)
+    const idx = (name: string) =>
+      bestHeader.findIndex((h) => h.toLowerCase().includes(name.toLowerCase()))
+
+    const iMls = idx("mls")
+    const iPrice = idx("price")
+    const iAddress = idx("address")
+    const iCity = idx("city")
+    const iState = idx("state")
+    const iClass = idx("class")
+    const iType = idx("type")
+    const iArea = idx("area")
+    const iBeds = idx("bed")
+    const iBaths = idx("bath")
+    const iSqft = ((): number => {
+      const s = bestHeader.findIndex((h) => /sq ?ft|sqft|sqr/i.test(h))
+      return s
+    })()
+    const iDom = bestHeader.findIndex((h) => /\bdom\b/i.test(h))
+    const iStatus = idx("status")
+
+    const at = (cells: string[], i: number): string | null =>
+      i >= 0 && i < cells.length ? (cells[i] || "").trim() : null
+
+    const bodyRows = Array.from(bestTable.querySelectorAll("tbody tr")) as HTMLTableRowElement[]
+    const rows = bodyRows.map((tr) => {
+      const cells = Array.from(tr.querySelectorAll("td")).map((c) => (c.textContent || "").trim())
+      return {
+        mlsNumber: at(cells, iMls),
+        address: at(cells, iAddress),
+        city: at(cells, iCity),
+        state: at(cells, iState),
+        propertyClass: at(cells, iClass),
+        propertyType: at(cells, iType),
+        area: at(cells, iArea),
+        price: toNum(at(cells, iPrice) || ""),
+        beds: toInt(at(cells, iBeds) || ""),
+        baths: toNum(at(cells, iBaths) || ""),
+        sqft: toInt(at(cells, iSqft) || ""),
+        dom: toInt(at(cells, iDom) || ""),
+        status: at(cells, iStatus),
+        rawCells: cells,
+      }
+    }).filter((r) => r.mlsNumber || r.address || r.price)
+
+    return { header: bestHeader, rows }
+  }) as Promise<{ header: string[]; rows: SavedCMAComp[] }>
+}
+
+/** Walks every frame and returns the one most likely to host the CMA
+ *  wizard — frame whose URL contains CMA/Main.mvc or CMA/Presentation. */
+function findCMAWizardFrame(page: Page): import("playwright").Frame | null {
+  const frames = [page.mainFrame(), ...page.frames().filter((f) => f !== page.mainFrame())]
+  // Prefer the deepest CMA-related frame (latest navigated)
+  const matches = frames.filter((f) => /\/CMA\//i.test(f.url()))
+  return matches[matches.length - 1] || null
+}
+
+/** Phase 3 — drill into one saved CMA and extract its comp table.
+ *  SINGLE SHOT. No cross-CMA iteration. */
+export async function paragonDrillSavedCMA(nameSubstring: string): Promise<SavedCMADrillResult> {
+  const started = Date.now()
+  const screenshots: string[] = []
+  let session: VendorSession | null = null
+  let step: SavedCMADrillResult["stepReached"] = "list"
+
+  const finish = (
+    status: SavedCMADrillResult["status"],
+    reason: string | undefined,
+    extra: Partial<SavedCMADrillResult> = {},
+  ): SavedCMADrillResult => ({
+    status,
+    reason,
+    loginPath: session?.refreshed ? "fresh" : "reused",
+    cmaId: extra.cmaId ?? null,
+    cmaName: extra.cmaName ?? null,
+    subjectMls: extra.subjectMls ?? null,
+    comps: extra.comps ?? [],
+    compTableHeader: extra.compTableHeader ?? [],
+    wizardUrl: extra.wizardUrl,
+    screenshots,
+    domDumpPath: extra.domDumpPath,
+    durationMs: Date.now() - started,
+    stepReached: step,
+  })
+
+  try {
+    session = await rateLimited(VENDOR, () =>
+      openVendorSession({
+        vendor: VENDOR,
+        probeUrl: "https://roam.clareity.net/layouts",
+        login: paragonLogin,
+        isLoggedIn: isParagonLoggedIn,
+        sessionMaxAgeDays: 7,
+      }),
+    )
+    const { context, page } = session
+    await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
+    await dismissDashboardModal(page)
+    const popup = await openParagonPopup(page, context)
+    await dismissUserPreferencesWizard(popup)
+    await popup.waitForTimeout(800)
+
+    // Nav to Saved Presentations
+    const navResult = await popup.evaluate(() => {
+      const all = Array.from(document.querySelectorAll("a, li, span, td, div")) as HTMLElement[]
+      const saved = all.find((el) => {
+        const own = Array.from(el.childNodes)
+          .filter((n) => n.nodeType === 3)
+          .map((n) => (n.textContent || "").trim())
+          .join(" ")
+          .trim()
+        return /^\s*Saved Presentations\s*$/i.test(own)
+      })
+      if (!saved) return { ok: false }
+      saved.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }))
+      return { ok: true }
+    })
+    if (!navResult?.ok) return finish("FAIL", "Could not navigate to Saved Presentations")
+
+    await popup.waitForTimeout(2500)
+    await popup.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
+
+    let cmaFrame = findCMAFrame(popup)
+    const frameDeadline = Date.now() + 10000
+    while (!cmaFrame && Date.now() < frameDeadline) {
+      await popup.waitForTimeout(500)
+      cmaFrame = findCMAFrame(popup)
+    }
+    if (!cmaFrame) return finish("FAIL", "CMA list frame not found")
+
+    // Expand page size so all rows are reachable
+    await setCMAPageSizeMax(cmaFrame).catch(() => null)
+    await popup.waitForTimeout(1500)
+
+    screenshots.push(await captureLandingScreenshot(popup, "day4p3_01_list"))
+
+    // Click into the target CMA
+    const clicked = await clickSavedCMAByName(cmaFrame, nameSubstring)
+    if (!clicked.ok) {
+      return finish("FAIL", `No CMA row matched "${nameSubstring}"`)
+    }
+    step = "row_found"
+
+    // Wait for wizard to open — new frame nav under /CMA/
+    await popup.waitForTimeout(3000)
+    await popup.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
+    screenshots.push(await captureLandingScreenshot(popup, "day4p3_02_post_click"))
+
+    const wizardFrame = findCMAWizardFrame(popup) || cmaFrame
+    step = "wizard_opened"
+    const wizardUrl = wizardFrame.url()
+
+    // Captcha guard
+    const cap = await detectCaptcha(popup)
+    if (cap.present) {
+      throw new ScraperHaltError(
+        `Captcha detected in wizard (${cap.kind ?? "unknown"})`,
+        VENDOR,
+        await captureLandingScreenshot(popup, "day4p3_captcha"),
+      )
+    }
+
+    // Click Step 2: Comparables in the wizard sidebar
+    // Try the wizardFrame first, fall back to popup top frame
+    const compsClicked =
+      (await clickWizardComparables(wizardFrame).catch(() => false)) ||
+      (await clickWizardComparables(popup.mainFrame()).catch(() => false))
+    if (!compsClicked) {
+      // Dump DOM so next run can identify the step link by shape
+      const dump = await captureListDomOutline(popup, "day4p3_wizard_no_comparables_link")
+      return finish("FAIL", "Could not click Comparables step", {
+        cmaId: clicked.cmaId,
+        cmaName: clicked.name,
+        subjectMls: clicked.subjectMls,
+        wizardUrl,
+        domDumpPath: dump,
+      })
+    }
+    step = "comparables_nav"
+    await popup.waitForTimeout(3000)
+    await popup.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
+    screenshots.push(await captureLandingScreenshot(popup, "day4p3_03_comparables_view"))
+
+    // Extract comps from the most likely frame — re-check after Comparables click
+    const postClickWizFrame = findCMAWizardFrame(popup) || wizardFrame
+    let extract = await extractWizardComps(postClickWizFrame).catch(() => ({ header: [], rows: [] }))
+    if (extract.rows.length === 0) {
+      // Try main frame as fallback
+      extract = await extractWizardComps(popup.mainFrame()).catch(() => ({ header: [], rows: [] }))
+    }
+
+    const domDumpPath = await captureListDomOutline(popup, "day4p3_comparables_dom")
+
+    if (extract.rows.length === 0) {
+      return finish("FAIL", "Comparables grid not found or empty after step nav", {
+        cmaId: clicked.cmaId,
+        cmaName: clicked.name,
+        subjectMls: clicked.subjectMls,
+        wizardUrl,
+        compTableHeader: extract.header,
+        domDumpPath,
+      })
+    }
+    step = "comps_extracted"
+
+    recordSuccess(VENDOR)
+    await logScrapeRun({ vendor: VENDOR, subject: `saved_cma_${clicked.cmaId}`, status: "success", durationMs: Date.now() - started })
+
+    return finish("PASS", undefined, {
+      cmaId: clicked.cmaId,
+      cmaName: clicked.name,
+      subjectMls: clicked.subjectMls,
+      comps: extract.rows,
+      compTableHeader: extract.header,
+      wizardUrl,
+      domDumpPath,
+    })
+  } catch (err) {
+    if (err instanceof ScraperHaltError) return finish("HALT", err.reason)
+    const message = err instanceof Error ? err.message : String(err)
+    recordFailure(VENDOR)
+    await logScrapeRun({ vendor: VENDOR, subject: `saved_cma_drill_${nameSubstring}`, status: "failure", durationMs: Date.now() - started, error: message })
+    return finish("FAIL", message)
+  } finally {
+    if (session?.context) {
+      await session.context.close().catch(() => {})
+    }
+  }
+}
+
 /** Phase 1 recon for saved CMA harvest. Single shot, list view only. */
 export async function paragonListSavedPresentations(): Promise<SavedPresentationsReconResult> {
   const started = Date.now()
