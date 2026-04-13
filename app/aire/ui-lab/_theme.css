@@ -1,0 +1,190 @@
+/* =============================================================================
+   AIRE UI-Lab Theme System — Daylight + Nocturne (scoped to /aire/ui-lab/*)
+   Locked palette only:
+     Sage #9aab7e | Olive #6b7d52 | Cream #f5f2ea | Linen #e8e4d8 | DeepForest #1e2416
+   No blue. No neon. No off-palette gradients. Glossy depth comes from layered
+   shadows, hairline highlights, and palette-tinted specular only.
+
+   Scope: variables apply only when a `.ui-lab-scope` ancestor carries
+   data-theme="daylight|nocturne" — keeps the rest of the app untouched.
+   ============================================================================= */
+
+.ui-lab-scope[data-theme="daylight"] {
+  --surface-base:        #f5f2ea;
+  --surface-rail:        #1e2416;
+  --surface-card:        #f0ece2;
+  --surface-card-soft:   #f5f2ea;
+  --surface-emph:        #1e2416;
+  --surface-overlay:     rgba(245,242,234,0.92);
+  --surface-overlay-2:   rgba(240,236,226,0.85);
+
+  --text-strong:         #1e2416;
+  --text-body:           #2c3520;
+  --text-soft:           #4a5638;
+  --text-muted:          #8a9070;
+  --text-subtle:         #b3b29f;
+  --text-accent:         #6b7d52;
+  --text-on-emph:        #e8e4d8;
+  --text-on-rail:        #8a9070;
+  --text-on-rail-active: #9aab7e;
+
+  --border-base:         #c5c9b8;
+  --border-soft:         #ede9e0;
+  --border-rail:         rgba(74,86,56,0.40);
+  --border-on-emph:      rgba(74,86,56,0.60);
+
+  --accent-primary-bg:   #6b7d52;
+  --accent-primary-fg:   #f5f2ea;
+  --accent-primary-hover:#5a6b43;
+  --accent-dot:          #9aab7e;
+
+  --shadow-flat:         0 1px 0 rgba(255,255,255,0.6) inset;
+  --shadow-raised:       var(--shadow-flat), 0 1px 3px rgba(30,36,22,0.06), 0 4px 12px rgba(30,36,22,0.05);
+  --shadow-elev:         var(--shadow-flat), 0 2px 6px rgba(30,36,22,0.07), 0 12px 32px rgba(30,36,22,0.10);
+  --shadow-float:        var(--shadow-flat), 0 4px 12px rgba(30,36,22,0.08), 0 22px 56px rgba(30,36,22,0.14), 0 40px 80px rgba(30,36,22,0.06);
+
+  --glow-highlight:      rgba(255,255,255,0.55);
+  --glow-specular:       rgba(154,171,126,0.06);
+  --glow-hairline:       rgba(154,171,126,0.30);
+  --glow-cta:            0 0 0 1px rgba(154,171,126,0.0), 0 6px 18px rgba(106,125,82,0.16);
+
+  --num-shadow:          none;
+  --grid-opacity:        0;
+}
+
+.ui-lab-scope[data-theme="nocturne"] {
+  --surface-base:        #1e2416;
+  --surface-rail:        #16190f;
+  --surface-card:        #f0ece2;
+  --surface-card-soft:   #f5f2ea;
+  --surface-emph:        #16190f;
+  --surface-overlay:     rgba(22,25,15,0.88);
+  --surface-overlay-2:   rgba(22,25,15,0.85);
+
+  --text-strong:         #e8e4d8;
+  --text-body:           #d2cdb8;
+  --text-soft:           #b3b29f;
+  --text-muted:          #8a9070;
+  --text-subtle:         #6a7058;
+  --text-accent:         #9aab7e;
+  --text-on-emph:        #e8e4d8;
+  --text-on-rail:        #8a9070;
+  --text-on-rail-active: #9aab7e;
+
+  --border-base:         rgba(74,86,56,0.55);
+  --border-soft:         rgba(74,86,56,0.30);
+  --border-rail:         rgba(74,86,56,0.55);
+  --border-on-emph:      rgba(154,171,126,0.25);
+
+  --accent-primary-bg:   #9aab7e;
+  --accent-primary-fg:   #1e2416;
+  --accent-primary-hover:#a8b88c;
+  --accent-dot:          #9aab7e;
+
+  --shadow-flat:         0 1px 0 rgba(255,255,255,0.5) inset;
+  --shadow-raised:       var(--shadow-flat), 0 2px 8px rgba(0,0,0,0.30), 0 8px 22px rgba(0,0,0,0.25);
+  --shadow-elev:         var(--shadow-flat), 0 6px 18px rgba(0,0,0,0.40), 0 18px 44px rgba(0,0,0,0.32);
+  --shadow-float:        var(--shadow-flat), 0 10px 28px rgba(0,0,0,0.45), 0 24px 60px rgba(0,0,0,0.36), 0 48px 96px rgba(0,0,0,0.22);
+
+  --glow-highlight:      rgba(255,255,255,0.55);
+  --glow-specular:       rgba(154,171,126,0.12);
+  --glow-hairline:       rgba(154,171,126,0.42);
+  --glow-cta:            0 0 0 1px rgba(154,171,126,0.45), 0 6px 18px rgba(154,171,126,0.18);
+
+  /* Mono numeral text-shadow — starts at 15% for initial audit, dialed per feedback */
+  --num-shadow:          0 0 8px rgba(154,171,126,0.15);
+  --grid-opacity:        0.06;
+}
+
+/* ── Utility classes used throughout the mocks ─────────────────────── */
+
+.ui-lab-scope .ulb-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-base);
+  border-radius: 12px;
+  box-shadow: var(--shadow-raised);
+  position: relative;
+}
+
+.ui-lab-scope .ulb-card-elev {
+  background: var(--surface-card);
+  border: 1px solid var(--border-base);
+  border-radius: 12px;
+  box-shadow: var(--shadow-elev);
+  position: relative;
+}
+
+.ui-lab-scope .ulb-card-float {
+  background: var(--surface-card);
+  border: 1px solid var(--border-base);
+  border-radius: 12px;
+  box-shadow: var(--shadow-float);
+  position: relative;
+}
+
+/* Radial sage specular — top-left highlight on any tile */
+.ui-lab-scope .ulb-specular::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(140% 80% at 0% 0%, var(--glow-specular), transparent 55%);
+}
+
+/* CSS 3D tilt — only animates transform + box-shadow */
+.ui-lab-scope .ulb-tilt {
+  transform-style: preserve-3d;
+  transition: transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              box-shadow 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+.ui-lab-scope .ulb-tilt:hover {
+  transform: translateZ(6px) rotateX(2deg) rotateY(-2deg);
+  box-shadow: var(--shadow-float), 0 0 0 1px var(--glow-hairline);
+}
+.ui-lab-scope[data-theme="nocturne"] .ulb-tilt:hover {
+  transform: translateZ(8px) rotateX(2.5deg) rotateY(-2.5deg);
+}
+
+/* Row nudge on hover */
+.ui-lab-scope .ulb-row {
+  transform-origin: left center;
+  transition: transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1),
+              background-color 160ms ease-out;
+}
+.ui-lab-scope .ulb-row:hover {
+  transform: translateX(2px);
+}
+
+/* Activity stream staggered reveal */
+.ui-lab-scope .ulb-activity-row {
+  opacity: 0;
+  transform: translateY(4px);
+  animation: ulb-rise 360ms cubic-bezier(0, 0, 0.2, 1) forwards;
+}
+@keyframes ulb-rise {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mono numeral with optional sage glow (audited) */
+.ui-lab-scope .ulb-num {
+  font-family: var(--font-ibm-mono);
+  text-shadow: var(--num-shadow);
+}
+
+/* Theme cross-fade — background only, no layout shift */
+.ui-lab-scope {
+  transition: background-color 240ms ease-out, color 240ms ease-out;
+}
+
+/* Reduced motion — kill transforms + animations; opacity only */
+@media (prefers-reduced-motion: reduce) {
+  .ui-lab-scope .ulb-tilt,
+  .ui-lab-scope .ulb-row,
+  .ui-lab-scope .ulb-activity-row {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}

@@ -50,3 +50,4 @@ AIRE-KEY-SETUP-GUIDE.html
 public/_unused/
 .playwright-mcp/
 *.png
+!docs/ui-remodel-shots/*.png
