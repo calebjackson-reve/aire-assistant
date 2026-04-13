@@ -865,24 +865,78 @@ export async function paragonListSavedPresentations(): Promise<SavedPresentation
     await popup.waitForTimeout(1000)
     screenshots.push(await captureLandingScreenshot(popup, "day4_03_post_wizard"))
 
-    // Read-only DOM dump BEFORE click — captures all CMA candidate elements
-    // (tag, class, rect, visibility, icon alts) so we can write an exact
-    // selector without burning more selector-restart budget.
+    // Read-only DOM dump BEFORE click — evidence for selector writing.
     const cmaDumpPath = await dumpCMAElementCandidates(popup, "day4_pre_cma_click")
     if (cmaDumpPath) screenshots.push(cmaDumpPath)
 
-    const cmaOpened = await openCMATabDropdown(popup)
-    if (!cmaOpened) {
-      screenshots.push(await captureLandingScreenshot(popup, "day4_04_cma_dropdown_FAIL"))
-      return finish("FAIL", `CMA dropdown did not open. DOM dump: ${cmaDumpPath}`, popup.url())
+    // DOM-evidence-driven approach: the CMA dropdown and its sub-items
+    // ("Saved Presentations", "Create Presentation", etc.) are pre-rendered
+    // in the DOM but CSS-hidden via classic ASP.NET icon-sprite pattern.
+    // Their click handlers are active regardless of visibility. Dispatch the
+    // click directly via evaluate() — bypasses text-indent:-9999px and
+    // legacy nav icon-offset guesswork.
+    const directClickResult = await popup.evaluate(() => {
+      const result = {
+        tabFound: false,
+        subItemFound: false,
+        subItemText: null as string | null,
+        subItemHref: null as string | null,
+        navigated: false,
+        errors: [] as string[],
+      }
+      try {
+        // Find anchors whose *ownText* (not descendant) is exactly "Saved Presentations"
+        const all = Array.from(document.querySelectorAll("a, button, li, span, td, div")) as HTMLElement[]
+        const savedCandidates = all.filter((el) => {
+          const own = Array.from(el.childNodes)
+            .filter((n) => n.nodeType === 3)
+            .map((n) => (n.textContent || "").trim())
+            .join(" ")
+            .trim()
+          return /^\s*Saved Presentations\s*$/i.test(own)
+        })
+        // Prefer an <a>
+        const saved = savedCandidates.find((e) => e.tagName === "A") || savedCandidates[0]
+        if (!saved) {
+          result.errors.push("No 'Saved Presentations' element found in DOM")
+          return result
+        }
+        result.subItemFound = true
+        result.subItemText = saved.textContent?.trim() || null
+        result.subItemHref = (saved as HTMLAnchorElement).href || saved.getAttribute("data-url") || null
+
+        // Also find CMA tab anchor (for observability only)
+        const cmaTab = all.find((el) => {
+          const own = Array.from(el.childNodes)
+            .filter((n) => n.nodeType === 3)
+            .map((n) => (n.textContent || "").trim())
+            .join(" ")
+            .trim()
+          return /^CMA$/i.test(own) && el.tagName === "A"
+        })
+        result.tabFound = !!cmaTab
+
+        // Nuclear option: dispatch click on the saved-presentations element.
+        // Works for most legacy ASP.NET menus — their click handlers are
+        // wired at parse time, not on CSS visibility toggles.
+        saved.scrollIntoView?.({ block: "center", inline: "center" })
+        const evt = new MouseEvent("click", { bubbles: true, cancelable: true, view: window, button: 0 })
+        saved.dispatchEvent(evt)
+        result.navigated = true
+      } catch (e) {
+        result.errors.push(String(e))
+      }
+      return result
+    })
+
+    if (!directClickResult.subItemFound) {
+      screenshots.push(await captureLandingScreenshot(popup, "day4_04_saved_pres_FAIL"))
+      return finish("FAIL", `Saved Presentations element not in DOM. Dump: ${cmaDumpPath}. Detail: ${JSON.stringify(directClickResult)}`, popup.url())
     }
     step = "cma_tab_open"
-    screenshots.push(await captureLandingScreenshot(popup, "day4_04_cma_dropdown_open"))
-
-    const clicked = await clickSavedPresentations(popup)
-    if (!clicked) {
-      return finish("FAIL", "'Saved Presentations' sub-item not clickable", popup.url())
-    }
+    await popup.waitForTimeout(1500)
+    await popup.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
+    screenshots.push(await captureLandingScreenshot(popup, "day4_04_saved_pres_dispatched"))
     step = "saved_presentations_clicked"
     await popup.waitForTimeout(1500)
     await popup.waitForLoadState("networkidle", { timeout: 10000 }).catch(() => {})
