@@ -15,7 +15,7 @@ import { ThemeToggle } from "./ThemeToggle"
 export function Dashboard({ initialTheme }: { initialTheme: "daylight" | "nocturne" }) {
   return (
     <div
-      className="ui-lab-scope fixed inset-0 z-50 overflow-y-auto overflow-x-hidden"
+      className="ui-lab-scope relative min-h-screen w-full overflow-x-hidden"
       data-theme={initialTheme}
       data-default-theme={initialTheme}
       style={{ background: "var(--surface-base)", color: "var(--text-body)", fontFamily: "var(--font-body)" }}

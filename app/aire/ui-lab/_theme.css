@@ -98,6 +98,22 @@
 
 /* ── Utility classes used throughout the mocks ─────────────────────── */
 
+/* Cards are always light (Warm White) in both themes — so text inside a card
+   must resolve to dark regardless of the page theme. Override the text vars
+   in card scope so all `var(--text-*)` references inside render as dark. */
+.ui-lab-scope .ulb-card,
+.ui-lab-scope .ulb-card-elev,
+.ui-lab-scope .ulb-card-float {
+  --text-strong: #1e2416;
+  --text-body:   #2c3520;
+  --text-soft:   #4a5638;
+  --text-muted:  #8a9070;
+  --text-subtle: #b3b29f;
+  --text-accent: #6b7d52;
+  --border-base: #c5c9b8;
+  --border-soft: #ede9e0;
+}
+
 .ui-lab-scope .ulb-card {
   background: var(--surface-card);
   border: 1px solid var(--border-base);
