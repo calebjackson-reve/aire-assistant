@@ -1128,14 +1128,16 @@ export interface SavedCMADrillResult {
     | "comps_extracted"
 }
 
-/** Clicks into one CMA from the saved-list jqGrid. Matches the row by
- *  name (case-insensitive substring). Returns the row's CMAID + subject
- *  MLS# on success. Uses JS dispatch — same pattern as Phase 1. */
+/** Clicks into one CMA from the saved-list jqGrid. Matches by exact CMAID
+ *  if `match.cmaId` provided (preferred — unambiguous), else by name
+ *  substring. Returns the row's CMAID + subject MLS# on success. */
 async function clickSavedCMAByName(
   frame: import("playwright").Frame,
   nameSubstring: string,
+  matchCmaId?: string | null,
 ): Promise<{ ok: boolean; cmaId: string | null; subjectMls: string | null; name: string | null }> {
-  return await frame.evaluate((needle) => {
+  return await frame.evaluate((args) => {
+    const { needle, exactCmaId } = args
     const grid = document.querySelector("#cmaList") as HTMLTableElement | null
     if (!grid) return { ok: false, cmaId: null, subjectMls: null, name: null }
     const trs = Array.from(grid.querySelectorAll("tbody tr")) as HTMLTableRowElement[]
@@ -1146,7 +1148,9 @@ async function clickSavedCMAByName(
       const cmaId = (cells[2].textContent || "").trim()
       const name = (cells[3].textContent || "").trim()
       const subjectMls = (cells[5].textContent || "").trim()
-      if (!name.toLowerCase().includes(String(needle).toLowerCase())) continue
+      if (exactCmaId) {
+        if (cmaId !== String(exactCmaId)) continue
+      } else if (!name.toLowerCase().includes(String(needle).toLowerCase())) continue
 
       // Try strategies in order:
       // 1) Click the Name <td> directly
@@ -1171,7 +1175,7 @@ async function clickSavedCMAByName(
       return { ok: true, cmaId, subjectMls, name }
     }
     return { ok: false, cmaId: null, subjectMls: null, name: null }
-  }, nameSubstring) as Promise<{
+  }, { needle: nameSubstring, exactCmaId: matchCmaId ?? null }) as Promise<{
     ok: boolean
     cmaId: string | null
     subjectMls: string | null
@@ -1586,6 +1590,227 @@ export async function paragonDrillSavedCMA(nameSubstring: string): Promise<Saved
     recordFailure(VENDOR)
     await logScrapeRun({ vendor: VENDOR, subject: `saved_cma_drill_${nameSubstring}`, status: "failure", durationMs: Date.now() - started, error: message })
     return finish("FAIL", message)
+  } finally {
+    if (session?.context) {
+      await session.context.close().catch(() => {})
+    }
+  }
+}
+
+// ── Day 4 Phase 4: batch harvest comps from many saved CMAs ────────────
+
+export interface SavedCMAHarvestTarget {
+  cmaId: string
+  name: string
+}
+
+export interface SavedCMAHarvestResult {
+  cmaId: string
+  name: string
+  status: "PASS" | "FAIL" | "SKIPPED"
+  reason?: string
+  compCount: number
+  snapshotPath?: string
+}
+
+export interface SavedCMABatchResult {
+  status: "PASS" | "FAIL" | "HALT"
+  reason?: string
+  loginPath: "fresh" | "reused"
+  results: SavedCMAHarvestResult[]
+  durationMs: number
+}
+
+/** Navigates the popup back to the saved-CMA list (Saved Presentations). */
+async function returnToSavedList(popup: Page): Promise<boolean> {
+  await injectNameShim(popup)
+  for (const f of popup.frames()) await injectNameShim(f)
+  const r = await popup.evaluate(() => {
+    const all = Array.from(document.querySelectorAll("a, li, span, td, div")) as HTMLElement[]
+    const saved = all.find((el) => {
+      const own = Array.from(el.childNodes)
+        .filter((n) => n.nodeType === 3)
+        .map((n) => (n.textContent || "").trim())
+        .join(" ")
+        .trim()
+      return /^\s*Saved Presentations\s*$/i.test(own)
+    })
+    if (!saved) return false
+    saved.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }))
+    return true
+  })
+  await popup.waitForTimeout(2500)
+  await popup.waitForLoadState("networkidle", { timeout: 10000 }).catch(() => {})
+  return r
+}
+
+/** Single-session batch harvester. Opens popup once, iterates targets in
+ *  order, saves a per-CMA snapshot. Resumable: skips targets whose
+ *  snapshot file already exists at SNAPSHOT_DIR/cma_{id}_{slug}.json. */
+export async function paragonHarvestSavedCMAs(
+  targets: SavedCMAHarvestTarget[],
+  options: { politePauseMs?: number; resumeFromSnapshots?: boolean } = {},
+): Promise<SavedCMABatchResult> {
+  const started = Date.now()
+  const politePauseMs = options.politePauseMs ?? 2000
+  const resume = options.resumeFromSnapshots !== false
+  const SNAPSHOT_DIR = path.resolve(process.cwd(), "lib/cma/scrapers/snapshots/mls_paragon/saved_cmas")
+  await fs.mkdir(SNAPSHOT_DIR, { recursive: true })
+
+  const slug = (s: string) => s.replace(/[^a-z0-9]+/gi, "_").toLowerCase()
+  const snapshotPathFor = (cmaId: string, name: string) =>
+    path.join(SNAPSHOT_DIR, `cma_${cmaId}_${slug(name)}.json`)
+
+  let session: VendorSession | null = null
+  const results: SavedCMAHarvestResult[] = []
+
+  try {
+    session = await rateLimited(VENDOR, () =>
+      openVendorSession({
+        vendor: VENDOR,
+        probeUrl: "https://roam.clareity.net/layouts",
+        login: paragonLogin,
+        isLoggedIn: isParagonLoggedIn,
+        sessionMaxAgeDays: 7,
+      }),
+    )
+    const { context, page } = session
+    await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
+    await dismissDashboardModal(page)
+    const popup = await openParagonPopup(page, context)
+    await dismissUserPreferencesWizard(popup)
+    await popup.waitForTimeout(800)
+
+    // Initial nav to Saved Presentations
+    await returnToSavedList(popup)
+
+    for (const target of targets) {
+      const snapPath = snapshotPathFor(target.cmaId, target.name)
+      if (resume) {
+        const exists = await fs.stat(snapPath).then(() => true).catch(() => false)
+        if (exists) {
+          results.push({ cmaId: target.cmaId, name: target.name, status: "SKIPPED", reason: "snapshot exists", compCount: 0, snapshotPath: snapPath })
+          console.log(`[harvest] SKIP ${target.cmaId} ${target.name} (snapshot exists)`)
+          continue
+        }
+      }
+
+      // Captcha guard each iteration
+      const cap = await detectCaptcha(popup)
+      if (cap.present) {
+        throw new ScraperHaltError(
+          `Captcha detected mid-batch (${cap.kind ?? "unknown"})`,
+          VENDOR,
+          await captureLandingScreenshot(popup, "day4p4_captcha"),
+        )
+      }
+
+      // Find & inject shim on saved-list frame
+      let cmaFrame = findCMAFrame(popup)
+      const frameDeadline = Date.now() + 8000
+      while (!cmaFrame && Date.now() < frameDeadline) {
+        await popup.waitForTimeout(500)
+        cmaFrame = findCMAFrame(popup)
+      }
+      if (!cmaFrame) {
+        results.push({ cmaId: target.cmaId, name: target.name, status: "FAIL", reason: "saved-list frame not found", compCount: 0 })
+        continue
+      }
+      await injectNameShim(cmaFrame)
+      await setCMAPageSizeMax(cmaFrame).catch(() => null)
+      await popup.waitForTimeout(800)
+
+      // Click into the CMA by exact CMAID
+      const clicked = await clickSavedCMAByName(cmaFrame, target.name, target.cmaId)
+      if (!clicked.ok) {
+        results.push({ cmaId: target.cmaId, name: target.name, status: "FAIL", reason: "row not found by cmaId", compCount: 0 })
+        await returnToSavedList(popup)
+        continue
+      }
+
+      // Wait for wizard
+      await popup.waitForTimeout(3000)
+      await popup.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
+      await injectNameShim(popup)
+      for (const f of popup.frames()) await injectNameShim(f)
+
+      // Click Step 2: Comparables in wizard-scoped frames
+      const isWizardFrame = (f: import("playwright").Frame): boolean => {
+        const u = f.url()
+        if (!/cmaId=\d+/i.test(u)) return false
+        if (/\/CMA\/0/i.test(u)) return false
+        return true
+      }
+      let compsClicked: { ok: boolean; where: string | null } = { ok: false, where: null }
+      for (const f of popup.frames().filter(isWizardFrame)) {
+        compsClicked = await clickWizardComparables(f)
+        if (compsClicked.ok) break
+      }
+      if (!compsClicked.ok) {
+        results.push({ cmaId: target.cmaId, name: target.name, status: "FAIL", reason: "Comparables click missed", compCount: 0 })
+        await returnToSavedList(popup)
+        continue
+      }
+
+      await popup.waitForTimeout(5000)
+      await popup.waitForLoadState("networkidle", { timeout: 25000 }).catch(() => {})
+
+      // Re-shim, then extract from any frame
+      for (const f of popup.frames()) await injectNameShim(f)
+      let extract: { header: string[]; rows: SavedCMAComp[] } = { header: [], rows: [] }
+      const wizardFrame = findCMAWizardFrame(popup)
+      if (wizardFrame) extract = await extractWizardComps(wizardFrame).catch(() => ({ header: [], rows: [] }))
+      if (extract.rows.length === 0) {
+        for (const f of popup.frames()) {
+          const r = await extractWizardComps(f).catch(() => ({ header: [], rows: [] }))
+          if (r.rows.length > 0) {
+            extract = r
+            break
+          }
+        }
+      }
+
+      const snapshot = {
+        capturedAt: new Date().toISOString(),
+        cmaId: clicked.cmaId,
+        cmaName: clicked.name,
+        subjectMls: clicked.subjectMls,
+        compTableHeader: extract.header,
+        comps: extract.rows,
+      }
+      await fs.writeFile(snapPath, JSON.stringify(snapshot, null, 2), "utf8")
+
+      results.push({
+        cmaId: target.cmaId,
+        name: target.name,
+        status: extract.rows.length > 0 ? "PASS" : "FAIL",
+        reason: extract.rows.length === 0 ? "0 comps extracted" : undefined,
+        compCount: extract.rows.length,
+        snapshotPath: snapPath,
+      })
+      console.log(`[harvest] ${extract.rows.length > 0 ? "OK  " : "FAIL"} ${target.cmaId} ${target.name} → ${extract.rows.length} comps`)
+
+      // Polite pause + return to list for next iteration
+      await popup.waitForTimeout(politePauseMs)
+      await returnToSavedList(popup)
+    }
+
+    recordSuccess(VENDOR)
+    await logScrapeRun({ vendor: VENDOR, subject: `harvest_${targets.length}_cmas`, status: "success", durationMs: Date.now() - started })
+
+    return {
+      status: "PASS",
+      loginPath: session.refreshed ? "fresh" : "reused",
+      results,
+      durationMs: Date.now() - started,
+    }
+  } catch (err) {
+    if (err instanceof ScraperHaltError) {
+      return { status: "HALT", reason: err.reason, loginPath: session?.refreshed ? "fresh" : "reused", results, durationMs: Date.now() - started }
+    }
+    const message = err instanceof Error ? err.message : String(err)
+    recordFailure(VENDOR)
+    return { status: "FAIL", reason: message, loginPath: session?.refreshed ? "fresh" : "reused", results, durationMs: Date.now() - started }
   } finally {
     if (session?.context) {
       await session.context.close().catch(() => {})
