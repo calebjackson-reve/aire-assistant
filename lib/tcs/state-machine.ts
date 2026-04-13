@@ -11,12 +11,16 @@ import {
   stageComplete,
   nextQuestion,
 } from "./stages"
+import { evaluateStageGate, summarizeGate, type GateIssue } from "./compliance-gate"
+import { logAction } from "./stage-actions"
 
 export interface StageAdvanceResult {
   advanced: boolean
   fromStage: TCSStage
   toStage: TCSStage | null
   error?: string
+  blocked?: boolean
+  gateIssues?: GateIssue[]
 }
 
 /**
@@ -67,6 +71,30 @@ export async function maybeAdvanceStage(
       data: { completedAt: new Date() },
     })
     return { advanced: false, fromStage, toStage: null, error: "Already at final stage" }
+  }
+
+  // ─ Compliance gate ────────────────────────────────────────────────────────
+  // HIGH-severity issues block advance and surface as a silent action.
+  // MEDIUM/LOW issues are surfaced but allow the advance to proceed.
+  if (session.transactionId) {
+    const gate = await evaluateStageGate({
+      transactionId: session.transactionId,
+      fromStage,
+    })
+    const summary = summarizeGate(gate)
+    if (summary) {
+      await logAction(sessionId, summary)
+    }
+    if (gate.blocked) {
+      return {
+        advanced: false,
+        fromStage,
+        toStage: null,
+        error: `Compliance gate blocked advance from ${fromStage}`,
+        blocked: true,
+        gateIssues: gate.issues,
+      }
+    }
   }
 
   // TCS session advances its own pointer. The underlying Transaction is moved
