@@ -1255,7 +1255,10 @@ async function dumpNavCandidates(page: Page, label: string): Promise<string> {
   }
 }
 
-/** Extracts comps from the Step-2 Comparables grid in the CMA Wizard. */
+/** Extracts comps from the Step-2 Comparables grid in the CMA Wizard.
+ *  jqGrid pattern: header lives in <table class="ui-jqgrid-htable"> and
+ *  body rows live in a SEPARATE <table class="ui-jqgrid-btable"> inside
+ *  the same .ui-jqgrid-view container. Must pair them by proximity. */
 async function extractWizardComps(frame: import("playwright").Frame): Promise<{ header: string[]; rows: SavedCMAComp[] }> {
   return await frame.evaluate(() => {
     const toNum = (s: string): number | null => {
@@ -1269,63 +1272,83 @@ async function extractWizardComps(frame: import("playwright").Frame): Promise<{ 
       return n == null ? null : Math.round(n)
     }
 
-    // Heuristic: find the largest table with header cells containing "MLS" + "Price" + "Address"
-    let bestTable: HTMLTableElement | null = null
-    let bestHeader: string[] = []
+    // Collect ALL candidate (header, body) pairs. For each header table with
+    // MLS+Price+Address, locate a body table with matching column count
+    // either in the same DOM subtree or in the shared .ui-jqgrid-view parent.
+    type Pair = { header: string[]; body: HTMLTableElement; score: number }
+    const pairs: Pair[] = []
     const tables = Array.from(document.querySelectorAll("table")) as HTMLTableElement[]
-    for (const t of tables) {
-      const hdrCells = Array.from(t.querySelectorAll("thead th, thead td"))
-      const hdrText = hdrCells.map((c) => (c.textContent || "").trim())
-      const joined = hdrText.join(" | ").toLowerCase()
-      if (joined.includes("mls") && joined.includes("price") && joined.includes("address")) {
-        const bodyRows = t.querySelectorAll("tbody tr").length
-        if (!bestTable || bodyRows > bestTable.querySelectorAll("tbody tr").length) {
-          bestTable = t
-          bestHeader = hdrText
+
+    for (const hdrTable of tables) {
+      const hdrCells = Array.from(hdrTable.querySelectorAll("thead th, thead td, th"))
+      if (hdrCells.length < 4) continue
+      const headerText = hdrCells.map((c) => (c.textContent || "").trim())
+      const joined = headerText.join(" | ").toLowerCase()
+      if (!joined.includes("mls") || !joined.includes("price") || !joined.includes("address")) continue
+
+      // Same-table body first
+      const ownRows = hdrTable.querySelectorAll("tbody tr").length
+      if (ownRows > 0) {
+        pairs.push({ header: headerText, body: hdrTable, score: ownRows })
+        continue
+      }
+
+      // Walk up looking for .ui-jqgrid-view (or similar) and find sibling body
+      let parent: HTMLElement | null = hdrTable.parentElement
+      let bodyTable: HTMLTableElement | null = null
+      let hops = 0
+      while (parent && hops < 6 && !bodyTable) {
+        // Any <table> with >0 tbody rows within this parent subtree
+        const candidates = Array.from(parent.querySelectorAll("table")) as HTMLTableElement[]
+        for (const c of candidates) {
+          if (c === hdrTable) continue
+          if (c.querySelectorAll("tbody tr").length > 0) {
+            // Prefer tables whose tbody td count matches header length
+            const firstRowCells = c.querySelector("tbody tr")?.querySelectorAll("td").length ?? 0
+            if (Math.abs(firstRowCells - headerText.length) <= 3) {
+              bodyTable = c
+              break
+            }
+          }
         }
+        parent = parent.parentElement
+        hops += 1
+      }
+      if (bodyTable) {
+        pairs.push({ header: headerText, body: bodyTable, score: bodyTable.querySelectorAll("tbody tr").length })
       }
     }
 
-    // Fallback: jqGrid header (ui-jqgrid-htable) lives in a sibling; find
-    // any table whose first header includes a "MLS#" text.
-    if (!bestTable) {
-      for (const t of tables) {
-        const all = Array.from(t.querySelectorAll("th, td")).slice(0, 30).map((c) => (c.textContent || "").trim().toLowerCase())
-        if (all.some((s) => s.includes("mls")) && all.some((s) => s.includes("price")) && all.some((s) => s.includes("address"))) {
-          bestTable = t
-          bestHeader = Array.from(t.querySelectorAll("th")).map((c) => (c.textContent || "").trim())
-          break
-        }
-      }
-    }
+    if (pairs.length === 0) return { header: [], rows: [] }
+    // Pick the pair with most body rows
+    pairs.sort((a, b) => b.score - a.score)
+    const { header: bestHeader, body: bestBody } = pairs[0]
 
-    if (!bestTable) return { header: [], rows: [] }
-
-    // Column-index resolver by header name (case-insensitive contains)
     const idx = (name: string) =>
       bestHeader.findIndex((h) => h.toLowerCase().includes(name.toLowerCase()))
 
     const iMls = idx("mls")
-    const iPrice = idx("price")
+    const iPrice = bestHeader.findIndex((h) => /^price$/i.test(h.trim())) >= 0
+      ? bestHeader.findIndex((h) => /^price$/i.test(h.trim()))
+      : idx("price")
     const iAddress = idx("address")
     const iCity = idx("city")
-    const iState = idx("state")
+    const iState = bestHeader.findIndex((h) => /^state$/i.test(h.trim())) >= 0
+      ? bestHeader.findIndex((h) => /^state$/i.test(h.trim()))
+      : idx("state")
     const iClass = idx("class")
     const iType = idx("type")
     const iArea = idx("area")
-    const iBeds = idx("bed")
-    const iBaths = idx("bath")
-    const iSqft = ((): number => {
-      const s = bestHeader.findIndex((h) => /sq ?ft|sqft|sqr/i.test(h))
-      return s
-    })()
+    const iBeds = bestHeader.findIndex((h) => /\bbeds?\b|bedrooms/i.test(h))
+    const iBaths = bestHeader.findIndex((h) => /\bbaths?\b|bathrooms/i.test(h))
+    const iSqft = bestHeader.findIndex((h) => /sqft living|sq ?ft living|living area|sqft$|sq ?ft$/i.test(h))
     const iDom = bestHeader.findIndex((h) => /\bdom\b/i.test(h))
     const iStatus = idx("status")
 
     const at = (cells: string[], i: number): string | null =>
       i >= 0 && i < cells.length ? (cells[i] || "").trim() : null
 
-    const bodyRows = Array.from(bestTable.querySelectorAll("tbody tr")) as HTMLTableRowElement[]
+    const bodyRows = Array.from(bestBody.querySelectorAll("tbody tr")) as HTMLTableRowElement[]
     const rows = bodyRows.map((tr) => {
       const cells = Array.from(tr.querySelectorAll("td")).map((c) => (c.textContent || "").trim())
       return {
