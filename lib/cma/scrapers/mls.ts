@@ -619,14 +619,28 @@ export interface SavedPresentationsReconResult {
   durationMs: number
 }
 
-/** Opens the CMA dropdown in Paragon's top nav. Tries click first (Paragon
- *  classic navs are click-to-open, not hover-to-open), then hover fallback.
- *  Verifies the dropdown rendered by probing for the "Saved Presentations"
- *  label. */
+/** Opens the CMA dropdown in Paragon's top nav. Paragon renders tabs as
+ *  icon+label in a horizontal bar; the clickable handler is usually on the
+ *  icon, not the label. Day 3 SEARCH used box.y-15; CMA icon offset may
+ *  differ. Fix applied 2026-04-13 after Day 4 Phase 1 FAIL (commit 486e598):
+ *   - Probe window 600ms → 2000ms
+ *   - 4 click positions tried (icon-30, icon-15, label-center, tab-below)
+ *   - Probe ANY of {Saved Presentations, Create Presentation, EasyCMA,
+ *     Create an EasyCMA} — not just one label */
 async function openCMATabDropdown(page: Page): Promise<boolean> {
   const frames = [page.mainFrame(), ...page.frames().filter((f) => f !== page.mainFrame())]
-  const dropdownProbe = async (frame: import("playwright").Frame) =>
-    frame.locator('text=/Saved Presentations/i').first().isVisible().catch(() => false)
+  const dropdownProbe = async (frame: import("playwright").Frame) => {
+    const probes = [
+      'text=/Saved Presentations/i',
+      'text=/Create Presentation/i',
+      'text=/EasyCMA/i',
+      'text=/Create an EasyCMA/i',
+    ]
+    for (const p of probes) {
+      if (await frame.locator(p).first().isVisible().catch(() => false)) return true
+    }
+    return false
+  }
 
   for (const frame of frames) {
     const tab = frame.locator('text=/^CMA$/').first()
@@ -634,20 +648,38 @@ async function openCMATabDropdown(page: Page): Promise<boolean> {
     const box = await tab.boundingBox().catch(() => null)
     if (!box) continue
 
-    // Click icon area above the label — same pattern that worked for SEARCH tab.
-    await frame.page().mouse.click(box.x + box.width / 2, Math.max(box.y - 15, 0)).catch(() => {})
-    await page.waitForTimeout(600)
-    if (await dropdownProbe(frame)) return true
+    // Try 4 click positions — icon offsets vary per tab in Paragon's legacy nav.
+    const positions: Array<[number, number, string]> = [
+      [box.x + box.width / 2, Math.max(box.y - 30, 0), "icon-30"],
+      [box.x + box.width / 2, Math.max(box.y - 15, 0), "icon-15"],
+      [box.x + box.width / 2, box.y + box.height / 2, "label-center"],
+      [box.x + box.width / 2, box.y + box.height + 3, "tab-below"],
+    ]
+    for (const [x, y, _label] of positions) {
+      await frame.page().mouse.click(x, y).catch(() => {})
+      // Poll probe for up to 2000ms — dropdown animation + async render
+      const deadline = Date.now() + 2000
+      while (Date.now() < deadline) {
+        if (await dropdownProbe(frame)) return true
+        await page.waitForTimeout(200)
+      }
+    }
 
-    // Click on label itself
-    await tab.click({ timeout: 2500 }).catch(() => {})
-    await page.waitForTimeout(600)
-    if (await dropdownProbe(frame)) return true
-
-    // Hover fallback
+    // Hover fallback (Angular Material sometimes binds mouseenter)
     await frame.page().mouse.move(box.x + box.width / 2, box.y + box.height / 2).catch(() => {})
-    await page.waitForTimeout(700)
-    if (await dropdownProbe(frame)) return true
+    const deadline = Date.now() + 2000
+    while (Date.now() < deadline) {
+      if (await dropdownProbe(frame)) return true
+      await page.waitForTimeout(200)
+    }
+
+    // Native click via locator (real accessibility-tree dispatch)
+    await tab.click({ timeout: 2500, force: true }).catch(() => {})
+    const deadline2 = Date.now() + 2000
+    while (Date.now() < deadline2) {
+      if (await dropdownProbe(frame)) return true
+      await page.waitForTimeout(200)
+    }
   }
   return false
 }
