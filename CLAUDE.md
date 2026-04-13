@@ -1,5 +1,13 @@
 # AIRE Assistant — Project Instructions
 
+## UI/Design Rules — MANDATORY
+Before writing ANY frontend code, component, or UI element:
+1. Read `DESIGN.md` in this project root — it is the source of truth for all colors, fonts, components, and patterns
+2. Invoke the `frontend-design` skill
+3. Never use colors, fonts, or component styles not defined in DESIGN.md
+4. Every number/stat must use IBM Plex Mono. Every heading must use Playfair Display. Every body element must use Space Grotesk.
+5. Never use blue, pure white (#ffffff), or pure black (#000000)
+
 ## Stack
 Next.js 16, React 19, Prisma 6.19, Neon PostgreSQL, Clerk auth, Stripe billing, Vercel, Twilio
 Schema source of truth: `prisma/schema.prisma` — never duplicate schemas elsewhere.

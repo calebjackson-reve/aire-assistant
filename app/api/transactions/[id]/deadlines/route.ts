@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import prisma from "@/lib/prisma"
 import { onDeadlineCompleted } from "@/lib/workflow/state-machine"
+import { createCalendarEvent, deleteCalendarEvent } from "@/lib/integrations/gws-calendar"
 
 // GET: List all deadlines for a transaction
 export async function GET(
@@ -79,7 +80,7 @@ export async function POST(
 
     const transaction = await prisma.transaction.findFirst({
       where: { id: transactionId, userId: user.id },
-      select: { id: true },
+      select: { id: true, propertyAddress: true },
     })
 
     if (!transaction) {
@@ -107,6 +108,11 @@ export async function POST(
         data: { completedAt: new Date(), notes: body.notes ?? deadline.notes },
       })
 
+      // Remove Calendar event when deadline is completed (non-blocking)
+      if (deadline.googleCalendarEventId) {
+        deleteCalendarEvent(deadline.googleCalendarEventId).catch(() => {})
+      }
+
       // Trigger workflow auto-advance
       const advanceResult = await onDeadlineCompleted(transactionId, deadline.name, user.id)
 
@@ -130,6 +136,22 @@ export async function POST(
         notes: body.notes ?? null,
       },
     })
+
+    // Sync to Google Calendar (non-blocking — fires in background)
+    createCalendarEvent({
+      deadlineName: deadline.name,
+      dueDate: deadline.dueDate,
+      propertyAddress: transaction.propertyAddress,
+      transactionId,
+      notes: deadline.notes,
+    }).then((eventId) => {
+      if (eventId) {
+        prisma.deadline.update({
+          where: { id: deadline.id },
+          data: { googleCalendarEventId: eventId },
+        }).catch(() => {})
+      }
+    }).catch(() => {})
 
     return NextResponse.json(deadline, { status: 201 })
   } catch (error) {

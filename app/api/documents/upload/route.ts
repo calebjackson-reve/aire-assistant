@@ -9,6 +9,7 @@ import { autoFileDocument } from "@/lib/document-autofiler"
 import { logDocumentMemory } from "@/lib/document-memory"
 import { onDocumentUploaded } from "@/lib/workflow/state-machine"
 import { PDFDocument } from "pdf-lib"
+import { uploadDocumentToDrive } from "@/lib/integrations/gws-drive"
 
 // Common English words — used to detect real text vs binary garbage
 const REAL_WORDS = new Set([
@@ -321,6 +322,33 @@ export async function POST(req: NextRequest) {
         transactionId: resolvedTransactionId || undefined,
       },
     })
+
+    // ── Step 5b: Sync to Google Drive (non-blocking) ──
+    if (resolvedTransactionId) {
+      const tx = await prisma.transaction.findUnique({
+        where: { id: resolvedTransactionId },
+        select: { propertyAddress: true },
+      })
+      if (tx?.propertyAddress) {
+        uploadDocumentToDrive({
+          fileUrl: blob.url,
+          fileName: file.name,
+          docType,
+          transactionId: resolvedTransactionId,
+          propertyAddress: tx.propertyAddress,
+        }).then((driveResult) => {
+          if (driveResult) {
+            prisma.document.update({
+              where: { id: document.id },
+              data: {
+                driveFileId: driveResult.driveFileId,
+                driveFolderPath: driveResult.driveFolderPath,
+              },
+            }).catch(() => {})
+          }
+        }).catch(() => {})
+      }
+    }
 
     // ── Step 6: Trigger workflow if attached to transaction ──
     if (resolvedTransactionId) {

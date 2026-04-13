@@ -202,9 +202,10 @@ model Deadline {
 
   name            String      // e.g., "Inspection Deadline", "Financing Contingency"
   dueDate         DateTime
-  alertSent       Boolean     @default(false)
-  completedAt     DateTime?
-  notes           String?
+  alertSent              Boolean     @default(false)
+  completedAt            DateTime?
+  notes                  String?
+  googleCalendarEventId  String?     // GWS: synced Calendar event ID
 
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
@@ -231,6 +232,8 @@ model Document {
   dotloopDocId    String?
   signatureStatus String?     // draft, sent, signed, declined
   checklistStatus String?     // missing, uploaded, extracted, verified
+  driveFileId     String?     // GWS: Google Drive file ID after upload
+  driveFolderPath String?     // GWS: Drive folder path e.g. "AIRE Transactions/123 Main St"
 
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
