@@ -3,6 +3,8 @@ import { redirect } from "next/navigation"
 import prisma from "@/lib/prisma"
 import { IntelligenceDashboard } from "./IntelligenceDashboard"
 import { ScoredPropertiesTable } from "./ScoredPropertiesTable"
+import { MarketSnapshotPanel } from "./MarketSnapshotPanel"
+import { MARKET_BASELINES } from "@/lib/data/louisiana-live"
 
 export default async function IntelligencePage() {
   const { userId } = await auth()
@@ -31,20 +33,33 @@ export default async function IntelligencePage() {
 
   if (!user) redirect("/sign-in")
 
+  const markets = Object.values(MARKET_BASELINES)
+
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10">
-      <div className="mb-8">
-        <h1 className="font-[family-name:var(--font-cormorant)] italic text-cream text-3xl">
-          Market Intelligence
+    <div style={{ maxWidth: 1024, margin: "0 auto", padding: "32px 24px" }}>
+      {/* Header */}
+      <div style={{ marginBottom: 32 }}>
+        <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 12, fontWeight: 500, color: "#8a9070", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>
+          AIRE Intelligence · Market Data
+        </div>
+        <h1 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 36, fontWeight: 700, color: "#1e2416", margin: 0 }}>
+          Louisiana Market Intelligence
         </h1>
-        <p className="text-cream-dim text-sm mt-1">
-          AIRE Estimate AVM · Powered by aire-intelligence
+        <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 15, color: "#8a9070", marginTop: 8 }}>
+          Real-time parish market data, AIRE Estimate AVM, and pipeline intelligence
         </p>
       </div>
 
-      <IntelligenceDashboard transactions={user.transactions} />
+      {/* Parish Market Snapshots */}
+      <MarketSnapshotPanel markets={markets} />
 
-      <div className="mt-10">
+      {/* Transaction-level AVM */}
+      <div style={{ marginTop: 32 }}>
+        <IntelligenceDashboard transactions={user.transactions} />
+      </div>
+
+      {/* Scored Properties Admin Table */}
+      <div style={{ marginTop: 32 }}>
         <ScoredPropertiesTable />
       </div>
     </div>

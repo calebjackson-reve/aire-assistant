@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import { calculateDeadlines } from "@/lib/louisiana-rules-engine";
+import { ensureTransactionFolder } from "@/lib/integrations/gws-drive";
+import { createCalendarEvent } from "@/lib/integrations/gws-calendar";
 
 // GET: List all transactions for the authenticated user
 export async function GET() {
@@ -153,6 +155,42 @@ export async function POST(req: NextRequest) {
     });
 
     console.log(`✅ Transaction created: ${propertyAddress} with auto-calculated LA deadlines`);
+
+    // ── One-Click Listing Launch (non-blocking) ──────────────────────────
+    // Fires in background — never delays the API response
+    ;(async () => {
+      try {
+        // 1. Create Google Drive transaction folder
+        await ensureTransactionFolder(propertyAddress, transaction.id)
+        console.log(`[ListingLaunch] Drive folder created for ${propertyAddress}`)
+      } catch (e) {
+        console.error("[ListingLaunch] Drive folder failed:", e)
+      }
+
+      // 2. Sync auto-calculated deadlines to Google Calendar
+      if (contractDate && fullTransaction?.deadlines?.length) {
+        for (const dl of fullTransaction.deadlines) {
+          try {
+            const eventId = await createCalendarEvent({
+              deadlineName: dl.name,
+              dueDate: dl.dueDate,
+              propertyAddress,
+              transactionId: transaction.id,
+              notes: dl.notes,
+            })
+            if (eventId) {
+              await prisma.deadline.update({
+                where: { id: dl.id },
+                data: { googleCalendarEventId: eventId },
+              }).catch(() => {})
+            }
+          } catch (e) {
+            console.error(`[ListingLaunch] Calendar sync failed for ${dl.name}:`, e)
+          }
+        }
+        console.log(`[ListingLaunch] ${fullTransaction.deadlines.length} deadlines synced to GCal`)
+      }
+    })()
 
     return NextResponse.json(fullTransaction, { status: 201 });
   } catch (error) {
