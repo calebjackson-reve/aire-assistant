@@ -21,11 +21,13 @@ enum Tier {
 enum TransactionStatus {
   DRAFT
   ACTIVE
+  UNDER_CONTRACT
   PENDING_INSPECTION
   PENDING_APPRAISAL
   PENDING_FINANCING
   CLOSING
   CLOSED
+  POST_CLOSE
   CANCELLED
 }
 
@@ -79,6 +81,9 @@ model User {
   feedbackLogs    FeedbackLog[]
   errorMemories   ErrorMemory[]
   managedSessions ManagedAgentSession[]
+  compSets        CompSet[]
+  tcsSessions     TCSSession[]
+  brokerageMembership BrokerageMember?
 }
 
 // ============== PHASE 2: Transaction Core ==============
@@ -173,8 +178,16 @@ model Transaction {
   dealHealthLogs    DealHealthLog[]
   complianceAuditLogs ComplianceAuditLog[]
   negotiationLogs   NegotiationLog[]
+  tcsSessions       TCSSession[]
+
+  // Multi-tenant
+  brokerageId       String?
+  teamId            String?
+  assignedTcId      String?
 
   @@index([userId])
+  @@index([brokerageId])
+  @@index([teamId])
 }
 
 // ============== Workflow Event Log ==============
@@ -1034,4 +1047,213 @@ model ManagedAgentSession {
   createdAt   DateTime @default(now())
 
   @@index([userId, agentName, status])
+}
+
+// ============== CMA Engine ==============
+
+model CompSet {
+  id                       String   @id @default(cuid())
+  userId                   String
+  user                     User     @relation(fields: [userId], references: [id])
+
+  subjectAddress           String
+  subjectPropertyId        String?
+  subjectLat               Float?
+  subjectLng               Float?
+  subjectSqft              Int?
+  subjectBeds              Int?
+  subjectBaths             Float?
+  subjectYearBuilt         Int?
+  subjectLotSize           Int?
+  subjectCondition         String?  // 'excellent' | 'good' | 'average' | 'fair' | 'poor'
+  subjectFeatures          Json?    // { pool, garage_bays, fireplace, waterfront, ... }
+
+  mlsSuggestedPrice        Float?
+  propstreamSuggestedPrice Float?
+  rprSuggestedPrice        Float?
+
+  aireEstimate             Float?
+  aireRangeLow             Float?
+  aireRangeHigh            Float?
+  confidenceTier           String?  // HIGH | MEDIUM | LOW
+  confidenceScore          Float?   // 0-1
+  disagreementPct          Float?
+
+  vendorsResponded         Int      @default(0) // 0-3
+  degradationBand          String   @default("full") // full | partial | degraded
+  excludedFromTraining     Boolean  @default(false)
+
+  mortgageContext          Json?
+  status                   String   @default("active") // active | listed | sold | abandoned | degraded
+
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+
+  comps                    Comp[]
+  accuracyLog              AccuracyLog?
+
+  @@index([userId, createdAt])
+  @@index([subjectAddress])
+  @@index([status])
+}
+
+model Comp {
+  id                 String   @id @default(cuid())
+  compSetId          String
+  compSet            CompSet  @relation(fields: [compSetId], references: [id], onDelete: Cascade)
+
+  source             String   // 'mls_paragon' | 'propstream' | 'rpr'
+  address            String
+  lat                Float?
+  lng                Float?
+
+  soldPrice          Float
+  soldDate           DateTime
+  listPrice          Float?
+  daysOnMarket       Int?
+
+  sqft               Int?
+  beds               Int?
+  baths              Float?
+  yearBuilt          Int?
+  lotSize            Int?
+  garageBays         Int?
+  condition          String?
+  features           Json?
+  distanceMiles      Float?
+
+  similarityScore    Float    @default(0) // 0-1
+  selected           Boolean  @default(false)
+  adjustments        Json?    // [{ factor, amount, reason }]
+  adjustedValue      Float?
+  weight             Float?
+  overAdjusted       Boolean  @default(false)
+
+  rawPayload         Json?    // normalized vendor payload (no HTML)
+
+  createdAt          DateTime @default(now())
+
+  @@index([compSetId, selected])
+  @@index([source])
+  @@index([soldDate])
+}
+
+model AccuracyLog {
+  id                    String   @id @default(cuid())
+  compSetId             String   @unique
+  compSet               CompSet  @relation(fields: [compSetId], references: [id], onDelete: Cascade)
+
+  actualListPrice       Float?
+  actualSoldPrice       Float?
+  actualDOM             Int?
+  actualSoldDate        DateTime?
+
+  mlsError              Float?   // (mlsSuggested - soldPrice) / soldPrice
+  propstreamError       Float?
+  rprError              Float?
+  aireError             Float?
+
+  winner                String?  // 'mls' | 'propstream' | 'rpr' | 'aire'
+  notes                 String?
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([createdAt])
+  @@index([winner])
+}
+
+model ScraperSession {
+  id               String   @id @default(cuid())
+  vendor           String   @unique // 'mls_paragon' | 'propstream' | 'rpr'
+  storagePath      String
+  lastLoginAt      DateTime
+  lastProbeAt      DateTime?
+  status           String   @default("healthy") // 'healthy' | 'expired' | 'locked'
+  ttlMinutes       Int      @default(60)
+  failureCount     Int      @default(0)
+  circuitOpenUntil DateTime?
+  notes            String?
+  updatedAt        DateTime @updatedAt
+}
+
+// ============== PHASE 8: TCS (Transaction Coordination System) ==============
+
+model TCSSession {
+  id              String            @id @default(cuid())
+  userId          String
+  user            User              @relation(fields: [userId], references: [id])
+  transactionId   String?
+  transaction     Transaction?      @relation(fields: [transactionId], references: [id])
+
+  side            String            // "BUYER" | "LISTING" | "DUAL"
+  currentStage    TransactionStatus @default(DRAFT)
+  messages        Json              @default("[]")
+  answers         Json              @default("{}")
+  silentActions   Json              @default("[]")
+
+  completedAt     DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([transactionId])
+}
+
+model TCSQuestion {
+  id             String             @id @default(cuid())
+  stage          TransactionStatus
+  key            String             @unique
+  promptTemplate String             @db.Text
+  quickReplies   Json?
+  required       Boolean            @default(true)
+  orderHint      Int                @default(0)
+  createdAt      DateTime           @default(now())
+
+  @@index([stage, orderHint])
+}
+
+// ============== PHASE 9: Broker-Tenant Model ==============
+
+model Brokerage {
+  id             String    @id @default(cuid())
+  name           String
+  slug           String    @unique
+  logoUrl        String?
+  primaryContact String?
+  billingEmail   String?
+  seatCount      Int       @default(1)
+  tier           String    @default("STANDARD") // "STANDARD" | "ENTERPRISE"
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  members        BrokerageMember[]
+  teams          Team[]
+}
+
+model BrokerageMember {
+  id            String    @id @default(cuid())
+  brokerageId   String
+  brokerage     Brokerage @relation(fields: [brokerageId], references: [id])
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id])
+  role          String    // "OWNER" | "BROKER" | "TC" | "AGENT" | "ASSISTANT"
+  teamId        String?
+  team          Team?     @relation(fields: [teamId], references: [id])
+  joinedAt      DateTime  @default(now())
+
+  @@index([brokerageId])
+}
+
+model Team {
+  id            String    @id @default(cuid())
+  brokerageId   String
+  brokerage     Brokerage @relation(fields: [brokerageId], references: [id])
+  name          String
+  leaderUserId  String?
+
+  members       BrokerageMember[]
+
+  @@index([brokerageId])
 }
