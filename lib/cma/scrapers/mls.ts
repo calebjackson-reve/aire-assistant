@@ -1472,9 +1472,23 @@ export async function paragonDrillSavedCMA(nameSubstring: string): Promise<Saved
     await injectNameShim(popup)
     for (const f of popup.frames()) await injectNameShim(f)
 
-    // Iterate ALL frames trying to click Comparables.
+    // Always dump nav candidates BEFORE click — so we have evidence even on success.
+    const preClickNavDump = await dumpNavCandidates(popup, "day4p3_pre_comparables_nav")
+    if (preClickNavDump) screenshots.push(preClickNavDump)
+
+    // Iterate WIZARD-SCOPED frames only. Saved-presentations list frame at
+    // /CMA/Main.mvc/CMA/0?searchID=... has a jqGrid header cell literally
+    // named "Comparables" which was hijacking the click. Wizard shell is at
+    // /CMA/Main.mvc?cmaId=... (cmaId query param, no /CMA/0 path segment).
+    const isWizardFrame = (f: import("playwright").Frame): boolean => {
+      const u = f.url()
+      if (!/cmaId=\d+/i.test(u)) return false
+      if (/\/CMA\/0/i.test(u)) return false
+      return true
+    }
+    const wizardFrames = popup.frames().filter(isWizardFrame)
     let compsClicked: { ok: boolean; where: string | null } = { ok: false, where: null }
-    for (const f of [popup.mainFrame(), ...popup.frames().filter((x) => x !== popup.mainFrame())]) {
+    for (const f of wizardFrames) {
       compsClicked = await clickWizardComparables(f)
       if (compsClicked.ok) break
     }
