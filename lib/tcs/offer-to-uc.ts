@@ -20,6 +20,7 @@ import { calculateDeadlines } from "@/lib/louisiana-rules-engine"
 import { onDocumentUploaded } from "@/lib/workflow/state-machine"
 import { logAction, type SilentAction } from "./stage-actions"
 import { runAutoMessages } from "./auto-messages"
+import { runUcFlow } from "./uc-flow"
 import { put } from "@vercel/blob"
 import fs from "fs/promises"
 import path from "path"
@@ -364,6 +365,26 @@ export async function runOfferToUC(args: {
       await logAction(args.sessionId, {
         kind: "note",
         summary: `Auto-messages failed — ${err instanceof Error ? err.message : "unknown"}`,
+      }),
+    )
+  }
+
+  // ── Step 6: UC Flow — upgrade inspector draft with preferred vendor, mint
+  //            the earnest-money AirSign envelope to the title company.
+  try {
+    const uc = await runUcFlow({
+      sessionId: args.sessionId,
+      userId: args.userId,
+      transactionId: args.transactionId,
+      answers: args.answers,
+    })
+    actions.push(...uc.actions)
+  } catch (err) {
+    console.error("[TCS/offer-to-uc] uc-flow threw:", err)
+    actions.push(
+      await logAction(args.sessionId, {
+        kind: "note",
+        summary: `UC flow failed — ${err instanceof Error ? err.message : "unknown"}`,
       }),
     )
   }
