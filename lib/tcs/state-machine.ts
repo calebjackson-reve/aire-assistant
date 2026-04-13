@@ -4,7 +4,6 @@
 // actions on entry, persist session state.
 
 import prisma from "@/lib/prisma"
-import { advanceTransaction, type WorkflowTrigger } from "@/lib/workflow/state-machine"
 import {
   TCS_STAGE_ORDER,
   TCS_STAGES,
@@ -70,27 +69,16 @@ export async function maybeAdvanceStage(
     return { advanced: false, fromStage, toStage: null, error: "Already at final stage" }
   }
 
-  // If we have a linked Transaction, try to move it via the canonical workflow state machine
-  let workflowAdvance: WorkflowTrigger = "system"
-  if (session.transactionId) {
-    const result = await advanceTransaction({
-      transactionId: session.transactionId,
-      toStatus: toStage,
-      trigger: workflowAdvance,
-      triggeredBy,
-      metadata: { tcsSessionId: sessionId, reason: "Stage complete in TCS" },
-    })
-    // If direct transition not allowed, we still advance the TCS session's
-    // internal stage pointer — the workflow may auto-advance on downstream triggers.
-    if (!result.success) {
-      console.warn(`[TCS] Workflow advance ${fromStage} → ${toStage} rejected: ${result.error}`)
-    }
-  }
-
+  // TCS session advances its own pointer. The underlying Transaction is moved
+  // separately via canonical triggers inside stage-entry handlers
+  // (onDocumentUploaded after PA creation, etc). This keeps guards intact.
   await prisma.tCSSession.update({
     where: { id: sessionId },
     data: { currentStage: toStage },
   })
+
+  // triggeredBy is currently used as a breadcrumb only; logged for audit hooks later.
+  if (triggeredBy) void triggeredBy
 
   return { advanced: true, fromStage, toStage }
 }

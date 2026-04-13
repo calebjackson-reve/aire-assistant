@@ -661,6 +661,27 @@ function ActionRow({ action }: { action: SilentAction }) {
           ? "!"
           : "✓"
 
+  const href =
+    action.payload && typeof (action.payload as Record<string, unknown>).href === "string"
+      ? ((action.payload as Record<string, unknown>).href as string)
+      : null
+
+  const content = (
+    <span
+      style={{
+        color: "#2c3520",
+        fontFamily: "'IBM Plex Mono', monospace",
+        fontSize: 12,
+        lineHeight: 1.5,
+        textDecoration: href ? "underline" : "none",
+        textDecorationColor: href ? "#8a9070" : "transparent",
+        textUnderlineOffset: 3,
+      }}
+    >
+      {action.summary}
+    </span>
+  )
+
   return (
     <div
       style={{
@@ -685,9 +706,18 @@ function ActionRow({ action }: { action: SilentAction }) {
       >
         {glyph}
       </span>
-      <span style={{ color: "#2c3520", fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, lineHeight: 1.5 }}>
-        {action.summary}
-      </span>
+      {href ? (
+        <a
+          href={href}
+          target="_blank"
+          rel="noreferrer"
+          style={{ color: "inherit", textDecoration: "none" }}
+        >
+          {content}
+        </a>
+      ) : (
+        content
+      )}
     </div>
   )
 }

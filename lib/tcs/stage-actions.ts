@@ -259,25 +259,26 @@ const STAGE_ENTRY: Partial<Record<TCSStage, StageEntryHandler>> = {
     ]
   },
 
-  UNDER_CONTRACT: async ({ sessionId, transactionId, answers }) => {
+  UNDER_CONTRACT: async ({ sessionId, userId, transactionId, answers }) => {
     const actions: SilentAction[] = []
     actions.push(
       await logAction(sessionId, {
         kind: "stage_entered",
-        summary: `Under contract — EM + disclosures in flight`,
+        summary: `Under contract — drafting PA, envelope, deadlines`,
       }),
     )
-    // Compute canonical deadlines via the LA rules engine. Done in a separate
-    // file (louisiana-rules-engine.ts) — wiring is day-4 work.
-    if (transactionId && answers["offer.closingDate"]) {
+    if (!transactionId) {
       actions.push(
         await logAction(sessionId, {
-          kind: "deadline_created",
-          summary: `Auto-deadlines calculated from contract acceptance`,
-          payload: { anchor: answers["offer.closingDate"] },
+          kind: "note",
+          summary: `Cannot draft contract — transaction not yet linked`,
         }),
       )
+      return actions
     }
+    const { runOfferToUC } = await import("./offer-to-uc")
+    const result = await runOfferToUC({ sessionId, userId, transactionId, answers })
+    actions.push(...result.actions)
     return actions
   },
 
