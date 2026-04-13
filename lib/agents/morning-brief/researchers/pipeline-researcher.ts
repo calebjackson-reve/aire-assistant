@@ -4,6 +4,7 @@
 import prisma from "@/lib/prisma"
 import { normalizeAddress } from "@/lib/data/engines/normalize"
 import { getLatestScore } from "@/lib/data/db/queries/scores"
+import { TCS_STAGES, type TCSStage, nextQuestion } from "@/lib/tcs/stages"
 
 export interface DealIntelligence {
   aireEstimate: number | null
@@ -12,6 +13,15 @@ export interface DealIntelligence {
   ppsTotal: number | null
   assessorGapPct: number | null
   scoredAt: string | null
+}
+
+export interface PipelineTCSSummary {
+  sessionId: string
+  stage: TCSStage
+  stageLabel: string
+  nextActionPrompt: string | null
+  nextActionKey: string | null
+  updatedAt: Date
 }
 
 export interface PipelineDeal {
@@ -28,6 +38,7 @@ export interface PipelineDeal {
   needsAttention: boolean
   attentionReason: string | null
   intelligence: DealIntelligence | null
+  tcs: PipelineTCSSummary | null
 }
 
 export interface PipelineResearchResult {
@@ -36,6 +47,7 @@ export interface PipelineResearchResult {
   closingSoon: number   // closing within 14 days
   needsAttention: number
   lowConfidenceDeals: number  // deals where AIRE estimate confidence is LOW
+  tcsInFlight: number         // deals with an open TCS walkthrough
 }
 
 export async function researchPipeline(userId: string): Promise<PipelineResearchResult> {
@@ -60,6 +72,31 @@ export async function researchPipeline(userId: string): Promise<PipelineResearch
     },
     orderBy: { updatedAt: "desc" },
   })
+
+  // Pull in-flight TCS sessions for this user — one per transaction (most-recent)
+  const tcsSessions = await prisma.tCSSession.findMany({
+    where: {
+      userId: user.id,
+      completedAt: null,
+      transactionId: { in: transactions.map((t) => t.id) },
+    },
+    orderBy: { updatedAt: "desc" },
+  })
+  const tcsByTransactionId = new Map<string, PipelineTCSSummary>()
+  for (const s of tcsSessions) {
+    if (!s.transactionId) continue
+    if (tcsByTransactionId.has(s.transactionId)) continue // keep most-recent
+    const answered = new Set(Object.keys((s.answers as Record<string, unknown>) || {}))
+    const q = nextQuestion(s.currentStage as TCSStage, answered)
+    tcsByTransactionId.set(s.transactionId, {
+      sessionId: s.id,
+      stage: s.currentStage as TCSStage,
+      stageLabel: TCS_STAGES[s.currentStage as TCSStage]?.label ?? s.currentStage,
+      nextActionPrompt: q?.prompt ?? null,
+      nextActionKey: q?.key ?? null,
+      updatedAt: s.updatedAt,
+    })
+  }
 
   // Look up AIRE scores for each deal's property (parallel, fault-tolerant)
   const scoreMap = new Map<string, DealIntelligence>()
@@ -109,11 +146,24 @@ export async function researchPipeline(userId: string): Promise<PipelineResearch
     }
 
     const intelligence = scoreMap.get(t.id) ?? null
+    const tcs = tcsByTransactionId.get(t.id) ?? null
 
     // Flag low-confidence estimates as needing attention
     if (intelligence?.confidenceTier === 'LOW' && !needsAttention) {
       needsAttention = true
       attentionReason = `AIRE estimate confidence is LOW (${(intelligence.disagreementPct ?? 0 * 100).toFixed(1)}% source disagreement)`
+    }
+
+    // TCS in-flight takes precedence as the top card on this deal:
+    // surface the stage + next action in natural language.
+    if (tcs) {
+      needsAttention = true
+      const stageLabel = tcs.stageLabel.toLowerCase()
+      if (tcs.nextActionPrompt) {
+        attentionReason = `${t.propertyAddress} — ${stageLabel}: ${tcs.nextActionPrompt}`
+      } else {
+        attentionReason = `${t.propertyAddress} — awaiting ${stageLabel} response`
+      }
     }
 
     return {
@@ -130,6 +180,7 @@ export async function researchPipeline(userId: string): Promise<PipelineResearch
       needsAttention,
       attentionReason,
       intelligence,
+      tcs,
     }
   })
 
@@ -139,5 +190,6 @@ export async function researchPipeline(userId: string): Promise<PipelineResearch
     closingSoon: deals.filter((d) => d.daysUntilClosing !== null && d.daysUntilClosing <= 14).length,
     needsAttention: deals.filter((d) => d.needsAttention).length,
     lowConfidenceDeals: deals.filter((d) => d.intelligence?.confidenceTier === 'LOW').length,
+    tcsInFlight: deals.filter((d) => !!d.tcs).length,
   }
 }
