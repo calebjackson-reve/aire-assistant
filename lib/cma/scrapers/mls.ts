@@ -1179,24 +1179,80 @@ async function clickSavedCMAByName(
   }>
 }
 
-/** Clicks the "Comparables" step in the CMA Wizard left sidebar. */
-async function clickWizardComparables(frame: import("playwright").Frame): Promise<boolean> {
-  return await frame.evaluate(() => {
-    const all = Array.from(document.querySelectorAll("a, li, span, td, div")) as HTMLElement[]
-    const candidates = all.filter((el) => {
-      const own = Array.from(el.childNodes)
-        .filter((n) => n.nodeType === 3)
-        .map((n) => (n.textContent || "").trim())
-        .join(" ")
-        .trim()
-      return /^\s*Comparables\s*$/i.test(own)
-    })
+/** Clicks the "Comparables" step in the CMA Wizard left sidebar.
+ *  Wizard renders sidebar in a different frame than the main content;
+ *  iterate every frame and try multiple text shapes. */
+async function clickWizardComparables(frame: import("playwright").Frame): Promise<{ ok: boolean; where: string | null }> {
+  const result = await frame.evaluate(() => {
+    const findTargets = () => {
+      const all = Array.from(document.querySelectorAll("a, li, span, td, div, button")) as HTMLElement[]
+      const exact = all.filter((el) => {
+        const own = Array.from(el.childNodes)
+          .filter((n) => n.nodeType === 3)
+          .map((n) => (n.textContent || "").trim())
+          .join(" ")
+          .trim()
+        return /^\s*Comparables\s*$/i.test(own)
+      })
+      if (exact.length > 0) return exact
+      // Fallback: contains "Comparables" but isn't a heading/body wrapper
+      return all.filter((el) => {
+        const own = Array.from(el.childNodes)
+          .filter((n) => n.nodeType === 3)
+          .map((n) => (n.textContent || "").trim())
+          .join(" ")
+          .trim()
+        return /\bComparables\b/i.test(own) && own.length < 40
+      })
+    }
+    const candidates = findTargets()
+    if (candidates.length === 0) return { ok: false, clickedText: null }
     const target = candidates.find((e) => e.tagName === "A") || candidates[0]
-    if (!target) return false
     target.scrollIntoView?.({ block: "center" })
     target.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }))
-    return true
-  })
+    return { ok: true, clickedText: (target.textContent || "").trim().slice(0, 60) }
+  }).catch(() => ({ ok: false, clickedText: null }))
+  return { ok: result.ok, where: result.ok ? `${frame.url().slice(0, 80)} :: "${result.clickedText}"` : null }
+}
+
+/** Dumps every anchor/li/span with short text across all frames —
+ *  used to locate sidebar nav items when DOM outline misses them. */
+async function dumpNavCandidates(page: Page, label: string): Promise<string> {
+  try {
+    const allFrames = [page.mainFrame(), ...page.frames().filter((f) => f !== page.mainFrame())]
+    const out: Record<string, unknown> = { frames: [] }
+    for (const frame of allFrames) {
+      const data = await frame.evaluate(() => {
+        const items: Array<{ tag: string; text: string; href: string | null; onclick: boolean; visible: boolean }> = []
+        const els = Array.from(document.querySelectorAll("a, li, span[onclick], div[onclick], button")) as HTMLElement[]
+        for (const el of els) {
+          const own = Array.from(el.childNodes)
+            .filter((n) => n.nodeType === 3)
+            .map((n) => (n.textContent || "").trim())
+            .join(" ")
+            .trim()
+          if (!own || own.length > 60) continue
+          const r = el.getBoundingClientRect()
+          items.push({
+            tag: el.tagName.toLowerCase(),
+            text: own,
+            href: (el as HTMLAnchorElement).href || null,
+            onclick: !!el.getAttribute("onclick") || !!(el as unknown as { onclick?: unknown }).onclick,
+            visible: r.width > 0 && r.height > 0,
+          })
+        }
+        return { url: location.href, items: items.slice(0, 200) }
+      }).catch((e) => ({ error: String(e), url: frame.url() }))
+      ;(out.frames as unknown[]).push(data)
+    }
+    await fs.mkdir(DEBUG_DIR, { recursive: true })
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-")
+    const filepath = path.join(DEBUG_DIR, `${VENDOR}_${stamp}_${label}_nav.json`)
+    await fs.writeFile(filepath, JSON.stringify(out, null, 2), "utf8")
+    return filepath
+  } catch {
+    return ""
+  }
 }
 
 /** Extracts comps from the Step-2 Comparables grid in the CMA Wizard. */
@@ -1416,25 +1472,30 @@ export async function paragonDrillSavedCMA(nameSubstring: string): Promise<Saved
     await injectNameShim(popup)
     for (const f of popup.frames()) await injectNameShim(f)
 
-    // Click Step 2: Comparables in the wizard sidebar
-    // Try the wizardFrame first, fall back to popup top frame
-    const compsClicked =
-      (await clickWizardComparables(wizardFrame).catch(() => false)) ||
-      (await clickWizardComparables(popup.mainFrame()).catch(() => false))
-    if (!compsClicked) {
-      // Dump DOM so next run can identify the step link by shape
-      const dump = await captureListDomOutline(popup, "day4p3_wizard_no_comparables_link")
-      return finish("FAIL", "Could not click Comparables step", {
+    // Iterate ALL frames trying to click Comparables.
+    let compsClicked: { ok: boolean; where: string | null } = { ok: false, where: null }
+    for (const f of [popup.mainFrame(), ...popup.frames().filter((x) => x !== popup.mainFrame())]) {
+      compsClicked = await clickWizardComparables(f)
+      if (compsClicked.ok) break
+    }
+
+    if (!compsClicked.ok) {
+      // Dump anchors so we can locate the Comparables element exactly.
+      const navDump = await dumpNavCandidates(popup, "day4p3_wizard_no_comparables_link")
+      const domDump = await captureListDomOutline(popup, "day4p3_wizard_no_comparables_dom")
+      return finish("FAIL", `Could not click Comparables step. Nav dump: ${navDump}`, {
         cmaId: clicked.cmaId,
         cmaName: clicked.name,
         subjectMls: clicked.subjectMls,
         wizardUrl,
-        domDumpPath: dump,
+        domDumpPath: domDump,
       })
     }
     step = "comparables_nav"
-    await popup.waitForTimeout(3000)
-    await popup.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
+    console.log(`[mls] comparables clicked in: ${compsClicked.where}`)
+    // Generating CMA animation can run 5-15s per Caleb's screenshots
+    await popup.waitForTimeout(5000)
+    await popup.waitForLoadState("networkidle", { timeout: 25000 }).catch(() => {})
     screenshots.push(await captureLandingScreenshot(popup, "day4p3_03_comparables_view"))
 
     // Shim all frames again — comparables click likely spawned new content frames
