@@ -1703,11 +1703,21 @@ export async function paragonHarvestSavedCMAs(
     for (const target of targets) {
       const snapPath = snapshotPathFor(target.cmaId, target.name)
       if (resume) {
-        const exists = await fs.stat(snapPath).then(() => true).catch(() => false)
-        if (exists) {
-          results.push({ cmaId: target.cmaId, name: target.name, status: "SKIPPED", reason: "snapshot exists", compCount: 0, snapshotPath: snapPath })
-          console.log(`[harvest] SKIP ${target.cmaId} ${target.name} (snapshot exists)`)
-          continue
+        const content = await fs.readFile(snapPath, "utf8").catch(() => null)
+        if (content) {
+          try {
+            const parsed = JSON.parse(content) as { comps?: unknown[] }
+            if (Array.isArray(parsed.comps) && parsed.comps.length > 0) {
+              results.push({ cmaId: target.cmaId, name: target.name, status: "SKIPPED", reason: "snapshot has comps", compCount: parsed.comps.length, snapshotPath: snapPath })
+              console.log(`[harvest] SKIP ${target.cmaId} ${target.name} (${parsed.comps.length} comps already saved)`)
+              continue
+            }
+            // Empty snapshot — delete + re-harvest
+            await fs.unlink(snapPath).catch(() => {})
+          } catch {
+            // Corrupt file — delete + re-harvest
+            await fs.unlink(snapPath).catch(() => {})
+          }
         }
       }
 
