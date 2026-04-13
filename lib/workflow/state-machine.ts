@@ -33,13 +33,35 @@ const TRANSITIONS: TransitionRule[] = [
     allowedTriggers: ["manual", "voice_command", "document_uploaded"],
     description: "Activate a draft transaction",
   },
-  // ACTIVE → PENDING_INSPECTION: Contract signed, inspection period begins
+  // ACTIVE → UNDER_CONTRACT: Mutually signed PA, earnest money + disclosures in flight
+  {
+    from: "ACTIVE",
+    to: "UNDER_CONTRACT",
+    allowedTriggers: ["document_uploaded", "manual", "voice_command"],
+    guard: async (txId) => {
+      const contractDoc = await prisma.document.findFirst({
+        where: {
+          transactionId: txId,
+          type: { in: ["purchase_agreement", "contract"] },
+        },
+      })
+      return !!contractDoc
+    },
+    description: "Fully executed PA → under contract",
+  },
+  // UNDER_CONTRACT → PENDING_INSPECTION: Inspection window opens
+  {
+    from: "UNDER_CONTRACT",
+    to: "PENDING_INSPECTION",
+    allowedTriggers: ["document_uploaded", "manual", "voice_command", "deadline_completed"],
+    description: "Open inspection period",
+  },
+  // Legacy direct ACTIVE → PENDING_INSPECTION kept for backward compat
   {
     from: "ACTIVE",
     to: "PENDING_INSPECTION",
     allowedTriggers: ["document_uploaded", "manual", "voice_command"],
     guard: async (txId) => {
-      // Must have at least one contract-type document
       const contractDoc = await prisma.document.findFirst({
         where: {
           transactionId: txId,
@@ -78,6 +100,13 @@ const TRANSITIONS: TransitionRule[] = [
     allowedTriggers: ["document_uploaded", "manual"],
     description: "Act of Sale complete — transaction closed",
   },
+  // CLOSED → POST_CLOSE: 0–60 day post-close window (review, referral, nurture)
+  {
+    from: "CLOSED",
+    to: "POST_CLOSE",
+    allowedTriggers: ["manual", "system", "document_uploaded"],
+    description: "Enter post-close nurture window",
+  },
   // Any active status → CANCELLED
   {
     from: "DRAFT",
@@ -114,6 +143,12 @@ const TRANSITIONS: TransitionRule[] = [
     to: "CANCELLED",
     allowedTriggers: ["manual", "voice_command"],
     description: "Cancel during closing",
+  },
+  {
+    from: "UNDER_CONTRACT",
+    to: "CANCELLED",
+    allowedTriggers: ["manual", "voice_command"],
+    description: "Cancel while under contract",
   },
 ]
 
@@ -270,17 +305,31 @@ export async function onDocumentUploaded(
 
   const { status } = transaction
 
-  // Contract uploaded while ACTIVE → move to PENDING_INSPECTION
+  // Contract uploaded while ACTIVE → move to UNDER_CONTRACT (TCS-era stage)
   if (
     status === "ACTIVE" &&
     ["purchase_agreement", "contract"].includes(documentType)
   ) {
     return advanceTransaction({
       transactionId,
+      toStatus: "UNDER_CONTRACT",
+      trigger: "document_uploaded",
+      triggeredBy,
+      metadata: { documentType, reason: "Purchase agreement executed" },
+    })
+  }
+
+  // Earnest money or first disclosure while UNDER_CONTRACT → open inspection window
+  if (
+    status === "UNDER_CONTRACT" &&
+    ["earnest_money_receipt", "property_disclosure", "lead_paint_disclosure"].includes(documentType)
+  ) {
+    return advanceTransaction({
+      transactionId,
       toStatus: "PENDING_INSPECTION",
       trigger: "document_uploaded",
       triggeredBy,
-      metadata: { documentType, reason: "Contract uploaded" },
+      metadata: { documentType, reason: "EM / disclosures received — inspection opens" },
     })
   }
 
