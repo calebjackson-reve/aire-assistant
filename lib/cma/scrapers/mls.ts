@@ -764,48 +764,55 @@ async function clickSavedPresentations(page: Page): Promise<boolean> {
   return false
 }
 
-/** Best-effort DOM outline of the Saved Presentations list view — dumps a
- *  compact JSON describing tables/grids/rows so Phase 2 parser can be
- *  selector-accurate without a second reconnaissance run. */
+/** Best-effort DOM outline — iterates EVERY frame (Paragon is iframe-heavy:
+ *  main doc + SessionWarning + Page.mvc + nested content frames). Each
+ *  frame's tables/grids/headers/first-row are captured so Phase 2 parser
+ *  can find the actual list without a third recon run. */
 async function captureListDomOutline(page: Page, label: string): Promise<string> {
   try {
-    const outline = await page.evaluate(() => {
-      const summary: Record<string, unknown> = {}
-      const tables = Array.from(document.querySelectorAll("table"))
-      summary.tables = tables.slice(0, 8).map((t, i) => ({
-        index: i,
-        id: t.id || null,
-        className: t.className || null,
-        rowCount: t.querySelectorAll("tbody tr").length,
-        firstHeader: Array.from(t.querySelectorAll("thead th, thead td")).slice(0, 16).map((c) => (c.textContent || "").trim()),
-        firstRow: Array.from(t.querySelectorAll("tbody tr")).slice(0, 1).flatMap((r) =>
-          Array.from(r.querySelectorAll("td")).map((c) => (c.textContent || "").trim()),
-        ),
-      }))
-      const grids = Array.from(document.querySelectorAll('[role="grid"]'))
-      summary.grids = grids.slice(0, 4).map((g, i) => ({
-        index: i,
-        id: (g as HTMLElement).id || null,
-        rowCount: g.querySelectorAll('[role="row"]').length,
-      }))
-      summary.url = window.location.href
-      summary.title = document.title
-      // Headings (page title area)
-      summary.headings = Array.from(document.querySelectorAll("h1, h2, h3, legend"))
-        .slice(0, 10)
-        .map((h) => (h.textContent || "").trim())
-        .filter(Boolean)
-      // Action buttons / links near list
-      summary.buttonsTop10 = Array.from(document.querySelectorAll('button, input[type="button"], input[type="submit"], a.button, [role="button"]'))
-        .slice(0, 20)
-        .map((b) => ((b as HTMLElement).innerText || (b as HTMLInputElement).value || "").trim())
-        .filter(Boolean)
-      return summary
-    })
+    const allFrames = [page.mainFrame(), ...page.frames().filter((f) => f !== page.mainFrame())]
+    const out: Record<string, unknown> = { frames: [] }
+    for (const frame of allFrames) {
+      const data = await frame.evaluate(() => {
+        const tables = Array.from(document.querySelectorAll("table"))
+        const tableSummaries = tables.slice(0, 12).map((t, i) => ({
+          index: i,
+          id: t.id || null,
+          className: t.className?.toString?.() || null,
+          rowCount: t.querySelectorAll("tbody tr").length,
+          firstHeader: Array.from(t.querySelectorAll("thead th, thead td")).slice(0, 20).map((c) => (c.textContent || "").trim()),
+          // First 3 rows, all cells, for column-mapping inference
+          firstRows: Array.from(t.querySelectorAll("tbody tr")).slice(0, 3).map((r) =>
+            Array.from(r.querySelectorAll("td")).map((c) => (c.textContent || "").trim()),
+          ),
+        }))
+        const grids = Array.from(document.querySelectorAll('[role="grid"]'))
+        const gridSummaries = grids.slice(0, 4).map((g, i) => ({
+          index: i,
+          id: (g as HTMLElement).id || null,
+          rowCount: g.querySelectorAll('[role="row"]').length,
+        }))
+        return {
+          url: location.href,
+          title: document.title,
+          tables: tableSummaries,
+          grids: gridSummaries,
+          headings: Array.from(document.querySelectorAll("h1, h2, h3, legend"))
+            .slice(0, 10)
+            .map((h) => (h.textContent || "").trim())
+            .filter(Boolean),
+          buttonsTop20: Array.from(document.querySelectorAll('button, input[type="button"], input[type="submit"], a.button, [role="button"]'))
+            .slice(0, 20)
+            .map((b) => ((b as HTMLElement).innerText || (b as HTMLInputElement).value || "").trim())
+            .filter(Boolean),
+        }
+      }).catch((e) => ({ error: String(e), url: frame.url() }))
+      ;(out.frames as unknown[]).push(data)
+    }
     await fs.mkdir(DEBUG_DIR, { recursive: true })
     const stamp = new Date().toISOString().replace(/[:.]/g, "-")
     const filepath = path.join(DEBUG_DIR, `${VENDOR}_${stamp}_${label}_dom.json`)
-    await fs.writeFile(filepath, JSON.stringify(outline, null, 2), "utf8")
+    await fs.writeFile(filepath, JSON.stringify(out, null, 2), "utf8")
     return filepath
   } catch {
     return ""
