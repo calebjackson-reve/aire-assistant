@@ -53,12 +53,32 @@ export default async function AirSignPage() {
             </h1>
             <p className="text-[#e8e4d8]/60 text-sm tracking-wide mt-1">Electronic Signatures</p>
           </div>
-          <Link
-            href="/airsign/new"
-            className="bg-[#6b7d52] text-[#f5f2ea] font-medium px-5 py-2.5 rounded text-sm hover:bg-[#6b7d52]/80 transition-colors"
-          >
-            + New Envelope
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/airsign/templates"
+              className="border border-[#6b7d52]/30 text-[#e8e4d8]/80 font-medium px-4 py-2.5 rounded text-sm hover:border-[#9aab7e]/50 hover:text-[#e8e4d8] transition-colors"
+            >
+              Templates
+            </Link>
+            <Link
+              href="/airsign/brokerage"
+              className="border border-[#6b7d52]/30 text-[#e8e4d8]/80 font-medium px-4 py-2.5 rounded text-sm hover:border-[#9aab7e]/50 hover:text-[#e8e4d8] transition-colors"
+            >
+              Brokerage
+            </Link>
+            <Link
+              href="/airsign/broker"
+              className="border border-[#6b7d52]/30 text-[#e8e4d8]/80 font-medium px-4 py-2.5 rounded text-sm hover:border-[#9aab7e]/50 hover:text-[#e8e4d8] transition-colors"
+            >
+              Review queue
+            </Link>
+            <Link
+              href="/airsign/new"
+              className="bg-[#6b7d52] text-[#f5f2ea] font-medium px-5 py-2.5 rounded text-sm hover:bg-[#6b7d52]/80 transition-colors"
+            >
+              + New Envelope
+            </Link>
+          </div>
         </div>
 
         {/* Status Counts */}
