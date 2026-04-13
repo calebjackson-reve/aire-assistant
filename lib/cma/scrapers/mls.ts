@@ -41,10 +41,14 @@ const DEBUG_DIR = path.resolve(process.cwd(), "lib/cma/scrapers/debug")
 let consecutiveLoginFailures = 0
 const MAX_CONSECUTIVE_LOGIN_FAILURES = 2
 
-/** Login marker heuristic — post-login pages drop the /login path and expose a nav shell. */
+/** Login marker heuristic — ROAM redirects from clareityiam.net to clareity.net
+ *  after SSO hand-off. Treat any non-IAM clareity.net host as logged in, and
+ *  fall back to body text for skins on other hosts. */
 async function isParagonLoggedIn(page: Page): Promise<boolean> {
   const url = page.url().toLowerCase()
   if (url.includes("login") || url.includes("signin") || url.includes("authenticate")) return false
+  // Strong positive signal: we're on the ROAM MLS shell, not the IAM.
+  if (url.includes("clareity.net") && !url.includes("clareityiam.net")) return true
   const bodyText = (await page.textContent("body").catch(() => "")) || ""
   return /log ?out|sign ?out|my account|dashboard|home ?page|search/i.test(bodyText)
 }
@@ -101,8 +105,28 @@ async function paragonLogin(page: Page, creds: VendorCredentials): Promise<void>
     throw new Error(`Submit button not found on login page (screenshot: ${shot})`)
   }
   await page.click(submitSel)
-  await page.waitForLoadState("domcontentloaded", { timeout: 45000 }).catch(() => {})
-  await humanPause(1200, 2400)
+
+  // ROAM's SSO chain: clareityiam.net → clareity.net. Wait for the hand-off
+  // before deciding login succeeded. domcontentloaded fires on the interstitial
+  // and would return too early, which is what caused the blank-screenshot FAIL
+  // on 2026-04-13. Budget 20s for the redirect + 15s for network to settle.
+  await page.waitForURL(
+    (url) => {
+      const s = url.toString().toLowerCase()
+      return s.includes("clareity.net") && !s.includes("clareityiam.net") && !s.includes("/login")
+    },
+    { timeout: 20000 },
+  ).catch(() => {})
+  await page.waitForLoadState("domcontentloaded", { timeout: 15000 }).catch(() => {})
+  await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
+  await humanPause(800, 1600)
+
+  // Poll the marker for up to 10s in case the shell renders after networkidle.
+  const markerDeadline = Date.now() + 10000
+  while (Date.now() < markerDeadline) {
+    if (await isParagonLoggedIn(page)) break
+    await page.waitForTimeout(500)
+  }
 
   // Post-submit captcha check (challenges sometimes appear only after POST)
   const postCaptcha = await detectCaptcha(page)
