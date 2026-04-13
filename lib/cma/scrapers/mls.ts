@@ -355,18 +355,48 @@ async function dismissUserPreferencesWizard(page: Page): Promise<boolean> {
   return false
 }
 
-/** Navigates to the SEARCH tab in the Paragon top nav. */
+/** Navigates to the SEARCH tab in the Paragon top nav.
+ *  Paragon renders tabs as icon+label in a top navbar (not <a> or [role=tab]).
+ *  Labels are uppercase "SEARCH". Try text match with uppercase + strict. */
 async function clickSearchTab(page: Page): Promise<boolean> {
-  const candidates = [
-    'a:has-text("Search"):not(:has-text("Saved")):not(:has-text("Quick"))',
-    '[role="tab"]:has-text("Search")',
-    'text=/^Search$/',
+  // Strategy: locate ANY element whose text is exactly "SEARCH" (the tab
+  // label), then click its bounding box. Falls back to several more-specific
+  // shapes. Dual-frame handling: iterate frames if main frame misses.
+  const frames = [page.mainFrame(), ...page.frames().filter((f) => f !== page.mainFrame())]
+  for (const frame of frames) {
+    const loc = frame.locator('text=/^SEARCH$/').first()
+    if (await loc.isVisible().catch(() => false)) {
+      const box = await loc.boundingBox().catch(() => null)
+      if (box) {
+        // Click slightly above the text (where the icon is) — tabs in Paragon
+        // wire their onclick on the icon <img>/container, not the label span.
+        await frame.page().mouse.click(box.x + box.width / 2, box.y - 15).catch(() => {})
+      } else {
+        await loc.click({ timeout: 3000 }).catch(() => {})
+      }
+      await page.waitForTimeout(2500)
+      await page.waitForLoadState("networkidle", { timeout: 10000 }).catch(() => {})
+      return true
+    }
+  }
+  // Fallbacks: case-insensitive + tag-agnostic
+  const fallbacks = [
+    'text=/^\\s*Search\\s*$/i',
+    '[class*="tab" i]:has-text("Search")',
+    'li:has-text("SEARCH")',
+    'td:has-text("SEARCH")',
+    'span:has-text("SEARCH")',
   ]
-  for (const sel of candidates) {
+  for (const sel of fallbacks) {
     const el = page.locator(sel).first()
     if (await el.isVisible().catch(() => false)) {
-      await el.click({ timeout: 5000 }).catch(() => {})
-      await page.waitForTimeout(2000)
+      const box = await el.boundingBox().catch(() => null)
+      if (box) {
+        await page.mouse.click(box.x + box.width / 2, Math.max(box.y - 15, 0)).catch(() => {})
+      } else {
+        await el.click({ timeout: 3000 }).catch(() => {})
+      }
+      await page.waitForTimeout(2500)
       await page.waitForLoadState("networkidle", { timeout: 10000 }).catch(() => {})
       return true
     }
