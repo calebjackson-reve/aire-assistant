@@ -19,6 +19,7 @@ import { writeContract } from "@/lib/contracts/contract-writer"
 import { calculateDeadlines } from "@/lib/louisiana-rules-engine"
 import { onDocumentUploaded } from "@/lib/workflow/state-machine"
 import { logAction, type SilentAction } from "./stage-actions"
+import { runAutoMessages } from "./auto-messages"
 import { put } from "@vercel/blob"
 import fs from "fs/promises"
 import path from "path"
@@ -344,6 +345,25 @@ export async function runOfferToUC(args: {
       await logAction(args.sessionId, {
         kind: "note",
         summary: `Deadline creation failed — ${err instanceof Error ? err.message : "unknown"}`,
+      }),
+    )
+  }
+
+  // ── Step 5: Auto-draft the 5 canonical TC outbound messages ───────────────
+  try {
+    const messages = await runAutoMessages({
+      sessionId: args.sessionId,
+      userId: args.userId,
+      transactionId: args.transactionId,
+      answers: args.answers,
+    })
+    actions.push(...messages.actions)
+  } catch (err) {
+    console.error("[TCS/offer-to-uc] auto-messages threw:", err)
+    actions.push(
+      await logAction(args.sessionId, {
+        kind: "note",
+        summary: `Auto-messages failed — ${err instanceof Error ? err.message : "unknown"}`,
       }),
     )
   }

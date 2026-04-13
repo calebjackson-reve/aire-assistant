@@ -81,6 +81,35 @@ export async function appendAireMessage(
   })
 }
 
+/**
+ * Parse a freeform contact string like:
+ *   "Jane Doe / jane@ex.com"
+ *   "Jane Doe (jane@ex.com)"
+ *   "Jane Doe - 225-555-1212"
+ *   "Jane Doe jane@ex.com 225-555-1212"
+ * into structured name/email/phone. Best-effort; anything not matched
+ * is returned as the name.
+ */
+export function parseContact(raw: string): {
+  name: string
+  email: string | null
+  phone: string | null
+} {
+  const s = raw.trim()
+  if (!s) return { name: "", email: null, phone: null }
+  const emailMatch = s.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i)
+  const phoneMatch = s.match(/\+?\d[\d\s().-]{8,}\d/)
+  let name = s
+  if (emailMatch) name = name.replace(emailMatch[0], "")
+  if (phoneMatch) name = name.replace(phoneMatch[0], "")
+  name = name.replace(/[/|\-()]+/g, " ").replace(/\s+/g, " ").trim()
+  return {
+    name,
+    email: emailMatch?.[0] ?? null,
+    phone: phoneMatch?.[0]?.replace(/[^\d+]/g, "") ?? null,
+  }
+}
+
 function formatAnswer(v: unknown): string {
   if (v === null || v === undefined) return ""
   if (typeof v === "string") return v
@@ -222,19 +251,28 @@ const STAGE_ENTRY: Partial<Record<TCSStage, StageEntryHandler>> = {
     const address = String(answers["intake.address"] ?? "").trim()
     if (!address) return []
 
+    // Parse "Name / email@domain" or "Name (email@domain)" or "Name - phone"
+    const clientRaw = String(answers["intake.client"] ?? "")
+    const { name: clientName, email: clientEmail, phone: clientPhone } = parseContact(clientRaw)
+    const side = String(answers["intake.side"] ?? "")
+
     const tx = await prisma.transaction.create({
       data: {
         userId,
         propertyAddress: address,
         status: "ACTIVE",
         buyerName:
-          (answers["intake.side"] === "BUYER" || answers["intake.side"] === "DUAL")
-            ? String(answers["intake.client"] ?? "") || null
-            : null,
+          side === "BUYER" || side === "DUAL" ? clientName || null : null,
+        buyerEmail:
+          side === "BUYER" || side === "DUAL" ? clientEmail || null : null,
+        buyerPhone:
+          side === "BUYER" || side === "DUAL" ? clientPhone || null : null,
         sellerName:
-          (answers["intake.side"] === "LISTING" || answers["intake.side"] === "DUAL")
-            ? String(answers["intake.client"] ?? "") || null
-            : null,
+          side === "LISTING" || side === "DUAL" ? clientName || null : null,
+        sellerEmail:
+          side === "LISTING" || side === "DUAL" ? clientEmail || null : null,
+        sellerPhone:
+          side === "LISTING" || side === "DUAL" ? clientPhone || null : null,
         listPrice: answers["intake.listPrice"]
           ? Number(String(answers["intake.listPrice"]).replace(/[^0-9.]/g, "")) || null
           : null,
