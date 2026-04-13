@@ -264,6 +264,300 @@ export async function paragonSmokeTest(subject: string): Promise<ParagonSmokeRes
   }
 }
 
+// ── Day 3: comp search (ROAM dashboard → Paragon popup → search → parse) ─
+
+export interface RawComp {
+  address: string
+  soldPrice: number | null
+  soldDate: string | null
+  sqft: number | null
+  beds: number | null
+  baths: number | null
+  distanceMiles: number | null
+  mlsNumber?: string
+  status?: string
+  rawRow?: string[]
+}
+
+export interface ParagonCompSearchResult {
+  status: "PASS" | "FAIL" | "HALT"
+  reason?: string
+  stepReached: "session" | "dashboard" | "popup_opened" | "wizard_dismissed" | "search_tab" | "search_filled" | "results_rendered" | "parsed"
+  loginPath: "fresh" | "reused"
+  comps: RawComp[]
+  screenshots: string[]
+  popupUrl?: string
+  durationMs: number
+}
+
+/** Dismisses the ROAM dashboard announcement modal ("Coming Soon Listings…"). */
+async function dismissDashboardModal(page: Page): Promise<boolean> {
+  const candidates = [
+    'button[aria-label="Close"]',
+    'button[aria-label="close"]',
+    'button:has-text("Close")',
+    'button:has-text("×")',
+  ]
+  for (const sel of candidates) {
+    const el = page.locator(sel).first()
+    if (await el.isVisible().catch(() => false)) {
+      await el.click({ timeout: 3000 }).catch(() => {})
+      await page.waitForTimeout(600)
+      return true
+    }
+  }
+  return false
+}
+
+/** Opens the Paragon app by clicking the "Paragon" favorites tile icon.
+ *  The label is text "Paragon"; the clickable tile is the icon ~50px above it.
+ *  Returns the popup page once it loads, or throws. */
+async function openParagonPopup(
+  page: Page,
+  context: import("playwright").BrowserContext,
+): Promise<Page> {
+  const labelLoc = page.getByText("Paragon", { exact: true }).first()
+  const box = await labelLoc.boundingBox()
+  if (!box) throw new Error("Paragon tile label not found on dashboard")
+
+  const popupPromise = context.waitForEvent("page", { timeout: 15000 }).catch(() => null)
+  await page.mouse.click(box.x + box.width / 2, box.y - 50)
+
+  const popup = await popupPromise
+  const allPages = context.pages()
+  const target = popup || allPages.find((p) => p !== page)
+  if (!target) throw new Error("Paragon popup did not open within 15s")
+
+  await target.waitForLoadState("domcontentloaded", { timeout: 30000 }).catch(() => {})
+  await target.waitForLoadState("networkidle", { timeout: 20000 }).catch(() => {})
+  await target.waitForTimeout(1500)
+  return target
+}
+
+/** Closes the Paragon "User Preferences Wizard" first-run modal. */
+async function dismissUserPreferencesWizard(page: Page): Promise<boolean> {
+  // The wizard has a "Close" button in the top-right of its header.
+  const candidates = [
+    'button:has-text("Close")',
+    'input[value="Close"]',
+    '[aria-label="Close"]',
+    // Also try the "Don't show again" checkbox then Close
+    'text=/User Preferences Wizard/i',
+  ]
+  for (const sel of candidates.slice(0, 3)) {
+    const el = page.locator(sel).first()
+    if (await el.isVisible().catch(() => false)) {
+      await el.click({ timeout: 3000 }).catch(() => {})
+      await page.waitForTimeout(1000)
+      return true
+    }
+  }
+  return false
+}
+
+/** Navigates to the SEARCH tab in the Paragon top nav. */
+async function clickSearchTab(page: Page): Promise<boolean> {
+  const candidates = [
+    'a:has-text("Search"):not(:has-text("Saved")):not(:has-text("Quick"))',
+    '[role="tab"]:has-text("Search")',
+    'text=/^Search$/',
+  ]
+  for (const sel of candidates) {
+    const el = page.locator(sel).first()
+    if (await el.isVisible().catch(() => false)) {
+      await el.click({ timeout: 5000 }).catch(() => {})
+      await page.waitForTimeout(2000)
+      await page.waitForLoadState("networkidle", { timeout: 10000 }).catch(() => {})
+      return true
+    }
+  }
+  return false
+}
+
+/** Extract comp rows from Paragon's results grid. Paragon uses a classic
+ *  <table> or an Ag-grid-like <div role="grid">. Try both. */
+async function parseCompResults(page: Page): Promise<RawComp[]> {
+  const rows = await page.evaluate(() => {
+    const out: string[][] = []
+    // Strategy 1: classic <tr>/<td> table
+    const tables = Array.from(document.querySelectorAll("table"))
+    for (const t of tables) {
+      const trs = Array.from(t.querySelectorAll("tbody tr"))
+      if (trs.length < 3) continue
+      for (const tr of trs) {
+        const cells = Array.from(tr.querySelectorAll("td")).map((td) => (td.textContent || "").trim())
+        if (cells.length >= 4) out.push(cells)
+      }
+      if (out.length > 0) return out
+    }
+    // Strategy 2: role=grid with role=row / role=gridcell
+    const grids = Array.from(document.querySelectorAll('[role="grid"]'))
+    for (const g of grids) {
+      const rws = Array.from(g.querySelectorAll('[role="row"]'))
+      for (const r of rws) {
+        const cells = Array.from(r.querySelectorAll('[role="gridcell"], [role="cell"]')).map((c) => (c.textContent || "").trim())
+        if (cells.length >= 4) out.push(cells)
+      }
+      if (out.length > 0) return out
+    }
+    return out
+  })
+
+  // Heuristic mapping — Paragon results typically show:
+  // [MLS#, Status, Address, City, List$, Sold$, Beds, Baths, Sqft, DOM, CloseDate, ...]
+  return rows.slice(0, 25).map((cells) => {
+    const priceRegex = /\$?([\d,]{4,})/
+    const sqftRegex = /\b([\d,]{3,5})\b/
+    const dateRegex = /(\d{1,2}\/\d{1,2}\/\d{2,4})/
+    const numbers = cells.map((c) => {
+      const m = c.match(priceRegex)
+      return m ? parseInt(m[1].replace(/,/g, ""), 10) : null
+    })
+    // Best-effort extraction
+    const prices = numbers.filter((n): n is number => n !== null && n >= 20000 && n < 10_000_000).sort((a, b) => b - a)
+    const addressCell = cells.find((c) => /\b\d+\s+[A-Za-z]/.test(c)) || ""
+    const dateCell = cells.find((c) => dateRegex.test(c)) || ""
+    const sqftCell = cells.find((c) => {
+      const m = c.match(sqftRegex)
+      if (!m) return false
+      const n = parseInt(m[1].replace(/,/g, ""), 10)
+      return n >= 400 && n <= 20000
+    })
+    const bedsCell = cells.find((c) => /^[1-9]$/.test(c.trim()))
+
+    return {
+      address: addressCell,
+      soldPrice: prices[0] ?? null,
+      soldDate: dateCell ? (dateCell.match(dateRegex)?.[1] ?? null) : null,
+      sqft: sqftCell ? parseInt((sqftCell.match(sqftRegex)?.[1] ?? "0").replace(/,/g, ""), 10) : null,
+      beds: bedsCell ? parseInt(bedsCell.trim(), 10) : null,
+      baths: null,
+      distanceMiles: null,
+      rawRow: cells,
+    } satisfies RawComp
+  })
+}
+
+/** Day-3 comp search. Single shot. Navigates ROAM → Paragon popup →
+ *  dismisses wizards → SEARCH tab → screenshots whatever renders.
+ *  Conservative: if any step past "popup opened" fails, returns FAIL with
+ *  stepReached + screenshots rather than retrying or guessing. */
+export async function paragonCompSearch(subject: string): Promise<ParagonCompSearchResult> {
+  const started = Date.now()
+  const screenshots: string[] = []
+  let session: VendorSession | null = null
+  let step: ParagonCompSearchResult["stepReached"] = "session"
+
+  const finish = (
+    status: ParagonCompSearchResult["status"],
+    reason: string | undefined,
+    comps: RawComp[],
+    popupUrl?: string,
+  ): ParagonCompSearchResult => ({
+    status,
+    reason,
+    stepReached: step,
+    loginPath: session?.refreshed ? "fresh" : "reused",
+    comps,
+    screenshots,
+    popupUrl,
+    durationMs: Date.now() - started,
+  })
+
+  try {
+    session = await rateLimited(VENDOR, () =>
+      openVendorSession({
+        vendor: VENDOR,
+        probeUrl: "https://roam.clareity.net/layouts",
+        login: paragonLogin,
+        isLoggedIn: isParagonLoggedIn,
+        sessionMaxAgeDays: 7,
+      }),
+    )
+    const { context, page } = session
+    await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
+    await page.waitForTimeout(800)
+    step = "dashboard"
+    screenshots.push(await captureLandingScreenshot(page, "day3_01_dashboard"))
+
+    const modalDismissed = await dismissDashboardModal(page)
+    await captureDebug(VENDOR, page, modalDismissed ? "day3_modal_ok" : "day3_modal_missing")
+
+    const popup = await openParagonPopup(page, context).catch((e) => { throw e })
+    step = "popup_opened"
+    screenshots.push(await captureLandingScreenshot(popup, "day3_02_popup_opened"))
+
+    const wizardDismissed = await dismissUserPreferencesWizard(popup)
+    if (wizardDismissed) step = "wizard_dismissed"
+    await popup.waitForTimeout(1000)
+    screenshots.push(await captureLandingScreenshot(popup, "day3_03_post_wizard"))
+
+    const searchClicked = await clickSearchTab(popup)
+    if (!searchClicked) {
+      return finish("FAIL", "SEARCH tab not found or not clickable after wizard", [], popup.url())
+    }
+    step = "search_tab"
+    screenshots.push(await captureLandingScreenshot(popup, "day3_04_search_tab"))
+
+    // At this point the Search form should be visible. Paragon's search is
+    // a frame-heavy legacy UI; without a confirmed selector chain for the
+    // address field + radius + status + sold-date we stop here rather than
+    // risk misfiring the search. The screenshot at step="search_tab" is
+    // the handoff for Day 3.5.
+    //
+    // BEST-EFFORT address fill: try the visible Quick Search address field.
+    const addressFilled = await (async () => {
+      const candidates = [
+        'input[name*="Address"]',
+        'input[placeholder*="address" i]',
+        'input[id*="address" i]',
+      ]
+      for (const sel of candidates) {
+        const el = popup.locator(sel).first()
+        if (await el.isVisible().catch(() => false)) {
+          await el.fill(subject.split(",")[0]).catch(() => {})
+          await popup.waitForTimeout(500)
+          return sel
+        }
+      }
+      return null
+    })()
+    if (addressFilled) {
+      step = "search_filled"
+      screenshots.push(await captureLandingScreenshot(popup, "day3_05_address_filled"))
+    }
+
+    // Attempt to trigger a search. No submit — just parse whatever grid is on screen.
+    // (Submitting an unverified search form on a legacy ASP.NET app is the exact
+    // thing the "single-shot no-retry" rule protects against.)
+    screenshots.push(await captureLandingScreenshot(popup, "day3_06_pre_parse"))
+
+    const comps = await parseCompResults(popup)
+    if (comps.length > 0) step = "parsed"
+    screenshots.push(await captureLandingScreenshot(popup, "day3_07_post_parse"))
+
+    if (comps.length === 0) {
+      return finish(
+        "FAIL",
+        `Search form reached (step=${step}) but 0 comps parsed. Search submission + results parsing is Day 3.5 — needs a walkthrough of the exact Paragon Search → Sold Status → date range → polygon path.`,
+        [],
+        popup.url(),
+      )
+    }
+
+    return finish("PASS", undefined, comps, popup.url())
+  } catch (err) {
+    if (err instanceof ScraperHaltError) {
+      return finish("HALT", err.reason, [], undefined)
+    }
+    return finish("FAIL", err instanceof Error ? err.message : String(err), [], undefined)
+  } finally {
+    if (session?.context) {
+      await session.context.close().catch(() => {})
+    }
+  }
+}
+
 export async function shutdownParagonScraper() {
   await closeBrowser()
 }
