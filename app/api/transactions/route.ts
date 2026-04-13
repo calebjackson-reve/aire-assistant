@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { calculateDeadlines } from "@/lib/louisiana-rules-engine";
 import { ensureTransactionFolder } from "@/lib/integrations/gws-drive";
 import { createCalendarEvent } from "@/lib/integrations/gws-calendar";
+import { getScopedContext, scopedTransactionWhere } from "@/lib/tcs/scoped-prisma";
 
 // GET: List all transactions for the authenticated user
 export async function GET() {
@@ -18,8 +19,9 @@ export async function GET() {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    const ctx = await getScopedContext(user.id);
     const transactions = await prisma.transaction.findMany({
-      where: { userId: user.id },
+      where: scopedTransactionWhere(ctx),
       include: { deadlines: true },
       orderBy: { createdAt: "desc" },
     });

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import prisma from "@/lib/prisma"
+import { getScopedContext, scopedTransactionWhere } from "@/lib/tcs/scoped-prisma"
 
-// GET: Fetch a single transaction with all relations
+// GET: Fetch a single transaction with all relations (brokerage-scoped)
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -20,8 +21,9 @@ export async function GET(
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
+    const ctx = await getScopedContext(user.id)
     const transaction = await prisma.transaction.findFirst({
-      where: { id, userId: user.id },
+      where: scopedTransactionWhere(ctx, { id }),
       include: {
         deadlines: { orderBy: { dueDate: "asc" } },
         documents: { orderBy: { createdAt: "desc" } },
@@ -58,9 +60,10 @@ export async function PATCH(
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    // Verify ownership
+    // Verify brokerage-scoped access
+    const ctx = await getScopedContext(user.id)
     const existing = await prisma.transaction.findFirst({
-      where: { id, userId: user.id },
+      where: scopedTransactionWhere(ctx, { id }),
       select: { id: true, status: true },
     })
 
@@ -132,8 +135,9 @@ export async function DELETE(
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
+    const ctx = await getScopedContext(user.id)
     const transaction = await prisma.transaction.findFirst({
-      where: { id, userId: user.id },
+      where: scopedTransactionWhere(ctx, { id }),
       select: { id: true, status: true },
     })
 
