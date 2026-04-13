@@ -591,3 +591,236 @@ export async function paragonCompSearch(subject: string): Promise<ParagonCompSea
 export async function shutdownParagonScraper() {
   await closeBrowser()
 }
+
+// ── Day 4: Saved CMA Presentations harvest (back-engineer Caleb's own CMAs) ─
+//
+// Flow: ROAM dashboard → Paragon popup → dismiss wizard → CMA tab (dropdown)
+//       → "Saved Presentations" sub-item → list view (recon only for Phase 1).
+// Phase 2 (separate run) will open each saved CMA, extract subject + comps.
+// Phase 1 stops at list-view screenshot per single-shot discipline.
+
+export interface SavedPresentationsReconResult {
+  status: "PASS" | "FAIL" | "HALT"
+  reason?: string
+  stepReached:
+    | "session"
+    | "dashboard"
+    | "popup_opened"
+    | "wizard_dismissed"
+    | "cma_tab_open"
+    | "saved_presentations_clicked"
+    | "list_rendered"
+  loginPath: "fresh" | "reused"
+  listUrl?: string
+  listTitle?: string | null
+  rowCountHint: number | null
+  screenshots: string[]
+  domOutlinePath?: string
+  durationMs: number
+}
+
+/** Opens the CMA dropdown in Paragon's top nav. Tries click first (Paragon
+ *  classic navs are click-to-open, not hover-to-open), then hover fallback.
+ *  Verifies the dropdown rendered by probing for the "Saved Presentations"
+ *  label. */
+async function openCMATabDropdown(page: Page): Promise<boolean> {
+  const frames = [page.mainFrame(), ...page.frames().filter((f) => f !== page.mainFrame())]
+  const dropdownProbe = async (frame: import("playwright").Frame) =>
+    frame.locator('text=/Saved Presentations/i').first().isVisible().catch(() => false)
+
+  for (const frame of frames) {
+    const tab = frame.locator('text=/^CMA$/').first()
+    if (!(await tab.isVisible().catch(() => false))) continue
+    const box = await tab.boundingBox().catch(() => null)
+    if (!box) continue
+
+    // Click icon area above the label — same pattern that worked for SEARCH tab.
+    await frame.page().mouse.click(box.x + box.width / 2, Math.max(box.y - 15, 0)).catch(() => {})
+    await page.waitForTimeout(600)
+    if (await dropdownProbe(frame)) return true
+
+    // Click on label itself
+    await tab.click({ timeout: 2500 }).catch(() => {})
+    await page.waitForTimeout(600)
+    if (await dropdownProbe(frame)) return true
+
+    // Hover fallback
+    await frame.page().mouse.move(box.x + box.width / 2, box.y + box.height / 2).catch(() => {})
+    await page.waitForTimeout(700)
+    if (await dropdownProbe(frame)) return true
+  }
+  return false
+}
+
+/** Clicks the "Saved Presentations" sub-item in the CMA dropdown. */
+async function clickSavedPresentations(page: Page): Promise<boolean> {
+  const frames = [page.mainFrame(), ...page.frames().filter((f) => f !== page.mainFrame())]
+  for (const frame of frames) {
+    const loc = frame.locator('text=/^Saved Presentations$/i').first()
+    if (await loc.isVisible().catch(() => false)) {
+      await loc.click({ timeout: 3000 }).catch(() => {})
+      await page.waitForTimeout(2500)
+      await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
+      return true
+    }
+  }
+  return false
+}
+
+/** Best-effort DOM outline of the Saved Presentations list view — dumps a
+ *  compact JSON describing tables/grids/rows so Phase 2 parser can be
+ *  selector-accurate without a second reconnaissance run. */
+async function captureListDomOutline(page: Page, label: string): Promise<string> {
+  try {
+    const outline = await page.evaluate(() => {
+      const summary: Record<string, unknown> = {}
+      const tables = Array.from(document.querySelectorAll("table"))
+      summary.tables = tables.slice(0, 8).map((t, i) => ({
+        index: i,
+        id: t.id || null,
+        className: t.className || null,
+        rowCount: t.querySelectorAll("tbody tr").length,
+        firstHeader: Array.from(t.querySelectorAll("thead th, thead td")).slice(0, 16).map((c) => (c.textContent || "").trim()),
+        firstRow: Array.from(t.querySelectorAll("tbody tr")).slice(0, 1).flatMap((r) =>
+          Array.from(r.querySelectorAll("td")).map((c) => (c.textContent || "").trim()),
+        ),
+      }))
+      const grids = Array.from(document.querySelectorAll('[role="grid"]'))
+      summary.grids = grids.slice(0, 4).map((g, i) => ({
+        index: i,
+        id: (g as HTMLElement).id || null,
+        rowCount: g.querySelectorAll('[role="row"]').length,
+      }))
+      summary.url = window.location.href
+      summary.title = document.title
+      // Headings (page title area)
+      summary.headings = Array.from(document.querySelectorAll("h1, h2, h3, legend"))
+        .slice(0, 10)
+        .map((h) => (h.textContent || "").trim())
+        .filter(Boolean)
+      // Action buttons / links near list
+      summary.buttonsTop10 = Array.from(document.querySelectorAll('button, input[type="button"], input[type="submit"], a.button, [role="button"]'))
+        .slice(0, 20)
+        .map((b) => ((b as HTMLElement).innerText || (b as HTMLInputElement).value || "").trim())
+        .filter(Boolean)
+      return summary
+    })
+    await fs.mkdir(DEBUG_DIR, { recursive: true })
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-")
+    const filepath = path.join(DEBUG_DIR, `${VENDOR}_${stamp}_${label}_dom.json`)
+    await fs.writeFile(filepath, JSON.stringify(outline, null, 2), "utf8")
+    return filepath
+  } catch {
+    return ""
+  }
+}
+
+/** Phase 1 recon for saved CMA harvest. Single shot, list view only. */
+export async function paragonListSavedPresentations(): Promise<SavedPresentationsReconResult> {
+  const started = Date.now()
+  const screenshots: string[] = []
+  let session: VendorSession | null = null
+  let step: SavedPresentationsReconResult["stepReached"] = "session"
+  let domOutlinePath: string | undefined
+
+  const finish = (
+    status: SavedPresentationsReconResult["status"],
+    reason: string | undefined,
+    listUrl?: string,
+    listTitle?: string | null,
+    rowCountHint: number | null = null,
+  ): SavedPresentationsReconResult => ({
+    status,
+    reason,
+    stepReached: step,
+    loginPath: session?.refreshed ? "fresh" : "reused",
+    listUrl,
+    listTitle: listTitle ?? null,
+    rowCountHint,
+    screenshots,
+    domOutlinePath,
+    durationMs: Date.now() - started,
+  })
+
+  try {
+    session = await rateLimited(VENDOR, () =>
+      openVendorSession({
+        vendor: VENDOR,
+        probeUrl: "https://roam.clareity.net/layouts",
+        login: paragonLogin,
+        isLoggedIn: isParagonLoggedIn,
+        sessionMaxAgeDays: 7,
+      }),
+    )
+    const { context, page } = session
+    await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
+    await page.waitForTimeout(800)
+    step = "dashboard"
+    screenshots.push(await captureLandingScreenshot(page, "day4_01_dashboard"))
+
+    await dismissDashboardModal(page)
+    const popup = await openParagonPopup(page, context)
+    step = "popup_opened"
+    screenshots.push(await captureLandingScreenshot(popup, "day4_02_popup_opened"))
+
+    await dismissUserPreferencesWizard(popup)
+    step = "wizard_dismissed"
+    await popup.waitForTimeout(1000)
+    screenshots.push(await captureLandingScreenshot(popup, "day4_03_post_wizard"))
+
+    const cmaOpened = await openCMATabDropdown(popup)
+    if (!cmaOpened) {
+      screenshots.push(await captureLandingScreenshot(popup, "day4_04_cma_dropdown_FAIL"))
+      return finish("FAIL", "CMA dropdown did not open — 'Saved Presentations' label not visible after click/hover attempts", popup.url())
+    }
+    step = "cma_tab_open"
+    screenshots.push(await captureLandingScreenshot(popup, "day4_04_cma_dropdown_open"))
+
+    const clicked = await clickSavedPresentations(popup)
+    if (!clicked) {
+      return finish("FAIL", "'Saved Presentations' sub-item not clickable", popup.url())
+    }
+    step = "saved_presentations_clicked"
+    await popup.waitForTimeout(1500)
+    await popup.waitForLoadState("networkidle", { timeout: 10000 }).catch(() => {})
+    screenshots.push(await captureLandingScreenshot(popup, "day4_05_saved_presentations_list"))
+
+    // Post-load captcha check (defensive — unlikely on internal CMA page)
+    const cap = await detectCaptcha(popup)
+    if (cap.present) {
+      throw new ScraperHaltError(
+        `Captcha detected on Saved Presentations list (${cap.kind ?? "unknown"})`,
+        VENDOR,
+        await captureLandingScreenshot(popup, "day4_captcha_on_list"),
+      )
+    }
+
+    step = "list_rendered"
+    domOutlinePath = await captureListDomOutline(popup, "day4_05_saved_presentations")
+
+    // Rough row count hint — count first-hit table's tbody rows
+    const rowCountHint = await popup
+      .evaluate(() => {
+        const t = document.querySelector("table")
+        return t ? t.querySelectorAll("tbody tr").length : null
+      })
+      .catch(() => null)
+
+    recordSuccess(VENDOR)
+    await logScrapeRun({ vendor: VENDOR, subject: "saved_cmas_recon", status: "success", durationMs: Date.now() - started })
+
+    return finish("PASS", undefined, popup.url(), await popup.title().catch(() => null), rowCountHint ?? null)
+  } catch (err) {
+    if (err instanceof ScraperHaltError) {
+      return finish("HALT", err.reason)
+    }
+    const message = err instanceof Error ? err.message : String(err)
+    recordFailure(VENDOR)
+    await logScrapeRun({ vendor: VENDOR, subject: "saved_cmas_recon", status: "failure", durationMs: Date.now() - started, error: message })
+    return finish("FAIL", message)
+  } finally {
+    if (session?.context) {
+      await session.context.close().catch(() => {})
+    }
+  }
+}
