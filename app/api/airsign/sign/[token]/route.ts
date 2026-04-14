@@ -331,10 +331,16 @@ async function sealEnvelope(envelopeId: string) {
   }
   // Signature images are already captured in audit events above
 
+  // v2 extended FieldType with NAME/RADIO/STRIKETHROUGH/DROPDOWN; the legacy sealer
+  // only knows the original 5. Narrow here — new types seal in a follow-up pass.
+  const SEALABLE = ["SIGNATURE", "INITIALS", "DATE", "TEXT", "CHECKBOX"] as const
+  type SealableType = (typeof SEALABLE)[number]
   const sealFields: SealField[] = envelope.fields
-    .filter((f) => f.value && f.filledAt)
+    .filter((f): f is typeof f & { type: SealableType } =>
+      !!f.value && !!f.filledAt && (SEALABLE as readonly string[]).includes(f.type)
+    )
     .map((f) => ({
-      type: f.type === "NAME" ? "TEXT" : (f.type as SealField["type"]),
+      type: f.type as SealField["type"],
       page: f.page,
       xPercent: f.xPercent,
       yPercent: f.yPercent,

@@ -120,6 +120,34 @@ export default async function AirSignPage() {
             </div>
           </header>
 
+          {/* ── Nav actions (v2) ── */}
+          <nav className="mb-10 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.14em]">
+            <Link
+              href="/airsign/new"
+              className="rounded-md bg-[#6b7d52] px-5 py-2.5 font-medium text-[#f5f2ea] hover:bg-[#5a6b43] transition-colors"
+            >
+              + New envelope
+            </Link>
+            <Link
+              href="/airsign/templates"
+              className="rounded-md border border-[#6b7d52]/30 px-4 py-2.5 font-medium text-forest-deep/75 hover:border-[#6b7d52]/60 hover:text-forest-deep transition-colors"
+            >
+              Templates
+            </Link>
+            <Link
+              href="/airsign/brokerage"
+              className="rounded-md border border-[#6b7d52]/30 px-4 py-2.5 font-medium text-forest-deep/75 hover:border-[#6b7d52]/60 hover:text-forest-deep transition-colors"
+            >
+              Brokerage
+            </Link>
+            <Link
+              href="/airsign/broker"
+              className="rounded-md border border-[#6b7d52]/30 px-4 py-2.5 font-medium text-forest-deep/75 hover:border-[#6b7d52]/60 hover:text-forest-deep transition-colors"
+            >
+              Review queue
+            </Link>
+          </nav>
+
           {/* ── Empty state ── */}
           {envelopes.length === 0 ? (
             <div className="py-24 text-center">

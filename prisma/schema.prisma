@@ -90,6 +90,13 @@ model User {
   compSets        CompSet[]
   tcsSessions     TCSSession[]
   brokerageMembership BrokerageMember?
+
+  // v2 AirSign
+  airSignTemplates           AirSignTemplate[]
+  complianceReviewsSubmitted ComplianceReview[] @relation("ComplianceSubmitter")
+  complianceReviewsAssigned  ComplianceReview[] @relation("ComplianceReviewer")
+  bulkSendBatches            BulkSendBatch[]
+  loopImports                LoopImport[]
 }
 
 // ============== PHASE 2: Transaction Core ==============
@@ -189,11 +196,20 @@ model Transaction {
 
   // Multi-tenant
   brokerageId       String?
+  brokerage         Brokerage?        @relation(fields: [brokerageId], references: [id], onDelete: SetNull)
+  officeId          String?
+  office            Office?           @relation(fields: [officeId], references: [id], onDelete: SetNull)
   teamId            String?
   assignedTcId      String?
 
+  // v2: Loop Data Model — canonical data blob. Keys defined in lib/airsign/v2/data-keys.ts
+  loopData          Json?
+
+  archivedAt        DateTime?
+
   @@index([userId])
   @@index([brokerageId])
+  @@index([officeId])
   @@index([teamId])
 }
 
@@ -497,6 +513,53 @@ enum FieldType {
   DATE
   TEXT
   CHECKBOX
+  NAME
+  RADIO
+  STRIKETHROUGH
+  DROPDOWN
+}
+
+enum SignerAuthMethod {
+  EMAIL_LINK
+  SMS_OTP
+  ACCESS_CODE
+  KBA
+}
+
+enum SignerPermission {
+  CAN_SIGN
+  FILL_ONLY
+  VIEW_ONLY
+  CC
+}
+
+enum BrokerageRole {
+  BROKER_OWNER
+  COMPLIANCE_OFFICER
+  OFFICE_ADMIN
+  AGENT
+  ASSISTANT
+}
+
+enum TemplateScope {
+  PERSONAL
+  OFFICE
+  BROKERAGE
+  MARKETPLACE
+}
+
+enum TemplateKind {
+  DOCUMENT
+  TASK_LIST
+  CLAUSE
+  FIELD_SET
+}
+
+enum ComplianceReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CHANGES_REQUESTED
 }
 
 model AirSignEnvelope {
@@ -505,10 +568,46 @@ model AirSignEnvelope {
   user            User           @relation(fields: [userId], references: [id])
   transactionId   String?
 
+  // v2: brokerage tenancy (nullable for backwards compat with pre-v2 envelopes)
+  brokerageId     String?
+  brokerage       Brokerage?     @relation(fields: [brokerageId], references: [id], onDelete: SetNull)
+  officeId        String?
+  office          Office?        @relation(fields: [officeId], references: [id], onDelete: SetNull)
+
   name            String         // e.g., "Purchase Agreement - 123 Main St"
   status          EnvelopeStatus @default(DRAFT)
   documentUrl     String?        // Vercel Blob URL for the PDF
   pageCount       Int?
+
+  // v2: sender options captured at send time
+  customMessage   String?        @db.Text
+  attachPdf       Boolean        @default(false)
+
+  // v2: Loop Data Model snapshot at envelope creation — pre-fills TEXT/DATE/NAME fields via template dataBindings
+  loopDataSnapshot Json?
+
+  // v2: compliance gate
+  requiresReview  Boolean        @default(false)
+
+  // v2: provenance — which template this envelope was instantiated from (null for direct PDF uploads)
+  templateId      String?
+  template        AirSignTemplate? @relation("EnvelopeTemplate", fields: [templateId], references: [id], onDelete: SetNull)
+  templateInstantiatedAt DateTime?
+
+  // v2: bulk-send batch grouping (one template → many envelopes)
+  bulkSendBatchId String?
+  bulkSendBatch   BulkSendBatch?   @relation(fields: [bulkSendBatchId], references: [id], onDelete: SetNull)
+
+  // v2: brokerage AirSign settings snapshot — frozen at send-time so branding is stable
+  brokerageSettingsId String?
+  brokerageSettings   BrokerageAirSignSettings? @relation(fields: [brokerageSettingsId], references: [id], onDelete: SetNull)
+
+  // v2: overrides the per-signer default authMethod from BrokerageAirSignSettings; null = use default
+  requireAuthMethod SignerAuthMethod?
+
+  // v2: Dotloop import link (null for non-imported envelopes)
+  loopImportId    String?
+  loopImport      LoopImport?     @relation(fields: [loopImportId], references: [id], onDelete: SetNull)
 
   // Delivery
   sentAt          DateTime?
@@ -516,6 +615,7 @@ model AirSignEnvelope {
   expiresAt       DateTime?
   voidedAt        DateTime?
   voidReason      String?
+  archivedAt      DateTime?
 
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
@@ -523,9 +623,13 @@ model AirSignEnvelope {
   signers         AirSignSigner[]
   fields          AirSignField[]
   auditEvents     AirSignAuditEvent[]
+  reminders       AirSignReminder[]
+  complianceReview ComplianceReview?
 
   @@index([userId, status])
   @@index([transactionId])
+  @@index([brokerageId, status])
+  @@index([officeId])
 }
 
 model AirSignSigner {
@@ -536,9 +640,17 @@ model AirSignSigner {
   name            String
   email           String
   phone           String?
-  role            String         @default("SIGNER") // SIGNER, WITNESS, NOTARY
+  role            String         @default("SIGNER") // SIGNER, WITNESS, NOTARY, CC
   order           Int            @default(1)        // signing order
   signingOrder    Int            @default(0)        // sequential signing gate: lowest value signs first
+
+  // v2: per-recipient permission + auth
+  permission      SignerPermission @default(CAN_SIGN)
+  authMethod      SignerAuthMethod @default(EMAIL_LINK)
+  authSecret      String?        // hashed OTP target / access-code hash
+  authVerifiedAt  DateTime?      // session-level verification timestamp
+  otpAttempts     Int            @default(0)
+  kbaProviderRef  String?        // Persona/Jumio inquiry id
 
   // Signing state
   token           String         @unique @default(cuid()) // unique link token for /sign/[token]
@@ -581,6 +693,10 @@ model AirSignField {
   // Value after signing
   value           String?
   filledAt        DateTime?
+
+  // v2: data-key binding to Loop Data Model (null for pure signer fields)
+  dataKey         String?        // e.g., "loop.property.street"
+  options         Json?          // RADIO/DROPDOWN choices: ["Yes", "No", "N/A"]
 
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
@@ -1232,11 +1348,252 @@ model Brokerage {
   seatCount      Int       @default(1)
   tier           String    @default("STANDARD") // "STANDARD" | "ENTERPRISE"
 
+  // v2 AirSign fields
+  licenseNumber     String?
+  state             String?                               // "LA"
+  accentColor       String?                               // hex, layered on DESIGN.md palette
+  emailFooter       String?  @db.Text
+  requireReview     Boolean  @default(false)              // gate sends through broker review
+  defaultSignerAuth SignerAuthMethod @default(EMAIL_LINK)
+  stripeCustomerId  String?  @unique
+  seatsPaid         Int      @default(0)
+
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
   members        BrokerageMember[]
   teams          Team[]
+
+  // v2 AirSign relations
+  offices          Office[]
+  transactions     Transaction[]
+  airSignEnvelopes AirSignEnvelope[]
+  airSignTemplates AirSignTemplate[]
+  complianceReviews ComplianceReview[]
+  airSignSettings  BrokerageAirSignSettings? @relation("BrokerageAirSignSettings")
+}
+
+// ============== v2: Office (physical branch within Brokerage) ==============
+
+model Office {
+  id          String    @id @default(cuid())
+  brokerageId String
+  brokerage   Brokerage @relation(fields: [brokerageId], references: [id], onDelete: Cascade)
+  name        String                          // "Baton Rouge"
+  slug        String
+  address     String?
+  phone       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  transactions     Transaction[]
+  airSignEnvelopes AirSignEnvelope[]
+  airSignTemplates AirSignTemplate[]
+
+  @@unique([brokerageId, slug])
+  @@index([brokerageId])
+}
+
+// ============== v2: AirSign Template Library ==============
+
+model AirSignTemplate {
+  id            String        @id @default(cuid())
+  scope         TemplateScope
+  kind          TemplateKind
+  name          String
+  description   String?
+
+  // Scope owners (exactly one set based on scope)
+  userId        String?
+  user          User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  brokerageId   String?
+  brokerage     Brokerage?    @relation(fields: [brokerageId], references: [id], onDelete: Cascade)
+  officeId      String?
+  office        Office?       @relation(fields: [officeId], references: [id], onDelete: Cascade)
+
+  // DOCUMENT kind
+  pdfBlobUrl    String?
+  pageCount     Int?
+  formCode      String?        // "LREC-RPA", "LREC-BRA", etc.
+
+  // Field layout — [{ type, label, page, xPct, yPct, wPct, hPct, dataKey, signerRole, required, options }]
+  fieldLayout   Json?
+
+  // Data-key bindings for autofill hydration (also encoded inside fieldLayout, but this is the quick-lookup index)
+  dataBindings  Json?          // { "<fieldId>": "loop.property.street", ... }
+
+  // Taxonomy
+  folder        String?        // "Purchase & Sale" / "Listing & Agency"
+  tags          String[]
+
+  // CLAUSE kind
+  clauseBody    String?        @db.Text
+
+  // TASK_LIST kind — [{ name, offsetDays, assignee, required }]
+  taskList      Json?
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  // v2 back-relation: envelopes instantiated from this template
+  envelopes     AirSignEnvelope[] @relation("EnvelopeTemplate")
+
+  @@index([scope, kind, folder])
+  @@index([userId, scope])
+  @@index([brokerageId, scope])
+  @@index([officeId, scope])
+  @@index([formCode])
+}
+
+// ============== v2: Compliance Review ==============
+
+model ComplianceReview {
+  id             String                 @id @default(cuid())
+  envelopeId     String                 @unique
+  envelope       AirSignEnvelope        @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+  brokerageId    String
+  brokerage      Brokerage              @relation(fields: [brokerageId], references: [id], onDelete: Cascade)
+
+  submittedById  String
+  submittedBy    User                   @relation("ComplianceSubmitter", fields: [submittedById], references: [id])
+  submittedAt    DateTime               @default(now())
+
+  reviewerId     String?
+  reviewer       User?                  @relation("ComplianceReviewer", fields: [reviewerId], references: [id])
+  reviewedAt     DateTime?
+
+  status         ComplianceReviewStatus @default(PENDING)
+  reviewerNote   String?                @db.Text
+  requiredChanges String[]
+
+  @@index([brokerageId, status, submittedAt])
+  @@index([reviewerId, status])
+}
+
+// ============== v2: Brokerage AirSign Settings ==============
+// Settings-only extension alongside the existing Brokerage model owned by Agent 1.
+// Enables branding/auth-defaults/compliance policy to live in a dedicated v2 table
+// that can be added/modified without touching Brokerage.
+
+enum ComplianceMode {
+  OFF                 // no broker review required
+  REVIEW_BEFORE_SEND  // envelope must be approved before delivery
+  REVIEW_BEFORE_CLOSE // review triggers on final signer completion
+}
+
+model BrokerageAirSignSettings {
+  id              String          @id @default(cuid())
+  brokerageId     String          @unique
+  brokerage       Brokerage       @relation("BrokerageAirSignSettings", fields: [brokerageId], references: [id], onDelete: Cascade)
+
+  // Branding — rendered on signer pages + emails + Certificate of Completion
+  brandingJson    Json?           // { logoUrl, accentColor, emailFooter, fontFamily, wordmark }
+
+  // Signer authentication policy
+  defaultSignerAuth SignerAuthMethod @default(EMAIL_LINK)
+  requireSignerAuth Boolean       @default(false)  // force all signers to use >= default
+
+  // Compliance mode — how broker review gates envelope flow
+  complianceMode  ComplianceMode  @default(OFF)
+
+  // Retention / audit
+  certificateTemplate String?     @db.Text       // optional markdown override for CoC copy
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  envelopeSnapshots AirSignEnvelope[]
+
+  @@index([brokerageId])
+}
+
+// ============== v2: Bulk Send Batch ==============
+// Groups envelopes created from a single template + signer-list CSV upload.
+
+enum BulkSendStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  COMPLETED_WITH_ERRORS
+  FAILED
+}
+
+model BulkSendBatch {
+  id              String          @id @default(cuid())
+  userId          String
+  user            User            @relation(fields: [userId], references: [id])
+  brokerageId     String?
+  templateId      String?         // source template (null if from uploaded PDF)
+
+  name            String          // agent-chosen batch label, e.g. "Q2 seller disclosures"
+  totalCount      Int             @default(0)
+  createdCount    Int             @default(0)
+  sentCount       Int             @default(0)
+  failedCount     Int             @default(0)
+  errors          Json?           // [{ rowIndex, error, signerEmail? }]
+  status          BulkSendStatus  @default(PENDING)
+
+  createdAt       DateTime        @default(now())
+  completedAt     DateTime?
+
+  envelopes       AirSignEnvelope[]
+
+  @@index([userId, createdAt])
+  @@index([brokerageId, status])
+}
+
+// ============== v2: Dotloop Loop Import ==============
+// Captures raw Dotloop JSON export + parsed mapping so agents can continue a deal
+// that started in Dotloop without re-keying data.
+
+enum LoopImportStatus {
+  PENDING
+  PARSING
+  PARSED
+  FAILED
+  IMPORTED     // envelopes/txn created
+}
+
+model LoopImport {
+  id              String            @id @default(cuid())
+  userId          String
+  user            User              @relation(fields: [userId], references: [id])
+  transactionId   String?           // created/linked target transaction
+  brokerageId     String?
+
+  dotloopLoopId   String?           // original dotloop loop id if present in export
+  sourceFormat    String            @default("dotloop_json")  // dotloop_json | dotloop_pdf | other
+  rawJson         Json              // full export blob
+  parsedData      Json?             // normalized Loop Data Model (buyer/seller/property/financials/dates)
+  documentsIndex  Json?             // [{ fileName, blobUrl, status }]
+  status          LoopImportStatus  @default(PENDING)
+  errorMessage    String?           @db.Text
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  importedAt      DateTime?
+
+  envelopes       AirSignEnvelope[]
+
+  @@index([userId, status])
+  @@index([dotloopLoopId])
+  @@index([brokerageId, createdAt])
+}
+
+// ============== v2: AirSign Reminders ==============
+
+model AirSignReminder {
+  id           String          @id @default(cuid())
+  envelopeId   String
+  envelope     AirSignEnvelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+  signerId     String?                           // null = all unsigned signers
+  sendAt       DateTime
+  sentAt       DateTime?
+  kind         String          @default("REMINDER")  // REMINDER | EXPIRATION_WARNING | FINAL_NOTICE
+  createdAt    DateTime        @default(now())
+
+  @@index([sendAt, sentAt])
+  @@index([envelopeId])
 }
 
 model BrokerageMember {
