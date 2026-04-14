@@ -168,9 +168,10 @@ export function WisprProvider({ children }: { children: ReactNode }) {
       const data = (await res.json()) as WisprApiResponse
 
       if (!res.ok || !data.ok) {
+        const errTitle = !data.ok ? data.error : "Something went wrong"
         pushToast({
           tone: "error",
-          title: data.error || "Something went wrong",
+          title: errTitle,
           detail: data.detail,
         })
         return

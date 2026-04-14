@@ -39,7 +39,7 @@ function ToastRow({
   onDismiss,
   onUndo,
 }: {
-  toast: Parameters<typeof useWispr>[0] extends never ? never : ReturnType<typeof useWispr>["toasts"][number]
+  toast: ReturnType<typeof useWispr>["toasts"][number]
   onDismiss: () => void
   onUndo?: () => void
 }) {
