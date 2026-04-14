@@ -44,6 +44,34 @@ export function TemplatesClient({
   const [kindFilter, setKindFilter] = useState<string>("ALL")
   const [scopeFilter, setScopeFilter] = useState<string>("ALL")
   const [showNew, setShowNew] = useState(false)
+  const [seeding, setSeeding] = useState(false)
+  const [seedMessage, setSeedMessage] = useState<string | null>(null)
+
+  async function handleSeedLrec() {
+    setSeeding(true)
+    setSeedMessage(null)
+    try {
+      const res = await fetch("/api/airsign/v2/templates/seed-lrec", { method: "POST" })
+      if (!res.ok) {
+        const e = await res.json().catch(() => ({ error: "Seed failed" }))
+        setSeedMessage(e.error ?? "Seed failed")
+        return
+      }
+      const data = await res.json()
+      const created = data.seeded?.length ?? 0
+      const skipped = data.skipped?.length ?? 0
+      setSeedMessage(
+        created > 0
+          ? `Seeded ${created} LREC template${created === 1 ? "" : "s"}${skipped > 0 ? ` (${skipped} already existed)` : ""}. Refreshing…`
+          : `All LREC templates already in your library.`
+      )
+      if (created > 0) router.refresh()
+    } catch (err) {
+      setSeedMessage(err instanceof Error ? err.message : "Seed failed")
+    } finally {
+      setSeeding(false)
+    }
+  }
 
   const filtered = useMemo(() => {
     return templates.filter((t) => {
@@ -117,6 +145,14 @@ export function TemplatesClient({
         </select>
         <button
           type="button"
+          onClick={handleSeedLrec}
+          disabled={seeding}
+          className="border border-[#6b7d52]/60 text-[#9aab7e] font-medium px-4 py-2.5 rounded-md text-sm hover:bg-[#6b7d52]/10 disabled:opacity-50 transition-colors focus:outline-none focus:ring-2 focus:ring-[#9aab7e]/40"
+        >
+          {seeding ? "Seeding..." : "Seed LREC forms"}
+        </button>
+        <button
+          type="button"
           onClick={() => setShowNew(true)}
           className="bg-[#6b7d52] text-[#f5f2ea] font-medium px-5 py-2.5 rounded-md text-sm hover:bg-[#5a6b43] transition-colors focus:outline-none focus:ring-2 focus:ring-[#9aab7e]/40"
         >
@@ -124,10 +160,23 @@ export function TemplatesClient({
         </button>
       </div>
 
+      {seedMessage && (
+        <div className="mb-4 bg-[#1e2416]/40 border-l-[3px] border-[#9aab7e] text-[#e8e4d8] text-sm px-4 py-3 rounded">
+          {seedMessage}
+        </div>
+      )}
+
       {byFolder.length === 0 ? (
         <div className="bg-[#1e2416]/40 border border-[#4a5638]/50 rounded-lg p-12 text-center">
           <p className="text-[#e8e4d8] font-[family-name:var(--font-playfair)] text-xl mb-2">No templates yet</p>
-          <p className="text-[#e8e4d8]/50 text-sm">Upload a PDF, save a clause, or create a task list.</p>
+          <p className="text-[#e8e4d8]/50 text-sm mb-4">Upload a PDF, save a clause, or create a task list.</p>
+          <button
+            onClick={handleSeedLrec}
+            disabled={seeding}
+            className="bg-[#6b7d52] text-[#f5f2ea] px-5 py-2 rounded-md text-sm hover:bg-[#5a6b43] disabled:opacity-50 transition-colors"
+          >
+            {seeding ? "Seeding..." : "Seed 3 LREC templates"}
+          </button>
         </div>
       ) : (
         <div className="space-y-6">
