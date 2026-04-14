@@ -8,12 +8,9 @@ import { ScrollToTop } from "./components/ui/scroll-to-top"
 import { ScrollProgress } from "./components/ui/scroll-progress"
 import { PricingToggle } from "./components/landing/PricingToggle"
 import { EmailCaptureSection } from "./components/landing/EmailCaptureSection"
-import { DeviceMockup } from "./components/landing/DeviceMockup"
-import { RotatingWords } from "./components/landing/RotatingWords"
+import { HeroV2 } from "./components/landing/HeroV2"
 
 // Dynamic imports — heavy client components loaded lazily
-const WireframeGlobe = dynamic(() => import("./components/landing/WireframeGlobe").then(m => ({ default: m.WireframeGlobe })), { loading: () => <div className="w-full h-full" /> })
-const SparklesText = dynamic(() => import("./components/landing/SparklesText").then(m => ({ default: m.SparklesText })), { loading: () => <span /> })
 const LampSection = dynamic(() => import("./components/landing/LampSection").then(m => ({ default: m.LampSection })), { loading: () => <div className="h-[500px]" /> })
 import { CardFlip } from "./components/landing/CardFlip"
 
@@ -91,130 +88,8 @@ export default function HomePage() {
       <Navbar />
       <ScrollProgress />
 
-      {/* ═══ 1. HERO — Mesh gradient + grain + word reveal ═══ */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
-        {/* Background video — atmospheric, lazy loaded */}
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="none"
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="/landing.mp4" type="video/mp4" />
-        </video>
-        {/* Overlay to soften video and ensure text readability */}
-        <div className="absolute inset-0 bg-[#c8ceb8]/75" />
-        {/* Animated mesh gradient */}
-        <div className="absolute inset-0 hero-mesh-gradient" />
-        {/* Grain texture overlay */}
-        <div className="absolute inset-0 grain-overlay-svg" />
-        {/* Top announcement bar */}
-        <div className="absolute top-0 left-0 right-0 z-20 bg-[#3a4a28] text-center py-2.5">
-          <p className="text-[#f4f1ec]/70 text-xs tracking-wide">
-            18 deals closed. $3.38M in volume. 10 avg days on market. Now it&apos;s your turn.
-            <span className="text-[#f4f1ec]/40 mx-2">&middot;</span>
-            <Link href="#pricing" className="text-[#f4f1ec] underline underline-offset-2 hover:text-white transition-colors">
-              See pricing →
-            </Link>
-          </p>
-        </div>
-
-        {/* SVG filter for glass distortion effect */}
-        <svg style={{ display: "none" }}>
-          <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox">
-            <feTurbulence type="fractalNoise" baseFrequency="0.001 0.005" numOctaves="1" seed="17" result="turbulence" />
-            <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap" />
-            <feSpecularLighting in="softMap" surfaceScale="5" specularConstant="1" specularExponent="100" lightingColor="white" result="specLight">
-              <fePointLight x="-200" y="-200" z="300" />
-            </feSpecularLighting>
-            <feComposite in="specLight" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litImage" />
-            <feDisplacementMap in="SourceGraphic" in2="softMap" scale="200" xChannelSelector="R" yChannelSelector="G" />
-          </filter>
-        </svg>
-
-        {/* Hero split layout — text LEFT, globe RIGHT */}
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 pt-28 pb-8 md:pt-32 md:pb-12 flex flex-col md:flex-row items-center gap-8 md:gap-0">
-          {/* Left side — text content */}
-          <div className="flex-1 text-center md:text-left md:pr-8">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#3a4a28]/20 border border-[#3a4a28]/15 rounded-full mb-8 animate-fade-up">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#5c6e2e]" />
-              <span className="text-[#3a4a28] text-xs font-medium">Built by a Louisiana REALTOR. For Louisiana REALTORS.</span>
-            </div>
-
-            {/* AIRE with sparkles */}
-            <SparklesText
-              text="AIRE"
-              className="block text-[#1e2416] text-7xl md:text-9xl font-light italic tracking-[-0.03em] leading-none mb-4"
-            />
-
-            {/* Rotating description */}
-            <h2 className="text-[#3a4a28] text-2xl md:text-3xl font-light mb-3" style={{ fontFamily: "var(--font-cormorant)" }}>
-              Real estate{" "}
-              <RotatingWords
-                words={["intelligence", "clarity", "precision", "confidence", "automation"]}
-                className="text-[#6b7d52] font-medium italic"
-              />
-            </h2>
-
-            {/* Subhead */}
-            <p className="text-[#3a4a28]/70 text-base md:text-lg leading-relaxed max-w-lg mb-10 animate-fade-up [animation-delay:0.6s]">
-              Seven AI agents handle your deadlines, signatures, briefs, and compliance — so you can focus on the conversations that actually close deals.
-            </p>
-
-            {/* Liquid Glass CTAs */}
-            <div className="flex flex-wrap justify-center md:justify-start gap-4 mb-8 animate-fade-up [animation-delay:0.75s]">
-              <Link
-                href={signedIn ? "/aire" : "/sign-up"}
-                className="group relative inline-flex items-center gap-2 px-8 py-4 rounded-2xl text-sm font-semibold tracking-wide transition-all duration-700 hover:px-9 hover:py-[18px] overflow-hidden"
-                style={{ transitionTimingFunction: "cubic-bezier(0.175, 0.885, 0.32, 2.2)" }}
-              >
-                {/* Glass layers */}
-                <span className="absolute inset-0 rounded-2xl overflow-hidden" style={{ backdropFilter: "blur(3px)", filter: "url(#glass-distortion)", isolation: "isolate" }} />
-                <span className="absolute inset-0 rounded-2xl bg-[#1e2416]/80" />
-                <span className="absolute inset-0 rounded-2xl" style={{ boxShadow: "inset 2px 2px 1px 0 rgba(154, 171, 126, 0.3), inset -1px -1px 1px 1px rgba(154, 171, 126, 0.2)" }} />
-                <span className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#9aab7e]/20 via-transparent to-[#6b7d52]/20" />
-                <span className="relative z-10 text-[#f4f1ec]">
-                  {signedIn ? "Open Dashboard" : "Start Your Free Trial"}
-                </span>
-              </Link>
-              <a
-                href="#platform"
-                className="group relative inline-flex items-center gap-2 px-8 py-4 rounded-2xl text-sm font-semibold tracking-wide transition-all duration-700 hover:px-9 hover:py-[18px] overflow-hidden"
-                style={{ transitionTimingFunction: "cubic-bezier(0.175, 0.885, 0.32, 2.2)" }}
-              >
-                {/* Glass layers — lighter version */}
-                <span className="absolute inset-0 rounded-2xl overflow-hidden" style={{ backdropFilter: "blur(6px)", filter: "url(#glass-distortion)", isolation: "isolate" }} />
-                <span className="absolute inset-0 rounded-2xl bg-white/30" />
-                <span className="absolute inset-0 rounded-2xl" style={{ boxShadow: "inset 2px 2px 1px 0 rgba(255, 255, 255, 0.5), inset -1px -1px 1px 1px rgba(255, 255, 255, 0.3)" }} />
-                <span className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#9aab7e]/10 via-transparent to-[#f5f2ea]/20" />
-                <span className="relative z-10 text-[#1e2416]">
-                  See How It Works
-                </span>
-              </a>
-            </div>
-          </div>
-
-          {/* Right side — Wireframe dotted globe */}
-          <div className="flex-1 flex items-center justify-center md:justify-end relative">
-            <div className="relative w-[400px] h-[400px] md:w-[500px] md:h-[500px]">
-              <WireframeGlobe className="w-full h-full" />
-              {/* Subtle glow behind globe */}
-              <div className="absolute inset-0 rounded-full bg-[#9aab7e]/5 blur-3xl -z-10 scale-110" />
-            </div>
-          </div>
-        </div>
-
-        {/* Device mockup — below the hero split */}
-        <div className="relative z-10 w-full max-w-4xl mx-auto px-6 -mt-8 animate-fade-up [animation-delay:0.9s]">
-          <DeviceMockup />
-        </div>
-
-        {/* Bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-cream to-transparent z-[5]" />
-      </section>
+      {/* ═══ 1. HERO V2 — Product-first first-fold (rebuilt 2026-04-14) ═══ */}
+      <HeroV2 signedIn={signedIn} />
 
       {/* ═══ 2. PROOF BAR — Large mono numbers + Syncopate labels + dividers ═══ */}
       <section className="bg-cream">
