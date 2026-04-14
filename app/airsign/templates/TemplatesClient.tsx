@@ -126,7 +126,7 @@ export function TemplatesClient({
 
       {byFolder.length === 0 ? (
         <div className="bg-[#1e2416]/40 border border-[#4a5638]/50 rounded-lg p-12 text-center">
-          <p className="text-[#e8e4d8] font-[family-name:var(--font-playfair)] text-xl mb-2">No templates yet</p>
+          <p className="text-[#e8e4d8] font-[family-name:var(--font-cormorant)] text-xl mb-2">No templates yet</p>
           <p className="text-[#e8e4d8]/50 text-sm">Upload a PDF, save a clause, or create a task list.</p>
         </div>
       ) : (
@@ -273,7 +273,7 @@ function NewTemplateModal({
         className="bg-[#f5f2ea] border border-[#c5c9b8] rounded-xl p-8 max-w-lg w-full mx-4 shadow-[0_20px_60px_rgba(30,36,22,0.3)]"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="font-[family-name:var(--font-playfair)] text-[#1e2416] text-2xl mb-6">New template</h2>
+        <h2 className="font-[family-name:var(--font-cormorant)] text-[#1e2416] text-2xl mb-6">New template</h2>
 
         {err && (
           <div className="bg-[#f5e8e8] border-l-[3px] border-[#8b4a4a] text-[#5a2a2a] text-sm px-4 py-3 rounded mb-4">

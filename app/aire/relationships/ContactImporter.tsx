@@ -291,7 +291,7 @@ export function ContactImporter() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="text-sm bg-white hover:bg-[#9aab7e]/8 text-[#6a6a60] hover:text-[#1e2416] px-4 py-2 rounded-lg transition-colors border border-[#d4c8b8]/60"
+        className="text-sm bg-surface-elevated hover:bg-[#9aab7e]/8 text-[#6a6a60] hover:text-[#1e2416] px-4 py-2 rounded-lg transition-colors border border-[#d4c8b8]/60"
       >
         Import Contacts
       </button>
@@ -380,7 +380,7 @@ export function ContactImporter() {
                     <select
                       value={columnMap[h] ?? "skip"}
                       onChange={(e) => setColumnMap((m) => ({ ...m, [h]: e.target.value }))}
-                      className="flex-1 bg-white border border-[#d4c8b8]/50 rounded px-2 py-1 text-[#1e2416] text-xs focus:outline-none focus:border-[#9aab7e]"
+                      className="flex-1 bg-surface-elevated border border-[#d4c8b8]/50 rounded px-2 py-1 text-[#1e2416] text-xs focus:outline-none focus:border-[#9aab7e]"
                     >
                       {FIELD_OPTIONS.map((o) => (
                         <option key={o.value} value={o.value}>{o.label}</option>

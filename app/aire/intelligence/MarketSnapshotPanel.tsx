@@ -50,7 +50,7 @@ export function MarketSnapshotPanel({ markets }: { markets: MarketSnapshot[] }) 
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
                 <div>
-                  <div style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 17, fontWeight: 700, color: "#1e2416" }}>
+                  <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 17, fontWeight: 700, color: "#1e2416" }}>
                     {m.parish}
                   </div>
                   <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, color: "#8a9070", marginTop: 2 }}>

@@ -140,7 +140,7 @@ export function ContractForm() {
           <select
             value={formType}
             onChange={e => setFormType(e.target.value)}
-            className="w-full bg-white border border-[#9aab7e]/20 rounded-lg px-3 py-2 text-[#1e2416] text-sm focus:outline-none focus:border-[#9aab7e]/50"
+            className="w-full bg-surface-elevated border border-[#9aab7e]/20 rounded-lg px-3 py-2 text-[#1e2416] text-sm focus:outline-none focus:border-[#9aab7e]/50"
           >
             {FORM_TYPES.map(ft => (
               <option key={ft.value} value={ft.value}>{ft.label}</option>
@@ -152,7 +152,7 @@ export function ContractForm() {
           <select
             value={selectedTxn}
             onChange={e => setSelectedTxn(e.target.value)}
-            className="w-full bg-white border border-[#9aab7e]/20 rounded-lg px-3 py-2 text-[#1e2416] text-sm focus:outline-none focus:border-[#9aab7e]/50"
+            className="w-full bg-surface-elevated border border-[#9aab7e]/20 rounded-lg px-3 py-2 text-[#1e2416] text-sm focus:outline-none focus:border-[#9aab7e]/50"
           >
             <option value="">None — standalone contract</option>
             {transactions.map(t => (
@@ -170,7 +170,7 @@ export function ContractForm() {
           onChange={e => setNlInput(e.target.value)}
           rows={4}
           placeholder="Write a purchase agreement for 123 Oak Drive, buyer Sarah Johnson, $285,000, close June 15, conventional financing, 7-day inspection"
-          className="w-full bg-white border border-[#9aab7e]/20 rounded-lg px-4 py-3 text-[#1e2416] text-sm focus:outline-none focus:border-[#9aab7e]/50 placeholder:text-[#6b7d52]/30 resize-none"
+          className="w-full bg-surface-elevated border border-[#9aab7e]/20 rounded-lg px-4 py-3 text-[#1e2416] text-sm focus:outline-none focus:border-[#9aab7e]/50 placeholder:text-[#6b7d52]/30 resize-none"
         />
         <button
           onClick={handlePreviewFields}

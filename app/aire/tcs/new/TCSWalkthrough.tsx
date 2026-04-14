@@ -229,7 +229,7 @@ export function TCSWalkthrough() {
           <div>
             <div
               style={{
-                fontFamily: "'Playfair Display', Georgia, serif",
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
                 fontWeight: 700,
                 fontSize: 24,
                 letterSpacing: "-0.01em",
@@ -622,7 +622,7 @@ function TurnBubble({ turn }: { turn: ChatTurn }) {
           <>
             <span
               style={{
-                fontFamily: "'Playfair Display', Georgia, serif",
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
                 fontStyle: "italic",
                 fontWeight: 600,
                 fontSize: 13,

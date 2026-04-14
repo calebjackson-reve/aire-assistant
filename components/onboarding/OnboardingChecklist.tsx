@@ -103,7 +103,7 @@ export default function OnboardingChecklist({ compact = false }: OnboardingCheck
           <div>
             <h2
               className="text-lg font-bold text-[#f5f2ea]"
-              style={{ fontFamily: "'Playfair Display', serif" }}
+              style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
               Get Started with AIRE
             </h2>

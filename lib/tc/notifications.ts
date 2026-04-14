@@ -125,7 +125,7 @@ function buildDeadlineEmailHTML(
   return `
     <div style="font-family:'Space Grotesk',sans-serif;max-width:560px;margin:0 auto;color:#1e2416">
       <div style="background:#9aab7e;padding:20px 24px;border-radius:8px 8px 0 0">
-        <h2 style="margin:0;color:#f5f2ea;font-family:'Playfair Display',serif;font-size:20px">
+        <h2 style="margin:0;color:#f5f2ea;font-family:'Cormorant Garamond',serif;font-size:20px">
           AIRE Deadline Reminder
         </h2>
       </div>

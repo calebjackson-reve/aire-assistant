@@ -7,44 +7,101 @@
    ═══════════════════════════════════════════ */
 
 @theme inline {
-  /* ── Surfaces ──────────────────────────── */
-  --color-cream: #f4f1ec;
-  --color-cream-warm: #efe9e0;
-  --color-cream-cool: #f9f8f4;
-  --color-white: #faf7f2;
+  /* ═══════════════════════════════════════════════════════
+     F1a — Canonical token system (2026-04-14)
+     Source of truth: DESIGN.md §2 Color Palette & Roles
+     Theme-aware tokens switch via [data-theme] on <html>
+     ═══════════════════════════════════════════════════════ */
 
-  /* ── Text ──────────────────────────────── */
-  --color-ink: #1a1a18;
-  --color-ink-light: #3a3a30;
-  --color-ink-muted: #6a6a60;
-  --color-ink-faint: #9a9a90;
+  /* ── LOCKED PALETTE (5 colors — zero exceptions) ── */
+  --color-sage: #9aab7e;
+  --color-olive: #6b7d52;
+  --color-cream: #f5f2ea;
+  --color-linen: #e8e4d8;
+  --color-forest: #1e2416;
 
-  /* ── Accent ────────────────────────────── */
-  --color-sage: #7a8c50;
-  --color-sage-light: #8fa05e;
-  --color-olive: #5c6e2e;
-  --color-champagne: #beb09e;
-  --color-champagne-light: #d4c8b8;
+  /* ── Extended DESIGN.md tokens ── */
+  --color-ink-body: #2c3520;            /* Forest Text — body on Daylight */
+  --color-surface-elevated: #f0ece2;    /* Warm white — elevated cards */
+  --color-muted: #8a9070;               /* Muted sage — placeholder/disabled */
+  --color-sage-border: #c5c9b8;         /* Subtle border on light */
+  --color-olive-border: #4a5638;        /* Border on dark/sage */
+  --color-forest-raised: #252d1e;       /* Nocturne elevated card */
+  --color-forest-card: #2a3320;         /* Nocturne card */
 
-  /* ── App interior (dark) ───────────────── */
-  --color-forest-deep: #1e2416;
-  --color-forest: #2a3320;
-  --color-forest-card: #323d28;
-  --color-brown-border: rgba(190, 176, 158, 0.15);
-  --color-warm: #7a8c50;
-  --color-cream-dim: #beb09e;
+  /* ── Semantic (theme-stable) ── */
+  --color-success: #6b7d52;
+  --color-warning: #b5956a;
+  --color-error: #8b4a4a;
+  --color-info: #6b7d52;                /* replaces DESIGN.md cold-slate */
 
-  /* ── Status ────────────────────────────── */
-  --color-status-green: #6BBF59;
-  --color-status-amber: #E8B44C;
-  --color-status-red: #D45B5B;
+  /* ── Status badges (5 variants) ── */
+  --color-status-active: #9aab7e;
+  --color-status-pending: #b8a36b;
+  --color-status-overdue: #8b4a4a;
+  --color-status-info: #6b7d52;
+  --color-status-draft: #8a9070;
 
-  /* ── Fonts ─────────────────────────────── */
+  /* ── Glossy + shadow tokens ── */
+  --color-hairline: rgba(245, 242, 234, 0.40);
+  --color-shadow-tint: rgba(30, 36, 22, 0.18);
+
+  /* ── Runtime theme-aware tokens (see :root / [data-theme]) ── */
+  --color-canvas: var(--canvas);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+
+  /* ── Fonts (Cormorant canonical 2026-04-13; display has latitude) ── */
   --font-display: var(--font-cormorant, 'Cormorant Garamond', Georgia, serif);
-  --font-label: var(--font-syncopate, 'Syncopate', sans-serif);
+  --font-label: var(--font-space-grotesk, 'Space Grotesk', system-ui, sans-serif);
   --font-body: var(--font-space-grotesk, 'Space Grotesk', system-ui, sans-serif);
   --font-mono: var(--font-ibm-mono, 'IBM Plex Mono', monospace);
   --font-sans: var(--font-space-grotesk, 'Space Grotesk', system-ui, sans-serif);
+
+  /* ═══ DEPRECATED ALIASES — F1c removes after cluster sweep ═══
+     Keep during F1b so 477 consumer sites don't break in bulk.
+     Do NOT add new usages. Grep-replace to canonical names. */
+  --color-cream-warm: #f0ece2;          /* → --color-surface-elevated */
+  --color-cream-cool: #f9f8f4;          /* keep — legacy cool surface */
+  --color-cream-dim: #8a9070;           /* → --color-muted */
+  --color-white: #f5f2ea;               /* → --color-cream (never pure white) */
+  --color-ink-light: #3a3a30;           /* → --color-ink-muted */
+  --color-sage-light: #b3c295;          /* keep */
+  --color-champagne: #c5c9b8;           /* → --color-sage-border */
+  --color-champagne-light: #d4c8b8;     /* keep (subtle border tint) */
+  --color-forest-deep: #1e2416;         /* → --color-forest */
+  --color-brown-border: rgba(154, 171, 126, 0.15); /* → olive-tinted */
+  --color-warm: #9aab7e;                /* → --color-sage */
+  --color-status-green: #9aab7e;        /* → --color-status-active */
+  --color-status-amber: #b8a36b;        /* → --color-status-pending */
+  --color-status-red: #8b4a4a;          /* → --color-status-overdue */
+}
+
+/* ═══════════════════════════════════════════════════════
+   Runtime theme variables — drive theme-aware tokens above
+   ═══════════════════════════════════════════════════════ */
+
+:root {
+  /* Daylight — default for public/marketing routes */
+  --canvas: #f5f2ea;
+  --ink: #2c3520;
+  --ink-muted: #6b7d52;
+  --ink-faint: #8a9070;
+  --surface: #f0ece2;
+  --border: #c5c9b8;
+}
+
+[data-theme="nocturne"] {
+  /* Nocturne — default for authenticated /aire/* (see F2 bootstrap) */
+  --canvas: #1e2416;
+  --ink: #e8e4d8;
+  --ink-muted: #b3c295;
+  --ink-faint: #8a9070;
+  --surface: #252d1e;
+  --border: #4a5638;
 }
 
 /* ── Base ─────────────────────────────────── */

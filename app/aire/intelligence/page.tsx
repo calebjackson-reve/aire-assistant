@@ -42,7 +42,7 @@ export default async function IntelligencePage() {
         <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 12, fontWeight: 500, color: "#8a9070", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>
           AIRE Intelligence · Market Data
         </div>
-        <h1 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 36, fontWeight: 700, color: "#1e2416", margin: 0 }}>
+        <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 36, fontWeight: 700, color: "#1e2416", margin: 0 }}>
           Louisiana Market Intelligence
         </h1>
         <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 15, color: "#8a9070", marginTop: 8 }}>

@@ -144,7 +144,7 @@ export function LoopAutofillDrawer({
         <header className="sticky top-0 bg-[#f5f2ea]/95 backdrop-blur-sm border-b border-[#c5c9b8] px-6 py-4 flex items-center justify-between z-10">
           <div>
             <p className="text-[#8a9070] text-[10px] tracking-[0.1em] uppercase">Loop Data</p>
-            <h2 className="font-[family-name:var(--font-playfair)] text-[#1e2416] text-xl">Autofill</h2>
+            <h2 className="font-[family-name:var(--font-cormorant)] text-[#1e2416] text-xl">Autofill</h2>
           </div>
           <div className="flex items-center gap-3">
             {dirty && (
@@ -288,7 +288,7 @@ export function LoopAutofillDrawer({
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section>
-      <h3 className="font-[family-name:var(--font-playfair)] text-[#1e2416] text-lg mb-3 pb-1.5 border-b border-[#c5c9b8]/60">
+      <h3 className="font-[family-name:var(--font-cormorant)] text-[#1e2416] text-lg mb-3 pb-1.5 border-b border-[#c5c9b8]/60">
         {title}
       </h3>
       {children}
