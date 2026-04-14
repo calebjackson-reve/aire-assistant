@@ -1175,12 +1175,12 @@ async function clickSavedCMAByName(
       return { ok: true, cmaId, subjectMls, name }
     }
     return { ok: false, cmaId: null, subjectMls: null, name: null }
-  }, { needle: nameSubstring, exactCmaId: matchCmaId ?? null }) as Promise<{
+  }, { needle: nameSubstring, exactCmaId: matchCmaId ?? null }) as {
     ok: boolean
     cmaId: string | null
     subjectMls: string | null
     name: string | null
-  }>
+  }
 }
 
 /** Clicks the "Comparables" step in the CMA Wizard left sidebar.
@@ -1376,7 +1376,7 @@ async function extractWizardComps(frame: import("playwright").Frame): Promise<{ 
     }).filter((r) => r.mlsNumber || r.address || r.price)
 
     return { header: bestHeader, rows }
-  }) as Promise<{ header: string[]; rows: SavedCMAComp[] }>
+  }) as { header: string[]; rows: SavedCMAComp[] }
 }
 
 /** Walks every frame and returns the one most likely to host the CMA
@@ -2175,7 +2175,7 @@ async function extractListingFields(frame: import("playwright").Frame): Promise<
       }
     }
     return out
-  }) as Promise<Record<string, string>>
+  }) as Record<string, string>
 }
 
 function structureListing(mlsId: string, m: Record<string, string>): ListingDetail {
@@ -2361,17 +2361,26 @@ export async function paragonFetchListingDetail(mlsId: string): Promise<FetchLis
     await popup.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
     for (const f of popup.frames()) await injectNameShim(f)
 
-    // Poll for Reports.mvc frame AND extract IN THE SAME EVALUATE to avoid
-    // race where frame content resets between checks. Wait up to 30s.
+    // Poll ALL frames for one with rich listing content. Content may live
+    // inside a Reports.mvc frame, Spreadsheet.mvc, or a nested iframe.
+    // Threshold: any frame with >10 h3s OR any frame where textContent
+    // includes 'MLS#' + 'Bedrooms' (fallback for non-h3 layouts).
     let reportFrame: import("playwright").Frame | null = null
     let earlyFieldMap: Record<string, string> | null = null
     const deadline = Date.now() + 30000
     while (Date.now() < deadline && !earlyFieldMap) {
       for (const f of popup.frames()) {
-        if (!/Reports\/Report\.mvc\?listingIDs=/i.test(f.url())) continue
-        const h3c = await f.evaluate(() => document.querySelectorAll("h3").length).catch(() => 0)
-        if (h3c < 10) continue
-        // Extract IMMEDIATELY — don't let the frame reset
+        const diag = await f.evaluate(() => {
+          const h3c = document.querySelectorAll("h3").length
+          const tc = (document.body?.textContent || "")
+          return {
+            h3c,
+            hasMLS: /MLS#/i.test(tc) && /Bedroom/i.test(tc),
+            url: location.href.slice(0, 80),
+            len: tc.length,
+          }
+        }).catch(() => ({ h3c: 0, hasMLS: false, url: "", len: 0 }))
+        if (diag.h3c < 10 && !(diag.hasMLS && diag.len > 1000)) continue
         await injectNameShim(f).catch(() => {})
         const fm = await extractListingFields(f).catch(() => ({} as Record<string, string>))
         if (Object.keys(fm).length > 3) {
@@ -2385,13 +2394,24 @@ export async function paragonFetchListingDetail(mlsId: string): Promise<FetchLis
 
     if (!reportFrame || !earlyFieldMap) {
       const shot = await captureLandingScreenshot(popup, `listing_no_report_${mlsId}`)
-      const frameDiag = await Promise.all(popup.frames().map(async (f) => ({
-        url: f.url().slice(0, 100),
-        h3s: await f.evaluate(() => document.querySelectorAll("h3").length).catch(() => -1),
-      })))
+      // Deep diagnostic: for each frame, sample body text + any tag counts
+      const frameDiag = await Promise.all(popup.frames().map(async (f) => {
+        const d = await f.evaluate(() => {
+          const tc = (document.body?.textContent || "").trim().slice(0, 300)
+          const counts: Record<string, number> = {}
+          for (const tag of ["h1","h2","h3","h4","td","div","span","table"]) {
+            counts[tag] = document.querySelectorAll(tag).length
+          }
+          return { tc, counts, url: location.href.slice(0, 100), readyState: document.readyState }
+        }).catch(() => ({ tc: "", counts: {}, url: f.url().slice(0, 100), readyState: "error" }))
+        return d
+      }))
+      await fs.mkdir(DEBUG_DIR, { recursive: true })
+      const diagFile = path.join(DEBUG_DIR, `listing_deep_diag_${mlsId}_${Date.now()}.json`)
+      await fs.writeFile(diagFile, JSON.stringify(frameDiag, null, 2), "utf8")
       return {
         status: "FAIL",
-        reason: `Report.mvc frame not found. Frames: ${JSON.stringify(frameDiag)}`,
+        reason: `Report.mvc frame not found. Deep diag: ${diagFile}`,
         loginPath: session.refreshed ? "fresh" : "reused",
         mlsId,
         listing: null,

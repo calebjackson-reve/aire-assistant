@@ -239,7 +239,7 @@ async function walkWizardSteps(popup: import("playwright").Page): Promise<Wizard
 async function clickSavedCMARow(
   cmaFrame: import("playwright").Frame,
   nameSubstring: string,
-): Promise<{ ok: boolean; cmaId: string | null }> {
+): Promise<{ ok: boolean; cmaId: string | null; reason?: string | null }> {
   return (await cmaFrame.evaluate((needle: string) => {
     const grid = document.querySelector("#cmaList") as HTMLTableElement | null
     if (!grid) return { ok: false, cmaId: null, reason: "no #cmaList" }
