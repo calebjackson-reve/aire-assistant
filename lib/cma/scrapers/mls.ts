@@ -2361,13 +2361,21 @@ export async function paragonFetchListingDetail(mlsId: string): Promise<FetchLis
     await popup.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
     for (const f of popup.frames()) await injectNameShim(f)
 
-    const deadline = Date.now() + 15000
+    const deadline = Date.now() + 20000
     let reportFrame: import("playwright").Frame | null = null
     while (Date.now() < deadline && !reportFrame) {
       for (const f of popup.frames()) {
-        if (/Reports\/Report\.mvc/i.test(f.url())) {
-          const h3c = await f.evaluate(() => document.querySelectorAll("h3").length).catch(() => 0)
-          if (h3c > 10) { reportFrame = f; break }
+        // Accept frame if either URL pattern matches OR frame has
+        // listing-specific h3 labels regardless of URL.
+        const urlMatches = /Reports\/Report\.mvc|Reports\/GlobalReport|Reports\/Spreadsheet/i.test(f.url())
+        const diagnostics = await f.evaluate(() => {
+          const h3s = Array.from(document.querySelectorAll("h3")).map((h) => (h.textContent || "").trim())
+          const hasListing = h3s.some((t) => /MLS#|LivingSqFt|Bedrooms|Sold Price|ListPrice/i.test(t))
+          return { h3count: h3s.length, hasListing, url: location.href.slice(0, 80) }
+        }).catch(() => ({ h3count: 0, hasListing: false, url: "" }))
+        if ((urlMatches || diagnostics.hasListing) && diagnostics.h3count > 10) {
+          reportFrame = f
+          break
         }
       }
       if (!reportFrame) await popup.waitForTimeout(500)
@@ -2375,7 +2383,20 @@ export async function paragonFetchListingDetail(mlsId: string): Promise<FetchLis
 
     if (!reportFrame) {
       const shot = await captureLandingScreenshot(popup, `listing_no_report_${mlsId}`)
-      return { status: "FAIL", reason: "Report.mvc frame never rendered with fields", loginPath: session.refreshed ? "fresh" : "reused", mlsId, listing: null, durationMs: Date.now() - started, screenshotPath: shot }
+      // Debug: dump all frame URLs + h3 counts for diagnosis
+      const frameDiag = await Promise.all(popup.frames().map(async (f) => ({
+        url: f.url().slice(0, 100),
+        h3s: await f.evaluate(() => document.querySelectorAll("h3").length).catch(() => -1),
+      })))
+      return {
+        status: "FAIL",
+        reason: `Report.mvc frame not found. Frames: ${JSON.stringify(frameDiag)}`,
+        loginPath: session.refreshed ? "fresh" : "reused",
+        mlsId,
+        listing: null,
+        durationMs: Date.now() - started,
+        screenshotPath: shot,
+      }
     }
 
     await injectNameShim(reportFrame)
