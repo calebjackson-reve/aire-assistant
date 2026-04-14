@@ -2240,7 +2240,66 @@ function structureListing(mlsId: string, m: Record<string, string>): ListingDeta
   }
 }
 
-/** Fetch one listing's full detail via deep-link URL. Single-shot. */
+/** Types MLS# into Power Search and dispatches click on the autocomplete
+ *  listing row. Deep-link nav to Report.mvc fails because the Paragon
+ *  shell intercepts and re-renders the home (Wizard). This flow works —
+ *  verified via Chrome DevTools MCP. */
+async function powerSearchOpenListing(popup: Page, mlsId: string): Promise<{ ok: boolean; reason: string | null }> {
+  await injectNameShim(popup)
+  const focused = await popup.evaluate(() => {
+    const candidates = [
+      'input[role=searchbox]',
+      'input[aria-label*="POWER SEARCH" i]',
+      'input[aria-label*="POWER" i]',
+    ]
+    for (const sel of candidates) {
+      const el = document.querySelector(sel) as HTMLInputElement | null
+      if (el && el.offsetParent !== null) {
+        el.focus()
+        el.value = ""
+        return true
+      }
+    }
+    return false
+  })
+  if (!focused) return { ok: false, reason: "Power Search input not found" }
+
+  await popup.keyboard.type(mlsId, { delay: 40 })
+
+  const deadline = Date.now() + 5000
+  let ready = false
+  while (Date.now() < deadline && !ready) {
+    ready = await popup.evaluate((needle) => {
+      const dropdown = document.querySelector("ul.ui-autocomplete") as HTMLElement | null
+      if (!dropdown || !dropdown.offsetParent) return false
+      const items = Array.from(dropdown.querySelectorAll("li"))
+      return items.some((i) => (i.textContent || "").includes(String(needle)))
+    }, mlsId)
+    if (!ready) await popup.waitForTimeout(300)
+  }
+  if (!ready) return { ok: false, reason: "Autocomplete dropdown never populated" }
+
+  const clicked = await popup.evaluate((needle) => {
+    const dropdown = document.querySelector("ul.ui-autocomplete") as HTMLElement | null
+    if (!dropdown) return false
+    const items = Array.from(dropdown.querySelectorAll("li")) as HTMLElement[]
+    const target =
+      items.find((el) => {
+        const t = (el.textContent || "").trim()
+        return t.includes(String(needle)) && !/Run Classic Search/i.test(t)
+      }) || items[items.length - 1]
+    if (!target) return false
+    target.scrollIntoView?.({ block: "center" })
+    target.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, cancelable: true, view: window }))
+    target.dispatchEvent(new MouseEvent("mouseup", { bubbles: true, cancelable: true, view: window }))
+    target.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }))
+    return true
+  }, mlsId)
+  if (!clicked) return { ok: false, reason: "Could not click autocomplete item" }
+  return { ok: true, reason: null }
+}
+
+/** Fetch one listing's full detail via Power Search. Single-shot. */
 export async function paragonFetchListingDetail(mlsId: string): Promise<FetchListingResult> {
   const started = Date.now()
   let session: VendorSession | null = null
@@ -2254,53 +2313,51 @@ export async function paragonFetchListingDetail(mlsId: string): Promise<FetchLis
         sessionMaxAgeDays: 7,
       }),
     )
-    const { context } = session
-    const fetchPage = await context.newPage()
-    const deepLink =
-      `https://mlsbox.paragonrels.com/ParagonLS/Reports/Report.mvc` +
-      `?listingIDs=${encodeURIComponent(mlsId)}&viewID=c51&classID=0&usePDF=false&ShowAds=false`
+    const { context, page } = session
+    await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
+    await dismissDashboardModal(page)
+    const popup = await openParagonPopup(page, context)
+    await dismissUserPreferencesWizard(popup)
+    await popup.waitForTimeout(800)
+    await injectNameShim(popup)
+    for (const f of popup.frames()) await injectNameShim(f)
 
-    await fetchPage.goto(deepLink, { timeout: 30000, waitUntil: "domcontentloaded" }).catch(() => {})
-    await fetchPage.waitForLoadState("networkidle", { timeout: 20000 }).catch(() => {})
-    await fetchPage.waitForTimeout(800)
-
-    const cap = await detectCaptcha(fetchPage)
+    const cap = await detectCaptcha(popup)
     if (cap.present) {
-      const shot = await captureLandingScreenshot(fetchPage, `listing_captcha_${mlsId}`)
-      await fetchPage.close().catch(() => {})
-      throw new ScraperHaltError(`Captcha on listing detail for ${mlsId}`, VENDOR, shot)
+      const shot = await captureLandingScreenshot(popup, `listing_captcha_${mlsId}`)
+      throw new ScraperHaltError(`Captcha before listing fetch (${mlsId})`, VENDOR, shot)
     }
 
-    await injectNameShim(fetchPage)
-    for (const f of fetchPage.frames()) await injectNameShim(f)
+    const searched = await powerSearchOpenListing(popup, mlsId)
+    if (!searched.ok) {
+      const shot = await captureLandingScreenshot(popup, `listing_search_fail_${mlsId}`)
+      return { status: "FAIL", reason: `Power Search: ${searched.reason}`, loginPath: session.refreshed ? "fresh" : "reused", mlsId, listing: null, durationMs: Date.now() - started, screenshotPath: shot }
+    }
 
-    // Find the Report.mvc frame (main frame OR child iframe)
+    await popup.waitForTimeout(2500)
+    await popup.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
+    for (const f of popup.frames()) await injectNameShim(f)
+
     const deadline = Date.now() + 15000
     let reportFrame: import("playwright").Frame | null = null
     while (Date.now() < deadline && !reportFrame) {
-      if (/Reports\/Report\.mvc/i.test(fetchPage.url())) {
-        const h3c = await fetchPage.mainFrame().evaluate(() => document.querySelectorAll("h3").length).catch(() => 0)
-        if (h3c > 10) { reportFrame = fetchPage.mainFrame(); break }
-      }
-      for (const f of fetchPage.frames()) {
+      for (const f of popup.frames()) {
         if (/Reports\/Report\.mvc/i.test(f.url())) {
           const h3c = await f.evaluate(() => document.querySelectorAll("h3").length).catch(() => 0)
           if (h3c > 10) { reportFrame = f; break }
         }
       }
-      if (!reportFrame) await fetchPage.waitForTimeout(500)
+      if (!reportFrame) await popup.waitForTimeout(500)
     }
 
     if (!reportFrame) {
-      const shot = await captureLandingScreenshot(fetchPage, `listing_no_report_${mlsId}`)
-      await fetchPage.close().catch(() => {})
+      const shot = await captureLandingScreenshot(popup, `listing_no_report_${mlsId}`)
       return { status: "FAIL", reason: "Report.mvc frame never rendered with fields", loginPath: session.refreshed ? "fresh" : "reused", mlsId, listing: null, durationMs: Date.now() - started, screenshotPath: shot }
     }
 
     await injectNameShim(reportFrame)
     const fieldMap = await extractListingFields(reportFrame)
-    const shot = await captureLandingScreenshot(fetchPage, `listing_ok_${mlsId}`)
-    await fetchPage.close().catch(() => {})
+    const shot = await captureLandingScreenshot(popup, `listing_ok_${mlsId}`)
 
     if (Object.keys(fieldMap).length < 5) {
       return { status: "FAIL", reason: `Only ${Object.keys(fieldMap).length} fields extracted`, loginPath: session.refreshed ? "fresh" : "reused", mlsId, listing: null, durationMs: Date.now() - started, screenshotPath: shot }
