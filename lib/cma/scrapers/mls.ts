@@ -2361,37 +2361,30 @@ export async function paragonFetchListingDetail(mlsId: string): Promise<FetchLis
     await popup.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
     for (const f of popup.frames()) await injectNameShim(f)
 
-    // Two-stage: (1) find the Reports.mvc frame by URL — we saw it exists
-    // but h3 count may be 0 until the frame fully loads.
-    // (2) wait for that frame's load state then re-poll for h3s.
-    const urlDeadline = Date.now() + 15000
+    // Poll for Reports.mvc frame AND extract IN THE SAME EVALUATE to avoid
+    // race where frame content resets between checks. Wait up to 30s.
     let reportFrame: import("playwright").Frame | null = null
-    while (Date.now() < urlDeadline && !reportFrame) {
+    let earlyFieldMap: Record<string, string> | null = null
+    const deadline = Date.now() + 30000
+    while (Date.now() < deadline && !earlyFieldMap) {
       for (const f of popup.frames()) {
-        if (/Reports\/Report\.mvc\?listingIDs=/i.test(f.url())) {
+        if (!/Reports\/Report\.mvc\?listingIDs=/i.test(f.url())) continue
+        const h3c = await f.evaluate(() => document.querySelectorAll("h3").length).catch(() => 0)
+        if (h3c < 10) continue
+        // Extract IMMEDIATELY — don't let the frame reset
+        await injectNameShim(f).catch(() => {})
+        const fm = await extractListingFields(f).catch(() => ({} as Record<string, string>))
+        if (Object.keys(fm).length > 3) {
+          earlyFieldMap = fm
           reportFrame = f
           break
         }
       }
-      if (!reportFrame) await popup.waitForTimeout(500)
+      if (!earlyFieldMap) await popup.waitForTimeout(500)
     }
 
-    if (reportFrame) {
-      // Wait for the frame to finish loading + fields to render
-      await reportFrame.waitForLoadState("domcontentloaded", { timeout: 15000 }).catch(() => {})
-      await reportFrame.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
-      // Poll h3 count for up to 10s (content can render after networkidle)
-      const h3Deadline = Date.now() + 10000
-      while (Date.now() < h3Deadline) {
-        const h3c = await reportFrame.evaluate(() => document.querySelectorAll("h3").length).catch(() => 0)
-        if (h3c > 10) break
-        await popup.waitForTimeout(500)
-      }
-    }
-
-    if (!reportFrame) {
+    if (!reportFrame || !earlyFieldMap) {
       const shot = await captureLandingScreenshot(popup, `listing_no_report_${mlsId}`)
-      // Debug: dump all frame URLs + h3 counts for diagnosis
       const frameDiag = await Promise.all(popup.frames().map(async (f) => ({
         url: f.url().slice(0, 100),
         h3s: await f.evaluate(() => document.querySelectorAll("h3").length).catch(() => -1),
@@ -2407,12 +2400,24 @@ export async function paragonFetchListingDetail(mlsId: string): Promise<FetchLis
       }
     }
 
-    await injectNameShim(reportFrame)
-    const fieldMap = await extractListingFields(reportFrame)
+    const fieldMap = earlyFieldMap
     const shot = await captureLandingScreenshot(popup, `listing_ok_${mlsId}`)
 
     if (Object.keys(fieldMap).length < 5) {
-      return { status: "FAIL", reason: `Only ${Object.keys(fieldMap).length} fields extracted`, loginPath: session.refreshed ? "fresh" : "reused", mlsId, listing: null, durationMs: Date.now() - started, screenshotPath: shot }
+      // Dump h3 structure + text for diagnosis
+      const h3Diag = await reportFrame.evaluate(() => {
+        const h3s = Array.from(document.querySelectorAll("h3")).slice(0, 40)
+        return h3s.map((h) => {
+          const text = (h.textContent || "").trim().slice(0, 60)
+          const nextText = (h.nextElementSibling?.textContent || "").trim().slice(0, 60)
+          const nextTag = h.nextElementSibling?.tagName || null
+          return { text, nextTag, nextText }
+        })
+      }).catch(() => [])
+      await fs.mkdir(DEBUG_DIR, { recursive: true })
+      const diagFile = path.join(DEBUG_DIR, `listing_h3_diag_${mlsId}_${Date.now()}.json`)
+      await fs.writeFile(diagFile, JSON.stringify({ extractedFieldMap: fieldMap, h3Sample: h3Diag }, null, 2), "utf8")
+      return { status: "FAIL", reason: `Only ${Object.keys(fieldMap).length} fields extracted (h3 diag: ${diagFile})`, loginPath: session.refreshed ? "fresh" : "reused", mlsId, listing: null, durationMs: Date.now() - started, screenshotPath: shot }
     }
 
     const listing = structureListing(mlsId, fieldMap)
