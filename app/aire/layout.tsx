@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
 import prisma from "@/lib/prisma"
 import { DarkLayoutWithBadges } from "./DarkLayoutWithBadges"
+import { WisprShell } from "@/components/voice"
 import "./ui-lab/_theme.css"
 
 // FOUC-safe: set data-theme on the .ui-lab-scope wrapper before first paint.
@@ -42,9 +43,11 @@ export default async function AireLayout({ children }: { children: React.ReactNo
 
   return (
     <DarkLayoutWithBadges activeCount={activeCount} overdueCount={overdueCount}>
-      <div className="ui-lab-scope" data-theme="nocturne">
-        {children}
-      </div>
+      <WisprShell>
+        <div className="ui-lab-scope" data-theme="nocturne">
+          {children}
+        </div>
+      </WisprShell>
       <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
     </DarkLayoutWithBadges>
   )
