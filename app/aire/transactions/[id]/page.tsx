@@ -22,18 +22,20 @@ export default async function TransactionPage({
     include: {
       deadlines: { orderBy: { dueDate: "asc" } },
       documents: { orderBy: { createdAt: "desc" } },
-      workflowEvents: { orderBy: { createdAt: "desc" }, take: 20 },
+      // DNA strip needs chronological order (oldest first) — reversed by TransactionTimeline
+      workflowEvents: { orderBy: { createdAt: "asc" }, take: 50 },
     },
   })
 
   if (!transaction) notFound()
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10">
+    // overflow-x:hidden prevents CopilotDrawer translateX from creating a horizontal scrollbar
+    <div className="max-w-5xl mx-auto px-6 py-10" style={{ overflowX: "hidden" }}>
       <Link
         href="/aire/transactions"
         className="text-xs hover:underline mb-4 block transition-colors"
-        style={{ color: "var(--text-accent, #6b7d52)" }}
+        style={{ color: "#6b7d52" }}
       >
         ← All Transactions
       </Link>
