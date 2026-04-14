@@ -109,12 +109,12 @@ export function EmailDashboard({ googleConfigured }: { googleConfigured: boolean
   }
 
   if (loading) {
-    return <div className="text-[#6a6a60] text-sm py-12 text-center">Loading email intelligence...</div>
+    return <div className="text-[#6b7d52]/60 text-sm py-12 text-center">Loading email intelligence...</div>
   }
 
   if (fetchError) {
     return (
-      <div className="bg-white border border-[#d4c8b8] rounded-xl p-8 text-center">
+      <div className="bg-[#f5f2ea] border border-[#9aab7e]/20 rounded-xl p-8 text-center">
         <p className="text-[#D45B5B] text-sm mb-3">{fetchError}</p>
         <button onClick={() => { setLoading(true); fetchTriage() }} className="text-[#6b7d52] hover:text-[#5a6c44] text-sm font-medium">
           Retry
@@ -128,24 +128,24 @@ export function EmailDashboard({ googleConfigured }: { googleConfigured: boolean
   return (
     <div className="space-y-6">
       {/* Connection + Scan Bar */}
-      <div className="bg-white border border-[#d4c8b8]/60 rounded-xl p-5 flex items-center justify-between">
+      <div className="bg-[#f5f2ea] border border-[#9aab7e]/20 rounded-xl p-5 flex items-center justify-between">
         <div>
           {hasAccounts ? (
             <>
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#6BBF59]" />
+                <span className="w-2 h-2 rounded-full bg-[#9aab7e]" />
                 <p className="text-[#1e2416] text-sm font-medium">
                   {data.accounts.map((a) => a.email).join(", ")}
                 </p>
               </div>
-              <p className="text-[#9a9a90] text-xs mt-0.5 ml-4">
+              <p className="text-[#6b7d52]/50 text-xs mt-0.5 ml-4">
                 Last scan: {data.lastScanAt ? new Date(data.lastScanAt).toLocaleString() : "Never"}
               </p>
             </>
           ) : (
             <>
               <p className="text-[#1e2416] text-sm font-medium">No Gmail connected</p>
-              <p className="text-[#9a9a90] text-xs mt-0.5">
+              <p className="text-[#6b7d52]/50 text-xs mt-0.5">
                 {googleConfigured
                   ? "Connect Gmail to enable inbox scanning and AI triage."
                   : "Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET first."}
@@ -188,10 +188,10 @@ export function EmailDashboard({ googleConfigured }: { googleConfigured: boolean
       {data && data.missedCalls.length > 0 && (
         <Section title="Missed Calls" count={data.missedCalls.length} variant="red">
           {data.missedCalls.map((c) => (
-            <div key={c.id} className="bg-white border border-[#d4c8b8]/60 p-4 rounded-xl flex items-center justify-between">
+            <div key={c.id} className="bg-[#f5f2ea] border border-[#9aab7e]/20 p-4 rounded-xl flex items-center justify-between">
               <div>
                 <p className="text-[#1e2416] text-sm font-medium">{c.callerName ?? c.callerPhone}</p>
-                <p className="text-[#9a9a90] text-xs">{c.hoursAgo}h ago</p>
+                <p className="text-[#6b7d52]/50 text-xs">{c.hoursAgo}h ago</p>
               </div>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#D45B5B]/10 text-[#D45B5B] font-medium">Unreturned</span>
             </div>
@@ -241,16 +241,16 @@ export function EmailDashboard({ googleConfigured }: { googleConfigured: boolean
       {data && data.recentEmails.transaction.length > 0 && (
         <Section title="Transaction Emails" count={data.recentEmails.transaction.length} variant="sage">
           {data.recentEmails.transaction.map((e) => (
-            <div key={e.id} className="bg-white border border-[#d4c8b8]/60 p-4 rounded-xl">
+            <div key={e.id} className="bg-[#f5f2ea] border border-[#9aab7e]/20 p-4 rounded-xl">
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-[#1e2416] text-sm font-medium">{e.subject ?? "(no subject)"}</p>
-                  <p className="text-[#9a9a90] text-xs mt-0.5">{e.fromAddress}</p>
+                  <p className="text-[#6b7d52]/50 text-xs mt-0.5">{e.fromAddress}</p>
                 </div>
-                <span className="text-[#beb09e] text-xs shrink-0">{timeAgo(e.sentAt)}</span>
+                <span className="text-[#6b7d52]/40 text-xs shrink-0">{timeAgo(e.sentAt)}</span>
               </div>
               {e.bodyPreview && (
-                <p className="text-[#6a6a60] text-xs mt-2 line-clamp-2">{e.bodyPreview}</p>
+                <p className="text-[#6b7d52]/60 text-xs mt-2 line-clamp-2">{e.bodyPreview}</p>
               )}
             </div>
           ))}
@@ -261,7 +261,7 @@ export function EmailDashboard({ googleConfigured }: { googleConfigured: boolean
       {data && data.stats.totalUnanswered === 0 && data.missedCalls.length === 0 && (
         <div className="bg-[#9aab7e]/8 border border-[#9aab7e]/20 rounded-xl text-center py-12">
           <p className="text-[#1e2416] text-sm font-medium">All clear</p>
-          <p className="text-[#6a6a60] text-xs mt-1">No unanswered messages or missed calls.</p>
+          <p className="text-[#6b7d52]/60 text-xs mt-1">No unanswered messages or missed calls.</p>
         </div>
       )}
 
@@ -282,9 +282,10 @@ export function EmailDashboard({ googleConfigured }: { googleConfigured: boolean
 
 function StatCard({ label, value, alert }: { label: string; value: number; alert: boolean }) {
   return (
-    <div className="bg-white border border-[#d4c8b8]/60 p-4 rounded-xl text-center">
-      <p className="text-[#9a9a90] text-[10px] tracking-[0.15em] uppercase">{label}</p>
-      <p className={`text-2xl font-light mt-0.5 ${alert ? "text-[#D45B5B]" : "text-[#1e2416]"}`}>
+    <div className="bg-[#f5f2ea] border border-[#9aab7e]/20 p-4 rounded-xl text-center">
+      <p className="text-[#6b7d52]/50 text-[10px] tracking-[0.15em] uppercase">{label}</p>
+      <p className={`text-2xl font-light mt-0.5 ${alert ? "text-[#c45c5c]" : "text-[#1e2416]"}`}
+         style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
         {value}
       </p>
     </div>
@@ -331,7 +332,7 @@ function MessageCard({ msg, draft, draftingId, onDraft, onHandled, onSent }: {
     critical: "bg-[#D45B5B]/10 text-[#D45B5B]",
     high: "bg-[#E8B44C]/10 text-[#E8B44C]",
     medium: "bg-[#9aab7e]/10 text-[#6b7d52]",
-    low: "bg-[#beb09e]/10 text-[#9a9a90]",
+    low: "bg-[#9aab7e]/10 text-[#6b7d52]/50",
   }
 
   function openEditor() {
@@ -376,18 +377,18 @@ function MessageCard({ msg, draft, draftingId, onDraft, onHandled, onSent }: {
   }
 
   return (
-    <div className="bg-white border border-[#d4c8b8]/60 p-4 rounded-xl">
+    <div className="bg-[#f5f2ea] border border-[#9aab7e]/20 p-4 rounded-xl">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] uppercase tracking-[0.1em] text-[#9a9a90]">{msg.channel}</span>
+            <span className="text-[10px] uppercase tracking-[0.1em] text-[#6b7d52]/50">{msg.channel}</span>
             <span className={`text-[10px] py-0 px-1.5 rounded-full font-medium ${urgencyBadge[msg.urgency]}`}>
               {msg.hoursUnanswered > 48 ? "48h+" : `${Math.round(msg.hoursUnanswered)}h`}
             </span>
           </div>
           <p className="text-[#1e2416] text-sm font-medium mt-1">{msg.contactName ?? msg.from}</p>
-          {msg.subject && <p className="text-[#6a6a60] text-xs mt-0.5">{msg.subject}</p>}
-          <p className="text-[#9a9a90] text-xs mt-1 line-clamp-2">{msg.bodyPreview}</p>
+          {msg.subject && <p className="text-[#6b7d52]/60 text-xs mt-0.5">{msg.subject}</p>}
+          <p className="text-[#6b7d52]/50 text-xs mt-1 line-clamp-2">{msg.bodyPreview}</p>
         </div>
         <div className="flex gap-1.5 shrink-0">
           <button
@@ -399,7 +400,7 @@ function MessageCard({ msg, draft, draftingId, onDraft, onHandled, onSent }: {
           </button>
           <button
             onClick={() => onHandled(msg.id)}
-            className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[#d4c8b8] text-[#6a6a60] hover:bg-[#f5f2ea] transition-colors"
+            className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[#9aab7e]/20 text-[#6b7d52]/60 hover:bg-[#f5f2ea] transition-colors"
           >
             Handled
           </button>
@@ -408,20 +409,20 @@ function MessageCard({ msg, draft, draftingId, onDraft, onHandled, onSent }: {
 
       {/* Sent confirmation */}
       {sendStatus === "sent" && (
-        <div className="mt-3 pt-3 border-t border-[#d4c8b8]/40">
-          <p className="text-[#6BBF59] text-sm font-medium text-center py-2">Email sent to {msg.from}</p>
+        <div className="mt-3 pt-3 border-t border-[#9aab7e]/20">
+          <p className="text-[#9aab7e] text-sm font-medium text-center py-2">Email sent to {msg.from}</p>
         </div>
       )}
 
       {/* Draft Reply — view mode */}
       {draft && !editing && sendStatus !== "sent" && (
-        <div className="mt-3 pt-3 border-t border-[#d4c8b8]/40">
+        <div className="mt-3 pt-3 border-t border-[#9aab7e]/20">
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-[10px] uppercase tracking-[0.1em] text-[#6b7d52] font-medium">Draft Reply</span>
             <div className="flex gap-2">
               <button
                 onClick={() => navigator.clipboard.writeText(draft)}
-                className="text-xs text-[#9a9a90] hover:text-[#6a6a60] transition-colors"
+                className="text-xs text-[#6b7d52]/50 hover:text-[#6b7d52]/60 transition-colors"
               >
                 Copy
               </button>
@@ -433,7 +434,7 @@ function MessageCard({ msg, draft, draftingId, onDraft, onHandled, onSent }: {
               </button>
             </div>
           </div>
-          <p className="text-[#1e2416] text-xs leading-relaxed whitespace-pre-wrap bg-[#f5f2ea] border border-[#d4c8b8]/30 rounded-lg p-3">
+          <p className="text-[#1e2416] text-xs leading-relaxed whitespace-pre-wrap bg-[#f5f2ea] border border-[#9aab7e]/20/30 rounded-lg p-3">
             {draft}
           </p>
         </div>
@@ -441,14 +442,14 @@ function MessageCard({ msg, draft, draftingId, onDraft, onHandled, onSent }: {
 
       {/* Draft Reply — edit & send mode */}
       {editing && sendStatus !== "sent" && (
-        <div className="mt-3 pt-3 border-t border-[#d4c8b8]/40 space-y-2">
+        <div className="mt-3 pt-3 border-t border-[#9aab7e]/20 space-y-2">
           <div className="flex items-center justify-between mb-1">
             <span className="text-[10px] uppercase tracking-[0.1em] text-[#6b7d52] font-medium">
               Replying to {msg.from}
             </span>
             <button
               onClick={() => setEditing(false)}
-              className="text-xs text-[#9a9a90] hover:text-[#6a6a60] transition-colors"
+              className="text-xs text-[#6b7d52]/50 hover:text-[#6b7d52]/60 transition-colors"
             >
               Cancel
             </button>
@@ -458,13 +459,13 @@ function MessageCard({ msg, draft, draftingId, onDraft, onHandled, onSent }: {
             value={editedSubject}
             onChange={(e) => setEditedSubject(e.target.value)}
             placeholder="Subject"
-            className="w-full bg-[#f5f2ea] border border-[#d4c8b8]/50 rounded-lg px-3 py-2 text-[#1e2416] text-xs placeholder:text-[#beb09e] focus:outline-none focus:border-[#9aab7e]"
+            className="w-full bg-[#f5f2ea] border border-[#9aab7e]/20/50 rounded-lg px-3 py-2 text-[#1e2416] text-xs placeholder:text-[#6b7d52]/40 focus:outline-none focus:border-[#9aab7e]"
           />
           <textarea
             value={editedBody}
             onChange={(e) => setEditedBody(e.target.value)}
             rows={6}
-            className="w-full bg-[#f5f2ea] border border-[#d4c8b8]/50 rounded-lg px-3 py-2 text-[#1e2416] text-xs leading-relaxed placeholder:text-[#beb09e] focus:outline-none focus:border-[#9aab7e] resize-none"
+            className="w-full bg-[#f5f2ea] border border-[#9aab7e]/20/50 rounded-lg px-3 py-2 text-[#1e2416] text-xs leading-relaxed placeholder:text-[#6b7d52]/40 focus:outline-none focus:border-[#9aab7e] resize-none"
           />
           {sendStatus === "error" && (
             <p className="text-[#D45B5B] text-xs">Failed to send. Check your Resend API key.</p>
@@ -472,7 +473,7 @@ function MessageCard({ msg, draft, draftingId, onDraft, onHandled, onSent }: {
           <div className="flex justify-end gap-2">
             <button
               onClick={() => navigator.clipboard.writeText(editedBody)}
-              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[#d4c8b8] text-[#6a6a60] hover:bg-[#f5f2ea] transition-colors"
+              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[#9aab7e]/20 text-[#6b7d52]/60 hover:bg-[#f5f2ea] transition-colors"
             >
               Copy
             </button>

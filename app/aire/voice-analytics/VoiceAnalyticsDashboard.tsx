@@ -19,6 +19,12 @@ interface AnalyticsData {
   }>
 }
 
+const STATUS_COLOR: Record<string, string> = {
+  completed: "#9aab7e",
+  failed: "#c45c5c",
+  clarification_needed: "#d4944c",
+}
+
 export default function VoiceAnalyticsDashboard() {
   const [data, setData] = useState<AnalyticsData | null>(null)
   const [days, setDays] = useState(7)
@@ -32,8 +38,8 @@ export default function VoiceAnalyticsDashboard() {
       .catch(() => setLoading(false))
   }, [days])
 
-  if (loading) return <div className="text-cream-dim">Loading analytics...</div>
-  if (!data) return <div className="text-cream-dim">No analytics data available.</div>
+  if (loading) return <div className="text-[#e8e4d8]/60 text-sm py-8">Loading analytics...</div>
+  if (!data) return <div className="text-[#e8e4d8]/60 text-sm py-8">No analytics data available.</div>
 
   return (
     <div className="space-y-6">
@@ -43,9 +49,13 @@ export default function VoiceAnalyticsDashboard() {
           <button
             key={d}
             onClick={() => setDays(d)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-              days === d ? "bg-copper text-forest-deep" : "bg-forest-deep border border-brown-border text-cream-dim hover:text-cream"
-            }`}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+            style={{
+              backgroundColor: days === d ? "#9aab7e" : "#1e2416",
+              color: days === d ? "#1e2416" : "#e8e4d8",
+              border: days === d ? "none" : "1px solid rgba(154,171,126,0.2)",
+              fontFamily: "'IBM Plex Mono', monospace",
+            }}
           >
             {d}d
           </button>
@@ -74,22 +84,22 @@ export default function VoiceAnalyticsDashboard() {
 
       {/* Intent breakdown + Status */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="border border-brown-border rounded-xl p-5">
-          <h3 className="text-cream-dim text-xs uppercase tracking-wider mb-3">Intent Distribution</h3>
+        <div className="border border-[#9aab7e]/20 rounded-xl p-5">
+          <h3 className="text-[#e8e4d8]/60 text-xs uppercase tracking-wider mb-3">Intent Distribution</h3>
           {data.intentBreakdown.length === 0 ? (
-            <p className="text-cream-dim text-sm">No commands yet</p>
+            <p className="text-[#e8e4d8]/60 text-sm">No commands yet</p>
           ) : (
             <div className="space-y-2">
               {data.intentBreakdown.slice(0, 10).map(i => (
                 <div key={i.intent} className="flex items-center gap-3">
                   <div className="flex-1">
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-cream font-mono text-xs">{i.intent}</span>
-                      <span className="text-cream-dim text-xs">{i.count}</span>
+                      <span className="text-[#e8e4d8] font-mono text-xs">{i.intent}</span>
+                      <span className="text-[#e8e4d8]/60 text-xs">{i.count}</span>
                     </div>
-                    <div className="h-1.5 bg-forest-deep rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-[#1e2416] border border-[#9aab7e]/10 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-copper rounded-full"
+                        className="h-full bg-[#9aab7e] rounded-full"
                         style={{ width: `${Math.max(i.pct * 100, 2)}%` }}
                       />
                     </div>
@@ -100,50 +110,50 @@ export default function VoiceAnalyticsDashboard() {
           )}
         </div>
 
-        <div className="border border-brown-border rounded-xl p-5">
-          <h3 className="text-cream-dim text-xs uppercase tracking-wider mb-3">Status Breakdown</h3>
+        <div className="border border-[#9aab7e]/20 rounded-xl p-5">
+          <h3 className="text-[#e8e4d8]/60 text-xs uppercase tracking-wider mb-3">Status Breakdown</h3>
           <div className="space-y-2">
             {Object.entries(data.statusCounts).map(([status, count]) => (
               <div key={status} className="flex justify-between items-center">
-                <span className={`text-sm font-mono ${
-                  status === "completed" ? "text-green-400" :
-                  status === "failed" ? "text-red-400" :
-                  status === "clarification_needed" ? "text-yellow-400" :
-                  "text-cream-dim"
-                }`}>{status}</span>
-                <span className="text-cream text-sm font-medium">{count}</span>
+                <span
+                  className="text-sm font-mono"
+                  style={{ color: STATUS_COLOR[status] || "#e8e4d8" }}
+                >
+                  {status}
+                </span>
+                <span className="text-[#e8e4d8] text-sm font-medium font-mono">{count}</span>
               </div>
             ))}
           </div>
 
-          <h3 className="text-cream-dim text-xs uppercase tracking-wider mt-6 mb-3">Timing Breakdown</h3>
+          <h3 className="text-[#e8e4d8]/60 text-xs uppercase tracking-wider mt-6 mb-3">Timing Breakdown</h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-cream-dim">Avg Classify</span>
-              <span className="text-cream font-mono">{data.timing.avgClassifyMs}ms</span>
+              <span className="text-[#e8e4d8]/60">Avg Classify</span>
+              <span className="text-[#e8e4d8] font-mono">{data.timing.avgClassifyMs}ms</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-cream-dim">Avg Total</span>
-              <span className="text-cream font-mono">{data.timing.avgTotalMs}ms</span>
+              <span className="text-[#e8e4d8]/60">Avg Total</span>
+              <span className="text-[#e8e4d8] font-mono">{data.timing.avgTotalMs}ms</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-cream-dim">P95 Total</span>
-              <span className="text-cream font-mono">{data.timing.p95TotalMs}ms</span>
+              <span className="text-[#e8e4d8]/60">P95 Total</span>
+              <span className="text-[#e8e4d8] font-mono">{data.timing.p95TotalMs}ms</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Recent commands */}
-      <div className="border border-brown-border rounded-xl p-5">
-        <h3 className="text-cream-dim text-xs uppercase tracking-wider mb-3">Recent Commands</h3>
+      <div className="border border-[#9aab7e]/20 rounded-xl p-5">
+        <h3 className="text-[#e8e4d8]/60 text-xs uppercase tracking-wider mb-3">Recent Commands</h3>
         {data.recent.length === 0 ? (
-          <p className="text-cream-dim text-sm">No voice commands yet. Try saying "Show my pipeline".</p>
+          <p className="text-[#e8e4d8]/60 text-sm">No voice commands yet. Try saying "Show my pipeline".</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-cream-dim text-xs uppercase border-b border-brown-border">
+                <tr className="text-[#e8e4d8]/60 text-xs uppercase border-b border-[#9aab7e]/20">
                   <th className="text-left py-2 pr-3">Transcript</th>
                   <th className="text-left py-2 px-3">Intent</th>
                   <th className="text-right py-2 px-3">Conf.</th>
@@ -153,24 +163,25 @@ export default function VoiceAnalyticsDashboard() {
               </thead>
               <tbody>
                 {data.recent.map(cmd => (
-                  <tr key={cmd.id} className="border-b border-brown-border/30">
-                    <td className="py-2 pr-3 text-cream max-w-[200px] truncate">{cmd.transcript}</td>
-                    <td className="py-2 px-3 text-cream-dim font-mono text-xs">{cmd.intent || "—"}</td>
-                    <td className="py-2 px-3 text-right text-cream">
+                  <tr key={cmd.id} className="border-b border-[#9aab7e]/10">
+                    <td className="py-2 pr-3 text-[#e8e4d8] max-w-[200px] truncate">{cmd.transcript}</td>
+                    <td className="py-2 px-3 text-[#e8e4d8]/60 font-mono text-xs">{cmd.intent || "—"}</td>
+                    <td className="py-2 px-3 text-right text-[#e8e4d8] font-mono text-xs">
                       {cmd.confidence != null ? `${(cmd.confidence * 100).toFixed(0)}%` : "—"}
                     </td>
-                    <td className="py-2 px-3 text-right font-mono text-cream">
+                    <td className="py-2 px-3 text-right font-mono text-[#e8e4d8] text-xs">
                       {cmd.totalMs != null ? `${(cmd.totalMs / 1000).toFixed(1)}s` : "—"}
                       {cmd.classifyMs === 0 && cmd.totalMs != null && (
-                        <span className="ml-1 text-green-400 text-[10px]">FAST</span>
+                        <span className="ml-1 text-[#9aab7e] text-[10px]">FAST</span>
                       )}
                     </td>
                     <td className="py-2 pl-3 text-center">
-                      <span className={`text-xs ${
-                        cmd.status === "completed" ? "text-green-400" :
-                        cmd.status === "failed" ? "text-red-400" :
-                        "text-yellow-400"
-                      }`}>{cmd.status}</span>
+                      <span
+                        className="text-xs font-mono"
+                        style={{ color: STATUS_COLOR[cmd.status] || "#e8e4d8" }}
+                      >
+                        {cmd.status}
+                      </span>
                     </td>
                   </tr>
                 ))}
@@ -185,10 +196,14 @@ export default function VoiceAnalyticsDashboard() {
 
 function MetricCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="border border-brown-border rounded-xl p-4">
-      <div className="text-cream-dim text-xs uppercase tracking-wider">{label}</div>
-      <div className="text-cream text-2xl font-light mt-1">{value}</div>
-      {sub && <div className="text-cream-dim text-xs mt-1">{sub}</div>}
+    <div className="border border-[#9aab7e]/20 rounded-xl p-4">
+      <div className="text-[#e8e4d8]/60 text-[10px] uppercase tracking-wider" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+        {label}
+      </div>
+      <div className="text-[#e8e4d8] text-2xl font-light mt-1" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
+        {value}
+      </div>
+      {sub && <div className="text-[#e8e4d8]/50 text-xs mt-1 font-mono">{sub}</div>}
     </div>
   )
 }
