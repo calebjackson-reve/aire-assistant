@@ -288,7 +288,7 @@ const FAST_MATCHERS: FastMatch[] = [
     intent: "send_document",
     extractEntities: (m) => ({ document_type: m[1].trim(), buyer_name: m[2].trim() }),
   },
-  // ── SEND DOCUMENT FOR SIGNATURE (3 patterns) ──
+  // ── SEND DOCUMENT FOR SIGNATURE (6 patterns) ──
   {
     pattern: /^(?:send|route|take) (?:that |the )?(?:addendum|amendment|document|contract|agreement|PA) (?:we (?:just )?got )?(?:and )?(?:send (?:it )?)?(?:to (.+?) )?for signature(?:s)?$/i,
     intent: "send_document_for_signature",
@@ -307,6 +307,38 @@ const FAST_MATCHERS: FastMatch[] = [
     pattern: /^send (?:the )?(.+?) to (?:our |the )?(.+?) for signature(?:s)?$/i,
     intent: "send_document_for_signature",
     extractEntities: (m) => ({ document_type: m[1].trim(), seller_name: m[2].trim() }),
+  },
+  // "send 123 Main purchase agreement to John Smith (for signature)"
+  // Address + document type + recipient, "for signature" optional
+  {
+    pattern: /^send (\d+\s+[^,]+?) (purchase agreement|PA|contract|addendum|amendment|seller disclosure|disclosure|listing agreement) to ([A-Z][a-zA-Z'.-]+(?:\s+[A-Z][a-zA-Z'.-]+)+)(?:\s+for signature(?:s)?)?$/i,
+    intent: "send_document_for_signature",
+    extractEntities: (m) => ({
+      address: m[1].trim(),
+      document_type: m[2].trim(),
+      recipient: m[3].trim(),
+      buyer_name: m[3].trim(),
+    }),
+  },
+  // "send [document] to [name] for signature" — plain recipient + doc only
+  {
+    pattern: /^send (?:the )?(purchase agreement|PA|contract|addendum|amendment|seller disclosure|disclosure|listing agreement) to ([A-Z][a-zA-Z'.-]+(?:\s+[A-Z][a-zA-Z'.-]+)+)(?:\s+for signature(?:s)?)?$/i,
+    intent: "send_document_for_signature",
+    extractEntities: (m) => ({
+      document_type: m[1].trim(),
+      recipient: m[2].trim(),
+      buyer_name: m[2].trim(),
+    }),
+  },
+  // "get [doc] signed by [name]"
+  {
+    pattern: /^(?:get|have) (?:the )?(.+?) signed by ([A-Z][a-zA-Z'.-]+(?:\s+[A-Z][a-zA-Z'.-]+)+)$/i,
+    intent: "send_document_for_signature",
+    extractEntities: (m) => ({
+      document_type: m[1].trim(),
+      recipient: m[2].trim(),
+      seller_name: m[2].trim(),
+    }),
   },
   // ── CREATE ADDENDUM (2 patterns) ──
   {

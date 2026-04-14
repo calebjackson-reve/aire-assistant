@@ -37,6 +37,11 @@ interface Message {
   role: "user" | "assistant"
   text: string
   action?: { label: string; href: string }
+  pendingConfirm?: {
+    voiceCommandId: string
+    intent: string
+    entities: Record<string, string>
+  }
 }
 
 // Browser TTS — AIRE speaks back
@@ -203,24 +208,49 @@ export function VoiceOverlay({ open, onClose }: VoiceOverlayProps) {
         speak("Voice commands are available on the Pro plan.")
       } else if (res.ok) {
         const data = await res.json()
-        const intent = data.classification?.intent || "unknown"
-        const response = data.response || data.classification?.response || "Command processed."
+        // v2 pipeline returns flat shape: {intent, entities, response, voiceCommandId, requiresConfirmation}
+        const intent: string = data.intent || data.classification?.intent || "unknown"
+        const entities: Record<string, string> = data.entities || {}
+        const response: string =
+          data.response || data.classification?.response || "Command processed."
+        const voiceCommandId: string | undefined = data.voiceCommandId
+        const requiresConfirm: boolean =
+          data.requiresConfirmation ??
+          ["send_document_for_signature", "send_document", "send_alert",
+           "create_transaction", "create_addendum", "schedule_closing"].includes(intent)
 
-        let action: { label: string; href: string } | undefined
-        if (intent === "create_transaction" && data.execution?.transactionId) {
-          action = { label: "View transaction", href: `/aire/transactions/${data.execution.transactionId}` }
-        } else if (intent === "check_pipeline") {
-          action = { label: "View deals", href: "/aire/transactions" }
-        } else if (intent === "write_contract") {
-          action = { label: "View contracts", href: "/aire/contracts" }
-        } else if (intent === "compliance_scan") {
-          action = { label: "View compliance", href: "/aire/compliance" }
+        // Auto-execute safe read-only intents immediately via /execute
+        const readOnlyIntents = new Set([
+          "show_pipeline", "check_deadlines", "market_analysis",
+          "calculate_roi", "run_compliance", "check_docs",
+        ])
+
+        if (voiceCommandId && readOnlyIntents.has(intent)) {
+          await runExecute({ voiceCommandId, intent, entities, confirmed: true, fallbackText: response })
+        } else if (voiceCommandId && requiresConfirm) {
+          // Show confirm UI — do NOT execute yet
+          setMessages(prev => [...prev, {
+            role: "assistant",
+            text: response,
+            pendingConfirm: { voiceCommandId, intent, entities },
+          }])
+          speak(response)
+        } else {
+          let action: { label: string; href: string } | undefined
+          if (intent === "create_transaction" && data.execution?.transactionId) {
+            action = { label: "View transaction", href: `/aire/transactions/${data.execution.transactionId}` }
+          } else if (intent === "check_pipeline" || intent === "show_pipeline") {
+            action = { label: "View deals", href: "/aire/transactions" }
+          } else if (intent === "write_contract") {
+            action = { label: "View contracts", href: "/aire/contracts" }
+          } else if (intent === "compliance_scan" || intent === "run_compliance") {
+            action = { label: "View compliance", href: "/aire/compliance" }
+          } else if (intent === "send_document_for_signature") {
+            action = { label: "Open AirSign", href: "/airsign" }
+          }
+          setMessages(prev => [...prev, { role: "assistant", text: response, action }])
+          speak(response)
         }
-
-        setMessages(prev => [...prev, { role: "assistant", text: response, action }])
-
-        // AIRE speaks the response
-        speak(response)
       } else {
         const err = await res.json().catch(() => ({ error: "Request failed" }))
         const errMsg = err.error || "Something went wrong. Try again."
@@ -239,6 +269,83 @@ export function VoiceOverlay({ open, onClose }: VoiceOverlayProps) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     sendCommand(input)
+  }
+
+  // Executes a classified voice command via /api/voice-command/execute.
+  // Replaces the last pending-confirm message with the execution result.
+  async function runExecute(params: {
+    voiceCommandId: string
+    intent: string
+    entities: Record<string, string>
+    confirmed: boolean
+    fallbackText?: string
+  }) {
+    try {
+      const execRes = await fetch("/api/voice-command/execute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          voiceCommandId: params.voiceCommandId,
+          intent: params.intent,
+          entities: params.entities,
+          confirmed: params.confirmed,
+        }),
+      })
+
+      if (!execRes.ok) {
+        const err = await execRes.json().catch(() => ({ error: "Execution failed" }))
+        const msg = err.error || "Execution failed."
+        setMessages(prev => [...prev, { role: "assistant", text: msg }])
+        speak(msg)
+        return
+      }
+
+      const exec = await execRes.json()
+      const msg: string = exec.message || params.fallbackText || "Done."
+
+      // Build action button based on executed intent + data
+      let action: { label: string; href: string } | undefined
+      const data = exec.data || {}
+      if (data.redirectTo) {
+        action = { label: "Open", href: data.redirectTo }
+      } else if (params.intent === "send_document_for_signature" && data.envelopeId) {
+        action = { label: "View envelope", href: `/airsign/${data.envelopeId}` }
+      } else if (params.intent === "create_transaction" && data.transactionId) {
+        action = { label: "View transaction", href: `/aire/transactions/${data.transactionId}` }
+      } else if (params.intent === "show_pipeline") {
+        action = { label: "View deals", href: "/aire/transactions" }
+      } else if (params.intent === "run_compliance") {
+        action = { label: "View compliance", href: "/aire/compliance" }
+      }
+
+      setMessages(prev => [...prev, { role: "assistant", text: msg, action }])
+      speak(msg)
+    } catch {
+      const msg = "Network error running the action."
+      setMessages(prev => [...prev, { role: "assistant", text: msg }])
+      speak(msg)
+    }
+  }
+
+  // Confirm or cancel a pending approval-required intent.
+  async function confirmPending(m: Message, confirm: boolean) {
+    if (!m.pendingConfirm) return
+    // Remove the pending-confirm flag from this message to hide buttons
+    setMessages(prev =>
+      prev.map(x => (x === m ? { ...x, pendingConfirm: undefined } : x))
+    )
+    if (!confirm) {
+      const msg = "Cancelled."
+      setMessages(prev => [...prev, { role: "assistant", text: msg }])
+      speak(msg)
+      return
+    }
+    setLoading(true)
+    try {
+      await runExecute({ ...m.pendingConfirm, confirmed: true })
+    } finally {
+      setLoading(false)
+    }
   }
 
   // ── Whisper-powered recording ──
@@ -525,6 +632,24 @@ export function VoiceOverlay({ open, onClose }: VoiceOverlayProps) {
                         <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
                       </svg>
                     </button>
+                  )}
+                  {msg.pendingConfirm && (
+                    <div className="mt-2 flex items-center gap-2">
+                      <button
+                        onClick={() => confirmPending(msg, true)}
+                        disabled={loading}
+                        className="text-xs px-3 py-1.5 rounded-lg bg-sage/30 text-cream hover:bg-sage/40 transition disabled:opacity-50"
+                      >
+                        Confirm
+                      </button>
+                      <button
+                        onClick={() => confirmPending(msg, false)}
+                        disabled={loading}
+                        className="text-xs px-3 py-1.5 rounded-lg bg-cream/5 text-cream/70 hover:bg-cream/10 transition disabled:opacity-50"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   )}
                   {msg.role === "assistant" && (
                     <div className="mt-2 pt-1 border-t border-cream/5">
