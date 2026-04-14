@@ -1,0 +1,165 @@
+{
+  "batchStarted": "2026-04-14T02:20:52.016Z",
+  "batchEnded": "2026-04-14T02:30:46.302Z",
+  "totalTargets": 23,
+  "successes": 5,
+  "failures": 18,
+  "results": [
+    {
+      "cmaId": "52880",
+      "cmaName": "28274 lake bruin",
+      "ok": true,
+      "path": "lib\\cma\\backtest\\cma_data\\52880.json"
+    },
+    {
+      "cmaId": "50997",
+      "cmaName": "Austin Gayle",
+      "ok": true,
+      "path": "lib\\cma\\backtest\\cma_data\\50997.json"
+    },
+    {
+      "cmaId": "52738",
+      "cmaName": "John Jackson",
+      "ok": true,
+      "path": "lib\\cma\\backtest\\cma_data\\52738.json"
+    },
+    {
+      "cmaId": "52579",
+      "cmaName": "12361 Pecan Island Rd",
+      "ok": true,
+      "path": "lib\\cma\\backtest\\cma_data\\52579.json"
+    },
+    {
+      "cmaId": "52530",
+      "cmaName": "Dani and Clint",
+      "ok": true,
+      "path": "lib\\cma\\backtest\\cma_data\\52530.json"
+    },
+    {
+      "cmaId": "52577",
+      "cmaName": "Gavin Property",
+      "ok": false,
+      "error": "Could not re-nav to Saved Presentations",
+      "path": "lib\\cma\\backtest\\cma_data\\52577.json"
+    },
+    {
+      "cmaId": "51674",
+      "cmaName": "Jenny Wilcox",
+      "ok": false,
+      "error": "Could not re-nav to Saved Presentations",
+      "path": "lib\\cma\\backtest\\cma_data\\51674.json"
+    },
+    {
+      "cmaId": "52335",
+      "cmaName": "Eagle Drive Jenny Wilcox",
+      "ok": false,
+      "error": "Could not re-nav to Saved Presentations",
+      "path": "lib\\cma\\backtest\\cma_data\\52335.json"
+    },
+    {
+      "cmaId": "52465",
+      "cmaName": "743 avenue b",
+      "ok": false,
+      "error": "Could not re-nav to Saved Presentations",
+      "path": "lib\\cma\\backtest\\cma_data\\52465.json"
+    },
+    {
+      "cmaId": "52342",
+      "cmaName": "greg junghas",
+      "ok": false,
+      "error": "Could not re-nav to Saved Presentations",
+      "path": "lib\\cma\\backtest\\cma_data\\52342.json"
+    },
+    {
+      "cmaId": "52431",
+      "cmaName": "patin dyke rd",
+      "ok": false,
+      "error": "Could not re-nav to Saved Presentations",
+      "path": "lib\\cma\\backtest\\cma_data\\52431.json"
+    },
+    {
+      "cmaId": "52432",
+      "cmaName": "Trails End updated",
+      "ok": false,
+      "error": "Could not re-nav to Saved Presentations",
+      "path": "lib\\cma\\backtest\\cma_data\\52432.json"
+    },
+    {
+      "cmaId": "52321",
+      "cmaName": "Todd C",
+      "ok": false,
+      "error": "Could not re-nav to Saved Presentations",
+      "path": "lib\\cma\\backtest\\cma_data\\52321.json"
+    },
+    {
+      "cmaId": "52315",
+      "cmaName": "Boone Ave",
+      "ok": false,
+      "error": "Could not re-nav to Saved Presentations",
+      "path": "lib\\cma\\backtest\\cma_data\\52315.json"
+    },
+    {
+      "cmaId": "52275",
+      "cmaName": "gina",
+      "ok": false,
+      "error": "Could not re-nav to Saved Presentations",
+      "path": "lib\\cma\\backtest\\cma_data\\52275.json"
+    },
+    {
+      "cmaId": "51395",
+      "cmaName": "Heather Clement",
+      "ok": false,
+      "error": "Could not re-nav to Saved Presentations",
+      "path": "lib\\cma\\backtest\\cma_data\\51395.json"
+    },
+    {
+      "cmaId": "52198",
+      "cmaName": "109 Morningside Street",
+      "ok": false,
+      "error": "Could not re-nav to Saved Presentations",
+      "path": "lib\\cma\\backtest\\cma_data\\52198.json"
+    },
+    {
+      "cmaId": "51810",
+      "cmaName": "Bo Myers",
+      "ok": false,
+      "error": "Could not re-nav to Saved Presentations",
+      "path": "lib\\cma\\backtest\\cma_data\\51810.json"
+    },
+    {
+      "cmaId": "52059",
+      "cmaName": "109 Morningside st",
+      "ok": false,
+      "error": "Could not re-nav to Saved Presentations",
+      "path": "lib\\cma\\backtest\\cma_data\\52059.json"
+    },
+    {
+      "cmaId": "52058",
+      "cmaName": "Jacob Askins",
+      "ok": false,
+      "error": "Could not re-nav to Saved Presentations",
+      "path": "lib\\cma\\backtest\\cma_data\\52058.json"
+    },
+    {
+      "cmaId": "51784",
+      "cmaName": "13902 Ouachita ave",
+      "ok": false,
+      "error": "Could not re-nav to Saved Presentations",
+      "path": "lib\\cma\\backtest\\cma_data\\51784.json"
+    },
+    {
+      "cmaId": "51959",
+      "cmaName": "kaeleigh",
+      "ok": false,
+      "error": "Could not re-nav to Saved Presentations",
+      "path": "lib\\cma\\backtest\\cma_data\\51959.json"
+    },
+    {
+      "cmaId": "51456",
+      "cmaName": "Emily Vince",
+      "ok": false,
+      "error": "Could not re-nav to Saved Presentations",
+      "path": "lib\\cma\\backtest\\cma_data\\51456.json"
+    }
+  ]
+}

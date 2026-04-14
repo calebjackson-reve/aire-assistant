@@ -1,0 +1,26 @@
+{
+  "capturedAt": "2026-04-14T02:30:43.669Z",
+  "cmaId": "51456",
+  "cmaName": "Emily Vince",
+  "indexSubjectMls": "2020011401",
+  "wizardUrl": null,
+  "subject": {
+    "presentationName": null,
+    "subjectAddress": null,
+    "subjectMls": null,
+    "subjectSubdivision": null,
+    "subjectBeds": null,
+    "subjectBaths": null,
+    "subjectSqft": null,
+    "subjectYearBuilt": null,
+    "subjectLotSize": null,
+    "subjectListPrice": null,
+    "subjectSoldPrice": null,
+    "recommendedListPrice": null,
+    "rawText": ""
+  },
+  "comps": [],
+  "reportButtonsFound": [],
+  "durationMs": 1665,
+  "error": "Could not re-nav to Saved Presentations"
+}

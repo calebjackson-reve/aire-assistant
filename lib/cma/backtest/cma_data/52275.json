@@ -1,0 +1,26 @@
+{
+  "capturedAt": "2026-04-14T02:29:05.178Z",
+  "cmaId": "52275",
+  "cmaName": "gina",
+  "indexSubjectMls": "NO2180761",
+  "wizardUrl": null,
+  "subject": {
+    "presentationName": null,
+    "subjectAddress": null,
+    "subjectMls": null,
+    "subjectSubdivision": null,
+    "subjectBeds": null,
+    "subjectBaths": null,
+    "subjectSqft": null,
+    "subjectYearBuilt": null,
+    "subjectLotSize": null,
+    "subjectListPrice": null,
+    "subjectSoldPrice": null,
+    "recommendedListPrice": null,
+    "rawText": ""
+  },
+  "comps": [],
+  "reportButtonsFound": [],
+  "durationMs": 1520,
+  "error": "Could not re-nav to Saved Presentations"
+}
