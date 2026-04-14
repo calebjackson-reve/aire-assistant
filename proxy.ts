@@ -17,6 +17,7 @@ const isPublicRoute = createRouteMatcher([
   "/billing",
   "/test(.*)",
   "/demo(.*)",
+  "/ui-preview(.*)",           // Public mirror of /aire/ui-lab for mock review (hardcoded data, no PII) — remove before ui/remodel merges to main
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

@@ -2,6 +2,17 @@ import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
 import prisma from "@/lib/prisma"
 import { DarkLayoutWithBadges } from "./DarkLayoutWithBadges"
+import "./ui-lab/_theme.css"
+
+// FOUC-safe: set data-theme on the .ui-lab-scope wrapper before first paint.
+// Nocturne is the locked default on every /aire/* route.
+const THEME_BOOTSTRAP = `
+(function(){try{
+  var root=document.querySelector('.ui-lab-scope');
+  if(!root)return;
+  root.setAttribute('data-theme','nocturne');
+}catch(e){}})();
+`
 
 export default async function AireLayout({ children }: { children: React.ReactNode }) {
   const { userId } = await auth()
@@ -31,7 +42,10 @@ export default async function AireLayout({ children }: { children: React.ReactNo
 
   return (
     <DarkLayoutWithBadges activeCount={activeCount} overdueCount={overdueCount}>
-      {children}
+      <div className="ui-lab-scope" data-theme="nocturne">
+        {children}
+      </div>
+      <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
     </DarkLayoutWithBadges>
   )
 }

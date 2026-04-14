@@ -1,12 +1,20 @@
 # AIRE Assistant — Project Instructions
 
-## UI/Design Rules — MANDATORY
-Before writing ANY frontend code, component, or UI element:
-1. Read `DESIGN.md` in this project root — it is the source of truth for all colors, fonts, components, and patterns
-2. Invoke the `frontend-design` skill
+## UI/Design Rules — MANDATORY (enforced by hook + skill)
+Before writing ANY frontend code, component, UI element, page, layout, theme, or responsive pass:
+1. **Invoke the `aire-frontend-design` skill via the Skill tool as your FIRST action.** This is non-negotiable. The UserPromptSubmit hook auto-injects a MANDATORY AUTO-FIRE directive when UI keywords are detected — honor it.
+2. After the skill loads, read `DESIGN.md` in this project root — it is the source of truth for all colors, fonts, components, and patterns
 3. Never use colors, fonts, or component styles not defined in DESIGN.md
-4. Every number/stat must use IBM Plex Mono. Every heading must use Playfair Display. Every body element must use Space Grotesk.
+4. Every number/stat must use IBM Plex Mono. Every heading must use Cormorant Garamond (canonical as of 2026-04-13). Every body element must use Space Grotesk.
 5. Never use blue, pure white (#ffffff), or pure black (#000000)
+6. Mobile (375) + tablet (768) ship in the same PR as desktop. Skipping responsive is an instant fail.
+7. Self-evaluate against the 8-criteria rubric (brand fidelity / coherence / originality / craft / functionality / responsive / motion taste / accessibility). Total < 64/80 = revise before reporting done.
+
+## MLS/CMA Rules — MANDATORY (enforced by hook + skill)
+Before touching ANY CMA engine, comps logic, valuation, pricing strategy, or MLS scraper code:
+1. **Invoke the `aire-mls-master-operator` skill via the Skill tool as your FIRST action.** The UserPromptSubmit hook auto-injects a MANDATORY AUTO-FIRE directive when CMA/MLS/comps/valuation keywords are detected — honor it.
+2. After the skill loads, read `CMA_MASTER_PLAN.md` + latest `DAY*_NOTES.md` + `lib/cma/scrapers/base.ts`
+3. Never guess an MLS hostname — verify via DNS and Caleb's active browser tab first (see error log entries on ROAM vs Paragon)
 
 ## Stack
 Next.js 16, React 19, Prisma 6.19, Neon PostgreSQL, Clerk auth, Stripe billing, Vercel, Twilio

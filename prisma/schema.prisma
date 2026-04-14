@@ -29,6 +29,12 @@ enum TransactionStatus {
   CANCELLED
 }
 
+enum ComplianceStatus {
+  PENDING
+  PASSED
+  BLOCKED
+}
+
 model User {
   id              String    @id @default(cuid())
   clerkId         String    @unique
@@ -100,7 +106,8 @@ model Transaction {
   listPrice         Float?
   offerPrice        Float?
   acceptedPrice     Float?
-  status            TransactionStatus @default(DRAFT)
+  status            TransactionStatus  @default(DRAFT)
+  complianceStatus  ComplianceStatus   @default(PENDING)
 
   // Parties
   buyerName         String?

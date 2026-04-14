@@ -30,7 +30,11 @@ export default async function TransactionPage({
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-10">
-      <Link href="/aire/transactions" className="text-[#6b7d52] text-xs hover:underline mb-4 block">
+      <Link
+        href="/aire/transactions"
+        className="text-xs hover:underline mb-4 block transition-colors"
+        style={{ color: "var(--text-accent, #6b7d52)" }}
+      >
         ← All Transactions
       </Link>
       <TransactionDetail transaction={JSON.parse(JSON.stringify(transaction))} />

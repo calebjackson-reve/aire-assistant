@@ -334,7 +334,7 @@ async function sealEnvelope(envelopeId: string) {
   const sealFields: SealField[] = envelope.fields
     .filter((f) => f.value && f.filledAt)
     .map((f) => ({
-      type: f.type,
+      type: f.type === "NAME" ? "TEXT" : (f.type as SealField["type"]),
       page: f.page,
       xPercent: f.xPercent,
       yPercent: f.yPercent,
