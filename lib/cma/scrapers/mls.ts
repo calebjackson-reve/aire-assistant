@@ -2361,24 +2361,32 @@ export async function paragonFetchListingDetail(mlsId: string): Promise<FetchLis
     await popup.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
     for (const f of popup.frames()) await injectNameShim(f)
 
-    const deadline = Date.now() + 20000
+    // Two-stage: (1) find the Reports.mvc frame by URL — we saw it exists
+    // but h3 count may be 0 until the frame fully loads.
+    // (2) wait for that frame's load state then re-poll for h3s.
+    const urlDeadline = Date.now() + 15000
     let reportFrame: import("playwright").Frame | null = null
-    while (Date.now() < deadline && !reportFrame) {
+    while (Date.now() < urlDeadline && !reportFrame) {
       for (const f of popup.frames()) {
-        // Accept frame if either URL pattern matches OR frame has
-        // listing-specific h3 labels regardless of URL.
-        const urlMatches = /Reports\/Report\.mvc|Reports\/GlobalReport|Reports\/Spreadsheet/i.test(f.url())
-        const diagnostics = await f.evaluate(() => {
-          const h3s = Array.from(document.querySelectorAll("h3")).map((h) => (h.textContent || "").trim())
-          const hasListing = h3s.some((t) => /MLS#|LivingSqFt|Bedrooms|Sold Price|ListPrice/i.test(t))
-          return { h3count: h3s.length, hasListing, url: location.href.slice(0, 80) }
-        }).catch(() => ({ h3count: 0, hasListing: false, url: "" }))
-        if ((urlMatches || diagnostics.hasListing) && diagnostics.h3count > 10) {
+        if (/Reports\/Report\.mvc\?listingIDs=/i.test(f.url())) {
           reportFrame = f
           break
         }
       }
       if (!reportFrame) await popup.waitForTimeout(500)
+    }
+
+    if (reportFrame) {
+      // Wait for the frame to finish loading + fields to render
+      await reportFrame.waitForLoadState("domcontentloaded", { timeout: 15000 }).catch(() => {})
+      await reportFrame.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {})
+      // Poll h3 count for up to 10s (content can render after networkidle)
+      const h3Deadline = Date.now() + 10000
+      while (Date.now() < h3Deadline) {
+        const h3c = await reportFrame.evaluate(() => document.querySelectorAll("h3").length).catch(() => 0)
+        if (h3c > 10) break
+        await popup.waitForTimeout(500)
+      }
     }
 
     if (!reportFrame) {
