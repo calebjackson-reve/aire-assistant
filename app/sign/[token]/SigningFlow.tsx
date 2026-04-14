@@ -176,8 +176,8 @@ export function SigningFlow({ token }: { token: string }) {
 
   if (error && !data) {
     return (
-      <div className="border border-red-500/30 rounded-lg p-12 text-center">
-        <p className="text-red-400 text-sm">{error}</p>
+      <div className="border border-[#8b4a4a]/30 rounded-lg p-12 text-center">
+        <p className="text-[#8b4a4a] text-sm">{error}</p>
       </div>
     )
   }
@@ -251,7 +251,7 @@ export function SigningFlow({ token }: { token: string }) {
         <p className="text-[#e8e4d8]/50 text-sm mt-1">
           Signing as: {data.signer.name} ({data.signer.email})
         </p>
-        {error && <p className="text-red-400 text-xs mt-2">{error}</p>}
+        {error && <p className="text-[#8b4a4a] text-xs mt-2">{error}</p>}
       </div>
 
       {/* Progress + Next button */}
@@ -353,7 +353,7 @@ export function SigningFlow({ token }: { token: string }) {
 
       {/* Confirmation modal */}
       {confirmAction && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={() => { setConfirmAction(null); setDeclineReason("") }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1e2416]/60 backdrop-blur-sm" onClick={() => { setConfirmAction(null); setDeclineReason("") }}>
           <div className="bg-[#1e2416] border border-[#9aab7e]/20 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-[#e8e4d8] text-lg font-medium mb-2">
               {confirmAction === "sign" ? "Confirm Signature" : "Decline Document"}
@@ -390,7 +390,7 @@ export function SigningFlow({ token }: { token: string }) {
                   rows={3}
                   placeholder="Please explain why you are declining to sign..."
                   style={{ fontSize: 16 }}
-                  className="w-full bg-[#0f1208] border border-[#9aab7e]/20 rounded px-3 py-2 text-[#e8e4d8] focus:outline-none focus:border-[#9aab7e]/50 resize-none"
+                  className="w-full bg-[#1e2416] border border-[#9aab7e]/20 rounded px-3 py-2 text-[#e8e4d8] focus:outline-none focus:border-[#9aab7e]/50 resize-none"
                 />
                 <p className="text-[#e8e4d8]/30 text-[10px] mt-1">
                   {declineReason.trim().length}/10 characters minimum
@@ -418,7 +418,7 @@ export function SigningFlow({ token }: { token: string }) {
                 className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition disabled:opacity-30 disabled:cursor-not-allowed ${
                   confirmAction === "sign"
                     ? "bg-[#9aab7e] text-[#1e2416] hover:brightness-110"
-                    : "bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                    : "bg-[#8b4a4a]/20 text-[#8b4a4a] hover:bg-[#8b4a4a]/30"
                 }`}
               >
                 {confirmAction === "sign" ? "Sign Now" : "Yes, Decline"}
