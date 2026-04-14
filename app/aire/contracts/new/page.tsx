@@ -10,7 +10,7 @@ export default async function NewContractPage() {
   return (
     <div className="max-w-3xl mx-auto px-6 py-10">
       <Link href="/aire/contracts" className="text-[#6b7d52] text-xs hover:underline mb-4 block">← Contracts</Link>
-      <h1 className="font-[family-name:var(--font-cormorant)] italic text-[#1e2416] text-2xl mb-1">
+      <h1 className="font-(family-name:--font-cormorant) italic text-[#1e2416] text-3xl sm:text-4xl leading-[1.1] tracking-[-0.02em] mb-2">
         Write a Contract
       </h1>
       <p className="text-[#6b7d52]/50 text-sm mb-8">
