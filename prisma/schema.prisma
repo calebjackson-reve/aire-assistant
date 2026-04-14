@@ -48,6 +48,10 @@ model User {
   subscriptionId  String?
   subscriptionStatus String?
 
+  // Trial state — managed by Stripe checkout with trial_period_days
+  trialStartedAt  DateTime?
+  trialEndsAt     DateTime?
+
   // Onboarding (Day One)
   onboarded               Boolean   @default(false)
   onboardedAt             DateTime?
@@ -90,6 +94,7 @@ model User {
   compSets        CompSet[]
   tcsSessions     TCSSession[]
   brokerageMembership BrokerageMember?
+  conversionEvents ConversionEvent[]
 
   // v2 AirSign
   airSignTemplates           AirSignTemplate[]
@@ -1140,6 +1145,23 @@ model ErrorMemory {
   @@index([agentName, errorType, resolved])
   @@index([agentName, createdAt])
   @@index([errorMessage])
+}
+
+// ============== Revenue Activation ==============
+
+model ConversionEvent {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  // "viewed_upgrade" | "clicked_upgrade" | "started_trial" | "converted" | "trial_expired"
+  event     String
+  feature   String?  // which gated feature triggered the event
+  tier      String?  // which plan they viewed / started
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId, event])
+  @@index([event, createdAt])
 }
 
 model PromptVersion {
