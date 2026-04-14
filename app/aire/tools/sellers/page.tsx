@@ -15,7 +15,7 @@ const fmtPct = (n: number) => `${(n * 100).toFixed(1)}%`
 function SectionHeader({ title, subtitle }: { title: string; subtitle: string }) {
   return (
     <div className="mb-6">
-      <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", color: "#1e2416", fontSize: 24, fontWeight: 700, marginBottom: 4 }}>
+      <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: "#1e2416", fontSize: 24, fontWeight: 700, marginBottom: 4 }}>
         {title}
       </h2>
       <p style={{ fontFamily: "'Space Grotesk', sans-serif", color: "#8a9070", fontSize: 14 }}>{subtitle}</p>
@@ -437,7 +437,7 @@ export default function SellerToolsPage() {
         <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 12, fontWeight: 500, color: "#8a9070", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>
           AIRE Intelligence · Seller Tools
         </div>
-        <h1 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 38, fontWeight: 700, color: "#1e2416", margin: 0, lineHeight: 1.15 }}>
+        <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 38, fontWeight: 700, color: "#1e2416", margin: 0, lineHeight: 1.15 }}>
           Louisiana Seller Intelligence
         </h1>
         <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 16, color: "#8a9070", marginTop: 10, lineHeight: 1.6 }}>

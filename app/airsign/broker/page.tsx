@@ -22,7 +22,7 @@ export default async function BrokerDashboardPage() {
       <DarkLayout>
         <div className="max-w-3xl mx-auto px-6 py-20 text-center">
           <p className="text-[#9aab7e] text-xs tracking-[0.08em] uppercase mb-3">AirSign</p>
-          <h1 className="font-[family-name:var(--font-playfair)] text-[#e8e4d8] text-4xl mb-4">No brokerage</h1>
+          <h1 className="font-[family-name:var(--font-cormorant)] text-[#e8e4d8] text-4xl mb-4">No brokerage</h1>
           <p className="text-[#e8e4d8]/50 mb-6">Join or create a brokerage to access the broker dashboard.</p>
           <a
             href="/airsign/brokerage"
@@ -40,7 +40,7 @@ export default async function BrokerDashboardPage() {
     return (
       <DarkLayout>
         <div className="max-w-3xl mx-auto px-6 py-20 text-center">
-          <h1 className="font-[family-name:var(--font-playfair)] text-[#e8e4d8] text-4xl mb-4">Not authorized</h1>
+          <h1 className="font-[family-name:var(--font-cormorant)] text-[#e8e4d8] text-4xl mb-4">Not authorized</h1>
           <p className="text-[#e8e4d8]/50">Your role ({role}) cannot access the compliance review queue.</p>
         </div>
       </DarkLayout>
@@ -93,14 +93,14 @@ export default async function BrokerDashboardPage() {
         <div className="flex items-end justify-between mb-8">
           <div>
             <p className="text-[#9aab7e] text-xs tracking-[0.08em] uppercase mb-2">AirSign · Broker</p>
-            <h1 className="font-[family-name:var(--font-playfair)] text-[#e8e4d8] text-4xl leading-tight">
+            <h1 className="font-[family-name:var(--font-cormorant)] text-[#e8e4d8] text-4xl leading-tight">
               {membership.brokerage.name}
             </h1>
             <p className="text-[#e8e4d8]/50 text-sm mt-2">Compliance review queue · Last 30 days of activity</p>
           </div>
           <div className="text-right">
             <p className="text-[#e8e4d8]/40 text-[10px] tracking-[0.1em] uppercase">Your role</p>
-            <p className="text-[#9aab7e] text-sm font-[family-name:var(--font-playfair)]">{role.replace(/_/g, " ")}</p>
+            <p className="text-[#9aab7e] text-sm font-[family-name:var(--font-cormorant)]">{role.replace(/_/g, " ")}</p>
           </div>
         </div>
 

@@ -43,7 +43,7 @@ export function BrokerDashboardClient({ initialQueue }: { initialQueue: ReviewRo
       <p className="text-[#8a9070] text-[11px] tracking-[0.1em] uppercase mb-4">Pending review queue</p>
       {queue.length === 0 ? (
         <div className="bg-[#1e2416]/40 border border-[#4a5638]/50 rounded-lg p-12 text-center">
-          <p className="text-[#9aab7e] font-[family-name:var(--font-playfair)] text-2xl mb-1">All clear</p>
+          <p className="text-[#9aab7e] font-[family-name:var(--font-cormorant)] text-2xl mb-1">All clear</p>
           <p className="text-[#e8e4d8]/50 text-sm">No envelopes waiting for compliance review.</p>
         </div>
       ) : (

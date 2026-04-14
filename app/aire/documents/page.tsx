@@ -147,7 +147,7 @@ export default function DocumentsPage() {
           <div>
             <h1
               className="text-2xl font-bold text-[#1e2416]"
-              style={{ fontFamily: "'Playfair Display', serif" }}
+              style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
               Documents
             </h1>

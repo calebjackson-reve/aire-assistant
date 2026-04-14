@@ -40,7 +40,7 @@ export default async function BrokeragePage() {
           <>
             <div className="mb-8">
               <p className="text-[#9aab7e] text-xs tracking-[0.08em] uppercase mb-2">AirSign · Brokerage</p>
-              <h1 className="font-[family-name:var(--font-playfair)] text-[#e8e4d8] text-4xl mb-1">
+              <h1 className="font-[family-name:var(--font-cormorant)] text-[#e8e4d8] text-4xl mb-1">
                 {membership.brokerage.name}
               </h1>
               <p className="text-[#e8e4d8]/50 text-sm">
@@ -76,7 +76,7 @@ export default async function BrokeragePage() {
           <>
             <div className="mb-8">
               <p className="text-[#9aab7e] text-xs tracking-[0.08em] uppercase mb-2">AirSign</p>
-              <h1 className="font-[family-name:var(--font-playfair)] text-[#e8e4d8] text-4xl mb-2">Create your brokerage</h1>
+              <h1 className="font-[family-name:var(--font-cormorant)] text-[#e8e4d8] text-4xl mb-2">Create your brokerage</h1>
               <p className="text-[#e8e4d8]/50 text-sm">
                 Bring your office onto AIRESIGN. You&apos;ll be the first member as the broker-owner.
               </p>

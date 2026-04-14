@@ -53,7 +53,7 @@ export default function VoicePreview({
         <p
           className="text-[20px] leading-[1.4] italic"
           style={{
-            fontFamily: "'Playfair Display', serif",
+            fontFamily: "'Cormorant Garamond', serif",
             color: "#1e2416",
             letterSpacing: "-0.01em",
           }}

@@ -34,7 +34,7 @@ export default async function TemplatesPage() {
         <div className="flex items-end justify-between mb-8">
           <div>
             <p className="text-[#9aab7e] text-xs tracking-[0.08em] uppercase mb-2">AirSign</p>
-            <h1 className="font-[family-name:var(--font-playfair)] text-[#e8e4d8] text-4xl leading-tight">
+            <h1 className="font-[family-name:var(--font-cormorant)] text-[#e8e4d8] text-4xl leading-tight">
               Template Library
             </h1>
             <p className="text-[#e8e4d8]/50 text-sm mt-2 max-w-xl">
@@ -44,7 +44,7 @@ export default async function TemplatesPage() {
           {membership?.brokerage && (
             <div className="text-right">
               <p className="text-[#e8e4d8]/40 text-[10px] tracking-[0.1em] uppercase">Brokerage</p>
-              <p className="text-[#9aab7e] text-sm font-[family-name:var(--font-playfair)]">{membership.brokerage.name}</p>
+              <p className="text-[#9aab7e] text-sm font-[family-name:var(--font-cormorant)]">{membership.brokerage.name}</p>
             </div>
           )}
         </div>

@@ -94,7 +94,7 @@ export default function UpgradeModal({
         <div className="bg-[#9aab7e] px-6 py-5">
           <h2
             className="text-xl font-bold text-[#f5f2ea]"
-            style={{ fontFamily: "'Playfair Display', serif" }}
+            style={{ fontFamily: "'Cormorant Garamond', serif" }}
           >
             Upgrade to {tier.name}
           </h2>
@@ -148,7 +148,7 @@ export default function UpgradeModal({
           <div className="text-center mb-4">
             <span
               className="text-3xl font-bold text-[#1e2416]"
-              style={{ fontFamily: "'Playfair Display', serif" }}
+              style={{ fontFamily: "'Cormorant Garamond', serif" }}
             >
               {tier.price}
             </span>

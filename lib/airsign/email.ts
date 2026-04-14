@@ -6,7 +6,7 @@ export function buildSigningEmailHtml(signerName: string, envelopeName: string, 
   return `
     <div style="font-family: 'Space Grotesk', Arial, sans-serif; max-width: 520px; margin: 0 auto; color: #1e2416;">
       <div style="background: #6b7d52; padding: 20px 24px; border-radius: 8px 8px 0 0;">
-        <h2 style="margin: 0; color: #f5f2ea; font-family: 'Playfair Display', Georgia, serif; font-size: 20px; font-style: italic;">
+        <h2 style="margin: 0; color: #f5f2ea; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px; font-style: italic;">
           AirSign — Signature Requested
         </h2>
       </div>
@@ -43,7 +43,7 @@ export function buildDeclineNotificationHtml(
   return `
     <div style="font-family: 'Space Grotesk', Arial, sans-serif; max-width: 520px; margin: 0 auto; color: #1e2416;">
       <div style="background: #6b7d52; padding: 20px 24px; border-radius: 8px 8px 0 0;">
-        <h2 style="margin: 0; color: #f5f2ea; font-family: 'Playfair Display', Georgia, serif; font-size: 20px; font-style: italic;">
+        <h2 style="margin: 0; color: #f5f2ea; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px; font-style: italic;">
           AirSign — Signing Declined
         </h2>
       </div>

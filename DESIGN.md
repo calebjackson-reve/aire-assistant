@@ -65,9 +65,9 @@
 ### Type Hierarchy
 | Element | Font | Weight | Size | Line Height | Tracking |
 |---------|------|--------|------|-------------|---------|
-| Hero headline | Playfair Display | 700 | 56–72px | 1.1 | -0.03em |
-| Section heading (h1) | Playfair Display | 700 | 36–48px | 1.15 | -0.02em |
-| Page heading (h2) | Playfair Display | 600 | 28–32px | 1.2 | -0.01em |
+| Hero headline | Cormorant Garamond | 500 italic | 56–72px | 1.1 | -0.03em |
+| Section heading (h1) | Cormorant Garamond | 500 italic | 36–48px | 1.15 | -0.02em |
+| Page heading (h2) | Cormorant Garamond | 500 | 28–32px | 1.2 | -0.01em |
 | Sub-heading (h3) | Space Grotesk | 600 | 20–24px | 1.3 | 0 |
 | Body large | Space Grotesk | 400 | 18px | 1.7 | 0 |
 | Body default | Space Grotesk | 400 | 16px | 1.6 | 0 |
@@ -77,9 +77,9 @@
 | Large stat | IBM Plex Mono | 600 | 32–48px | 1.1 | -0.02em |
 
 ### Typography Rules
-- Editorial headings (Playfair Display) use italic for emphasis on editorial contexts
-- Data values always use IBM Plex Mono — never Playfair or Space Grotesk for numbers
-- Never use Playfair Display for body text
+- Editorial headings (Cormorant Garamond) use italic for emphasis on editorial contexts
+- Data values always use IBM Plex Mono — never Cormorant or Space Grotesk for numbers
+- Never use Cormorant Garamond for body text
 - Uppercase labels always use Space Grotesk 500 with letter-spacing: 0.05–0.08em
 
 ---

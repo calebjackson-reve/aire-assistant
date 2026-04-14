@@ -23,7 +23,7 @@ export default async function MLSInputPage() {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
       <div className="mb-8">
-        <h1 className="font-[family-name:var(--font-playfair)] italic text-[#1e2416] text-3xl font-light">
+        <h1 className="font-[family-name:var(--font-cormorant)] italic text-[#1e2416] text-3xl font-light">
           MLS Auto-Fill
         </h1>
         <p className="font-mono text-[10px] text-[#6b7d52]/60 tracking-wider uppercase mt-1.5">
