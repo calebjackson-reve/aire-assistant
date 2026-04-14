@@ -1,0 +1,26 @@
+{
+  "capturedAt": "2026-04-14T02:28:13.146Z",
+  "cmaId": "52431",
+  "cmaName": "patin dyke rd",
+  "indexSubjectMls": "2025019330",
+  "wizardUrl": null,
+  "subject": {
+    "presentationName": null,
+    "subjectAddress": null,
+    "subjectMls": null,
+    "subjectSubdivision": null,
+    "subjectBeds": null,
+    "subjectBaths": null,
+    "subjectSqft": null,
+    "subjectYearBuilt": null,
+    "subjectLotSize": null,
+    "subjectListPrice": null,
+    "subjectSoldPrice": null,
+    "recommendedListPrice": null,
+    "rawText": ""
+  },
+  "comps": [],
+  "reportButtonsFound": [],
+  "durationMs": 1531,
+  "error": "Could not re-nav to Saved Presentations"
+}

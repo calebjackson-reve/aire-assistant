@@ -1,0 +1,26 @@
+{
+  "capturedAt": "2026-04-14T02:27:17.023Z",
+  "cmaId": "51674",
+  "cmaName": "Jenny Wilcox",
+  "indexSubjectMls": "2021007777",
+  "wizardUrl": null,
+  "subject": {
+    "presentationName": null,
+    "subjectAddress": null,
+    "subjectMls": null,
+    "subjectSubdivision": null,
+    "subjectBeds": null,
+    "subjectBaths": null,
+    "subjectSqft": null,
+    "subjectYearBuilt": null,
+    "subjectLotSize": null,
+    "subjectListPrice": null,
+    "subjectSoldPrice": null,
+    "recommendedListPrice": null,
+    "rawText": ""
+  },
+  "comps": [],
+  "reportButtonsFound": [],
+  "durationMs": 1525,
+  "error": "Could not re-nav to Saved Presentations"
+}

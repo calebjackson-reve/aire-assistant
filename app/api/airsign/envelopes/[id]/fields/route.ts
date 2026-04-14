@@ -1,5 +1,5 @@
 // app/api/airsign/envelopes/[id]/fields/route.ts
-// POST: Add fields to an envelope. PUT: Bulk replace all fields.
+// GET: Fetch all fields. POST: Add fields to an envelope. PUT: Bulk replace all fields.
 
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
@@ -25,6 +25,26 @@ async function verifyOwnership(envelopeId: string, clerkId: string) {
   const envelope = await prisma.airSignEnvelope.findUnique({ where: { id: envelopeId } })
   if (!envelope || envelope.userId !== user.id) return null
   return envelope
+}
+
+// GET — Fetch all fields for an envelope
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { userId } = await auth()
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  const { id } = await params
+  const envelope = await verifyOwnership(id, userId)
+  if (!envelope) return NextResponse.json({ error: "Not found" }, { status: 404 })
+
+  const fields = await prisma.airSignField.findMany({
+    where: { envelopeId: id },
+    orderBy: [{ page: "asc" }, { yPercent: "asc" }],
+  })
+
+  return NextResponse.json({ fields })
 }
 
 // POST — Add fields
@@ -100,6 +120,7 @@ export async function PUT(
           yPercent: f.yPercent,
           widthPercent: f.widthPercent,
           heightPercent: f.heightPercent,
+          ...(f.value ? { value: f.value, filledAt: new Date() } : {}),
         })),
       }),
     ])

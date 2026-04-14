@@ -1,0 +1,36 @@
+{
+  "capturedAt": "2026-04-14T02:26:04.368Z",
+  "cmaId": "52530",
+  "cmaName": "Dani and Clint",
+  "indexSubjectMls": "2020010043",
+  "wizardUrl": "https://mlsbox.paragonrels.com/ParagonLS/CMA/SubjectProperty.mvc/PresentationName/0?cmaId=52880",
+  "subject": {
+    "presentationName": "28274 lake bruin",
+    "subjectAddress": null,
+    "subjectMls": null,
+    "subjectSubdivision": null,
+    "subjectBeds": null,
+    "subjectBaths": null,
+    "subjectSqft": null,
+    "subjectYearBuilt": null,
+    "subjectLotSize": null,
+    "subjectListPrice": null,
+    "subjectSoldPrice": null,
+    "recommendedListPrice": null,
+    "rawText": ""
+  },
+  "comps": [],
+  "reportButtonsFound": [
+    {
+      "label": "Save",
+      "id": "save",
+      "selector": "#save"
+    },
+    {
+      "label": "Generate Presentation",
+      "id": "generate",
+      "selector": "#generate"
+    }
+  ],
+  "durationMs": 47977
+}

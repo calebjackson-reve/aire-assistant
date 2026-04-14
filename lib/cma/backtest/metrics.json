@@ -1,0 +1,2187 @@
+{
+  "generatedAt": "2026-04-14T02:51:48.617Z",
+  "totalCMAs": 23,
+  "withSubject": 4,
+  "withAdjustmentComps": 4,
+  "withGroundTruth": 4,
+  "kendallMAE": 41300,
+  "kendallMAPE": 22.20430107526882,
+  "medianPpsfMAE": 39558.5,
+  "medianPpsfMAPE": 21.26801075268817,
+  "holdoutMAE": 30148.05,
+  "holdoutMAPE": 11.529522237479508,
+  "kendallWinsVsMedian": 0,
+  "medianWinsVsKendall": 4,
+  "ties": 0,
+  "rows": [
+    {
+      "cmaId": "50997",
+      "cmaName": "Austin Gayle",
+      "subject": {
+        "mls": "2019019206",
+        "address": "28274 LAKE BRUIN DR",
+        "subdivision": "Lakeside Estates",
+        "city": "Livingston",
+        "zip": "70754",
+        "status": "Closed",
+        "listPrice": 185000,
+        "soldPrice": 186000,
+        "soldDate": "12/20/2019",
+        "ppsf": 131.82,
+        "beds": 3,
+        "bathsDisplay": "2/",
+        "sqft": 1411,
+        "yearBuilt": 2017,
+        "daysOnMarket": 3,
+        "concessions": 5000,
+        "acres": 0.23
+      },
+      "compsFromAdjustment": [
+        {
+          "mls": "2024017942",
+          "address": "25305 WHITE LAKE AVE",
+          "subdivision": "Lakeside Estates",
+          "city": "Livingston",
+          "zip": "70754",
+          "status": "Closed",
+          "listPrice": 245000,
+          "soldPrice": 238000,
+          "soldDate": "1/15/2025",
+          "ppsf": 160.92,
+          "beds": 3,
+          "bathsDisplay": "2/",
+          "sqft": 1479,
+          "yearBuilt": 2014,
+          "daysOnMarket": 72,
+          "concessions": null,
+          "acres": 0.26,
+          "soldTerms": "Conventional"
+        }
+      ],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2025001119",
+          "address": "814 LEMON B RD",
+          "sqft": 3021,
+          "price": 534000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024012756",
+          "address": "1351 LA HWY 409",
+          "sqft": 2565,
+          "price": 479000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2023004141",
+          "address": "1234 KINGS VIEW CIR",
+          "sqft": 2590,
+          "price": 447500,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025010148",
+          "address": "4765 LA HWY 68",
+          "sqft": 2513,
+          "price": 440000,
+          "status": "Closed"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": 249900,
+        "aireMedianPpsfPrediction": 247051,
+        "psychologicalThresholdApplied": 250000
+      },
+      "outcome": {
+        "subjectListPrice": 185000,
+        "subjectSoldPrice": 186000,
+        "subjectSoldDate": "12/20/2019",
+        "subjectStatus": "Closed"
+      },
+      "errors": {
+        "kendallError": 63900,
+        "kendallErrorPct": 34.35483870967742,
+        "medianPpsfError": 61051,
+        "medianPpsfErrorPct": 32.82311827956989
+      },
+      "kFoldHoldout": {
+        "heldOutComp": {
+          "mls": "2024017942",
+          "soldPrice": 238000,
+          "sqft": 1479
+        },
+        "predictedFromOthers": 260195,
+        "holdoutError": 22195,
+        "holdoutErrorPct": 9.32563025210084
+      },
+      "qualityFlags": []
+    },
+    {
+      "cmaId": "51395",
+      "cmaName": "Heather Clement",
+      "subject": {
+        "mls": null,
+        "address": null,
+        "subdivision": null,
+        "city": null,
+        "zip": null,
+        "status": null,
+        "listPrice": null,
+        "soldPrice": null,
+        "soldDate": null,
+        "ppsf": null,
+        "beds": null,
+        "bathsDisplay": null,
+        "sqft": null,
+        "yearBuilt": null,
+        "daysOnMarket": null,
+        "concessions": null,
+        "acres": null
+      },
+      "compsFromAdjustment": [],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2024006925",
+          "address": "7844 BRETT PL",
+          "sqft": 2095,
+          "price": 388000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024001270",
+          "address": "7516 PRAIRIE DR",
+          "sqft": 3300,
+          "price": 459000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024017616",
+          "address": "7423 PRAIRIE DR",
+          "sqft": 2343,
+          "price": 390000,
+          "status": "Closed"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": null,
+        "aireMedianPpsfPrediction": null,
+        "psychologicalThresholdApplied": null
+      },
+      "outcome": {
+        "subjectListPrice": null,
+        "subjectSoldPrice": null,
+        "subjectSoldDate": null,
+        "subjectStatus": null
+      },
+      "errors": {
+        "kendallError": null,
+        "kendallErrorPct": null,
+        "medianPpsfError": null,
+        "medianPpsfErrorPct": null
+      },
+      "kFoldHoldout": {
+        "heldOutComp": null,
+        "predictedFromOthers": null,
+        "holdoutError": null,
+        "holdoutErrorPct": null
+      },
+      "qualityFlags": [
+        "scrape_error: Could not re-nav to Saved Presentations",
+        "no_adjustment_comps",
+        "insufficient_comps_for_holdout (3)",
+        "no_subject_sold_price"
+      ]
+    },
+    {
+      "cmaId": "51456",
+      "cmaName": "Emily Vince",
+      "subject": {
+        "mls": null,
+        "address": null,
+        "subdivision": null,
+        "city": null,
+        "zip": null,
+        "status": null,
+        "listPrice": null,
+        "soldPrice": null,
+        "soldDate": null,
+        "ppsf": null,
+        "beds": null,
+        "bathsDisplay": null,
+        "sqft": null,
+        "yearBuilt": null,
+        "daysOnMarket": null,
+        "concessions": null,
+        "acres": null
+      },
+      "compsFromAdjustment": [],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2024019755",
+          "address": "9095 WILLOW BEND DR",
+          "sqft": 1506,
+          "price": 265000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025013577",
+          "address": "30696 DUNN RD",
+          "sqft": 1630,
+          "price": 255000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025016963",
+          "address": "1508 WEEPING WILLOW DR",
+          "sqft": 1540,
+          "price": 255000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025002925",
+          "address": "1454 COTTONWOOD DR",
+          "sqft": 1976,
+          "price": 299900,
+          "status": "Closed"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": null,
+        "aireMedianPpsfPrediction": null,
+        "psychologicalThresholdApplied": null
+      },
+      "outcome": {
+        "subjectListPrice": null,
+        "subjectSoldPrice": null,
+        "subjectSoldDate": null,
+        "subjectStatus": null
+      },
+      "errors": {
+        "kendallError": null,
+        "kendallErrorPct": null,
+        "medianPpsfError": null,
+        "medianPpsfErrorPct": null
+      },
+      "kFoldHoldout": {
+        "heldOutComp": {
+          "mls": "2024019755",
+          "soldPrice": 265000,
+          "sqft": 1506
+        },
+        "predictedFromOthers": 235601,
+        "holdoutError": -29399,
+        "holdoutErrorPct": -11.093962264150942
+      },
+      "qualityFlags": [
+        "scrape_error: Could not re-nav to Saved Presentations",
+        "no_adjustment_comps",
+        "no_subject_sold_price"
+      ]
+    },
+    {
+      "cmaId": "51674",
+      "cmaName": "Jenny Wilcox",
+      "subject": {
+        "mls": null,
+        "address": null,
+        "subdivision": null,
+        "city": null,
+        "zip": null,
+        "status": null,
+        "listPrice": null,
+        "soldPrice": null,
+        "soldDate": null,
+        "ppsf": null,
+        "beds": null,
+        "bathsDisplay": null,
+        "sqft": null,
+        "yearBuilt": null,
+        "daysOnMarket": null,
+        "concessions": null,
+        "acres": null
+      },
+      "compsFromAdjustment": [],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2024022249",
+          "address": "5690 NEWELL ST",
+          "sqft": 1560,
+          "price": 239000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024020609",
+          "address": "2218 MARIE ST",
+          "sqft": 1526,
+          "price": 225000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024019262",
+          "address": "5039 NEWELL ST",
+          "sqft": 1739,
+          "price": 221750,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024020661",
+          "address": "6683 SANDY CREEK LN",
+          "sqft": 1670,
+          "price": 261000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024011997",
+          "address": "2680 MIDDLE TOWNE RD",
+          "sqft": 1683,
+          "price": 249000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024008012",
+          "address": "1365 EAGLE DR",
+          "sqft": 1786,
+          "price": 240000,
+          "status": "Closed"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": null,
+        "aireMedianPpsfPrediction": null,
+        "psychologicalThresholdApplied": null
+      },
+      "outcome": {
+        "subjectListPrice": null,
+        "subjectSoldPrice": null,
+        "subjectSoldDate": null,
+        "subjectStatus": null
+      },
+      "errors": {
+        "kendallError": null,
+        "kendallErrorPct": null,
+        "medianPpsfError": null,
+        "medianPpsfErrorPct": null
+      },
+      "kFoldHoldout": {
+        "heldOutComp": {
+          "mls": "2024022249",
+          "soldPrice": 239000,
+          "sqft": 1560
+        },
+        "predictedFromOthers": 230013,
+        "holdoutError": -8987,
+        "holdoutErrorPct": -3.7602510460251044
+      },
+      "qualityFlags": [
+        "scrape_error: Could not re-nav to Saved Presentations",
+        "no_adjustment_comps",
+        "no_subject_sold_price"
+      ]
+    },
+    {
+      "cmaId": "51784",
+      "cmaName": "13902 Ouachita ave",
+      "subject": {
+        "mls": null,
+        "address": null,
+        "subdivision": null,
+        "city": null,
+        "zip": null,
+        "status": null,
+        "listPrice": null,
+        "soldPrice": null,
+        "soldDate": null,
+        "ppsf": null,
+        "beds": null,
+        "bathsDisplay": null,
+        "sqft": null,
+        "yearBuilt": null,
+        "daysOnMarket": null,
+        "concessions": null,
+        "acres": null
+      },
+      "compsFromAdjustment": [],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2024003335",
+          "address": "13918 RED RIVER AVE",
+          "sqft": 1400,
+          "price": 215000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025014697",
+          "address": "13921 OUACHITA AVE",
+          "sqft": 1472,
+          "price": 199500,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025002288",
+          "address": "13623 RED RIVER AVE",
+          "sqft": 1560,
+          "price": 227000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2023016393",
+          "address": "13728 OUACHITA AVE",
+          "sqft": 1621,
+          "price": 212000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024017821",
+          "address": "13820 OUACHITA AVE",
+          "sqft": 1692,
+          "price": 225000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024016360",
+          "address": "13717 OUACHITA AVE",
+          "sqft": 1658,
+          "price": 213000,
+          "status": "Closed"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": null,
+        "aireMedianPpsfPrediction": null,
+        "psychologicalThresholdApplied": null
+      },
+      "outcome": {
+        "subjectListPrice": null,
+        "subjectSoldPrice": null,
+        "subjectSoldDate": null,
+        "subjectStatus": null
+      },
+      "errors": {
+        "kendallError": null,
+        "kendallErrorPct": null,
+        "medianPpsfError": null,
+        "medianPpsfErrorPct": null
+      },
+      "kFoldHoldout": {
+        "heldOutComp": {
+          "mls": "2024003335",
+          "soldPrice": 215000,
+          "sqft": 1400
+        },
+        "predictedFromOthers": 186170,
+        "holdoutError": -28830,
+        "holdoutErrorPct": -13.409302325581397
+      },
+      "qualityFlags": [
+        "scrape_error: Could not re-nav to Saved Presentations",
+        "no_adjustment_comps",
+        "no_subject_sold_price"
+      ]
+    },
+    {
+      "cmaId": "51810",
+      "cmaName": "Bo Myers",
+      "subject": {
+        "mls": null,
+        "address": null,
+        "subdivision": null,
+        "city": null,
+        "zip": null,
+        "status": null,
+        "listPrice": null,
+        "soldPrice": null,
+        "soldDate": null,
+        "ppsf": null,
+        "beds": null,
+        "bathsDisplay": null,
+        "sqft": null,
+        "yearBuilt": null,
+        "daysOnMarket": null,
+        "concessions": null,
+        "acres": null
+      },
+      "compsFromAdjustment": [],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2025020425",
+          "address": "10910 FAIRVIEW LN",
+          "sqft": 991,
+          "price": 265000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024010114",
+          "address": "11849 GRAHAM RD",
+          "sqft": 1086,
+          "price": 235000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025014434",
+          "address": "8270 CARVER RD",
+          "sqft": 1262,
+          "price": 169000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2023015988",
+          "address": "11524 OLD LAUREL HILL RD",
+          "sqft": 798,
+          "price": 316000,
+          "status": "Closed"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": null,
+        "aireMedianPpsfPrediction": null,
+        "psychologicalThresholdApplied": null
+      },
+      "outcome": {
+        "subjectListPrice": null,
+        "subjectSoldPrice": null,
+        "subjectSoldDate": null,
+        "subjectStatus": null
+      },
+      "errors": {
+        "kendallError": null,
+        "kendallErrorPct": null,
+        "medianPpsfError": null,
+        "medianPpsfErrorPct": null
+      },
+      "kFoldHoldout": {
+        "heldOutComp": {
+          "mls": "2025020425",
+          "soldPrice": 265000,
+          "sqft": 991
+        },
+        "predictedFromOthers": 214443,
+        "holdoutError": -50557,
+        "holdoutErrorPct": -19.07811320754717
+      },
+      "qualityFlags": [
+        "scrape_error: Could not re-nav to Saved Presentations",
+        "no_adjustment_comps",
+        "no_subject_sold_price"
+      ]
+    },
+    {
+      "cmaId": "51959",
+      "cmaName": "kaeleigh",
+      "subject": {
+        "mls": null,
+        "address": null,
+        "subdivision": null,
+        "city": null,
+        "zip": null,
+        "status": null,
+        "listPrice": null,
+        "soldPrice": null,
+        "soldDate": null,
+        "ppsf": null,
+        "beds": null,
+        "bathsDisplay": null,
+        "sqft": null,
+        "yearBuilt": null,
+        "daysOnMarket": null,
+        "concessions": null,
+        "acres": null
+      },
+      "compsFromAdjustment": [],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2023018055",
+          "address": "4910 LOUISE ST",
+          "sqft": 1201,
+          "price": 185000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024021642",
+          "address": "4843 KENNEDY",
+          "sqft": 1116,
+          "price": 190000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025009171",
+          "address": "5023 KENNEDY DR",
+          "sqft": 1880,
+          "price": 225000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024016530",
+          "address": "4866 JUNE ST",
+          "sqft": 1253,
+          "price": 193500,
+          "status": "Closed"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": null,
+        "aireMedianPpsfPrediction": null,
+        "psychologicalThresholdApplied": null
+      },
+      "outcome": {
+        "subjectListPrice": null,
+        "subjectSoldPrice": null,
+        "subjectSoldDate": null,
+        "subjectStatus": null
+      },
+      "errors": {
+        "kendallError": null,
+        "kendallErrorPct": null,
+        "medianPpsfError": null,
+        "medianPpsfErrorPct": null
+      },
+      "kFoldHoldout": {
+        "heldOutComp": {
+          "mls": "2023018055",
+          "soldPrice": 185000,
+          "sqft": 1201
+        },
+        "predictedFromOthers": 185470,
+        "holdoutError": 470,
+        "holdoutErrorPct": 0.25405405405405407
+      },
+      "qualityFlags": [
+        "scrape_error: Could not re-nav to Saved Presentations",
+        "no_adjustment_comps",
+        "no_subject_sold_price"
+      ]
+    },
+    {
+      "cmaId": "52058",
+      "cmaName": "Jacob Askins",
+      "subject": {
+        "mls": null,
+        "address": null,
+        "subdivision": null,
+        "city": null,
+        "zip": null,
+        "status": null,
+        "listPrice": null,
+        "soldPrice": null,
+        "soldDate": null,
+        "ppsf": null,
+        "beds": null,
+        "bathsDisplay": null,
+        "sqft": null,
+        "yearBuilt": null,
+        "daysOnMarket": null,
+        "concessions": null,
+        "acres": null
+      },
+      "compsFromAdjustment": [],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2025017473",
+          "address": "2508 ORLEANS QUARTERS DR",
+          "sqft": 2248,
+          "price": 355000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025011050",
+          "address": "4849 TRIAL DR",
+          "sqft": 2217,
+          "price": 338000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025001200",
+          "address": "4644 LONGWOOD DR",
+          "sqft": 2217,
+          "price": 325000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025007686",
+          "address": "6693 LINWOOD DR",
+          "sqft": 2217,
+          "price": 310000,
+          "status": "Closed"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": null,
+        "aireMedianPpsfPrediction": null,
+        "psychologicalThresholdApplied": null
+      },
+      "outcome": {
+        "subjectListPrice": null,
+        "subjectSoldPrice": null,
+        "subjectSoldDate": null,
+        "subjectStatus": null
+      },
+      "errors": {
+        "kendallError": null,
+        "kendallErrorPct": null,
+        "medianPpsfError": null,
+        "medianPpsfErrorPct": null
+      },
+      "kFoldHoldout": {
+        "heldOutComp": {
+          "mls": "2025017473",
+          "soldPrice": 355000,
+          "sqft": 2248
+        },
+        "predictedFromOthers": 329544,
+        "holdoutError": -25456,
+        "holdoutErrorPct": -7.170704225352114
+      },
+      "qualityFlags": [
+        "scrape_error: Could not re-nav to Saved Presentations",
+        "no_adjustment_comps",
+        "no_subject_sold_price"
+      ]
+    },
+    {
+      "cmaId": "52059",
+      "cmaName": "109 Morningside st",
+      "subject": {
+        "mls": null,
+        "address": null,
+        "subdivision": null,
+        "city": null,
+        "zip": null,
+        "status": null,
+        "listPrice": null,
+        "soldPrice": null,
+        "soldDate": null,
+        "ppsf": null,
+        "beds": null,
+        "bathsDisplay": null,
+        "sqft": null,
+        "yearBuilt": null,
+        "daysOnMarket": null,
+        "concessions": null,
+        "acres": null
+      },
+      "compsFromAdjustment": [],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2025008366",
+          "address": "107 LEJEUNE ST",
+          "sqft": 1220,
+          "price": 341885,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025006949",
+          "address": "205 OLINDE ST",
+          "sqft": 1512,
+          "price": 232000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024020556",
+          "address": "311 PENNSYLVANIA AVE",
+          "sqft": 1658,
+          "price": 220000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025004233",
+          "address": "505 WESTEND",
+          "sqft": 963,
+          "price": 157000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024019160",
+          "address": "602 Berthier Street",
+          "sqft": 1281,
+          "price": 150000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025018755",
+          "address": "807 JANIS ST",
+          "sqft": 1091,
+          "price": 145000,
+          "status": "Closed"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": null,
+        "aireMedianPpsfPrediction": null,
+        "psychologicalThresholdApplied": null
+      },
+      "outcome": {
+        "subjectListPrice": null,
+        "subjectSoldPrice": null,
+        "subjectSoldDate": null,
+        "subjectStatus": null
+      },
+      "errors": {
+        "kendallError": null,
+        "kendallErrorPct": null,
+        "medianPpsfError": null,
+        "medianPpsfErrorPct": null
+      },
+      "kFoldHoldout": {
+        "heldOutComp": {
+          "mls": "2025008366",
+          "soldPrice": 341885,
+          "sqft": 1220
+        },
+        "predictedFromOthers": 162145,
+        "holdoutError": -179740,
+        "holdoutErrorPct": -52.57323368969098
+      },
+      "qualityFlags": [
+        "scrape_error: Could not re-nav to Saved Presentations",
+        "no_adjustment_comps",
+        "no_subject_sold_price"
+      ]
+    },
+    {
+      "cmaId": "52198",
+      "cmaName": "109 Morningside Street",
+      "subject": {
+        "mls": null,
+        "address": null,
+        "subdivision": null,
+        "city": null,
+        "zip": null,
+        "status": null,
+        "listPrice": null,
+        "soldPrice": null,
+        "soldDate": null,
+        "ppsf": null,
+        "beds": null,
+        "bathsDisplay": null,
+        "sqft": null,
+        "yearBuilt": null,
+        "daysOnMarket": null,
+        "concessions": null,
+        "acres": null
+      },
+      "compsFromAdjustment": [],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2024002966",
+          "address": "8952 HERON WAY",
+          "sqft": 1518,
+          "price": 245000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025006949",
+          "address": "205 OLINDE ST",
+          "sqft": 1512,
+          "price": 232000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024011372",
+          "address": "7500 ISLAND RD",
+          "sqft": 1072,
+          "price": 170000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024016105",
+          "address": "903 W END DR",
+          "sqft": 1000,
+          "price": 175000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024017442",
+          "address": "429 FAIRFIELD AVE",
+          "sqft": 1138,
+          "price": 179000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024010605",
+          "address": "301 OLINDE ST",
+          "sqft": 1392,
+          "price": 192500,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025004233",
+          "address": "505 WESTEND",
+          "sqft": 963,
+          "price": 157000,
+          "status": "Closed"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": null,
+        "aireMedianPpsfPrediction": null,
+        "psychologicalThresholdApplied": null
+      },
+      "outcome": {
+        "subjectListPrice": null,
+        "subjectSoldPrice": null,
+        "subjectSoldDate": null,
+        "subjectStatus": null
+      },
+      "errors": {
+        "kendallError": null,
+        "kendallErrorPct": null,
+        "medianPpsfError": null,
+        "medianPpsfErrorPct": null
+      },
+      "kFoldHoldout": {
+        "heldOutComp": {
+          "mls": "2024002966",
+          "soldPrice": 245000,
+          "sqft": 1518
+        },
+        "predictedFromOthers": 239750,
+        "holdoutError": -5250,
+        "holdoutErrorPct": -2.142857142857143
+      },
+      "qualityFlags": [
+        "scrape_error: Could not re-nav to Saved Presentations",
+        "no_adjustment_comps",
+        "no_subject_sold_price"
+      ]
+    },
+    {
+      "cmaId": "52275",
+      "cmaName": "gina",
+      "subject": {
+        "mls": null,
+        "address": null,
+        "subdivision": null,
+        "city": null,
+        "zip": null,
+        "status": null,
+        "listPrice": null,
+        "soldPrice": null,
+        "soldDate": null,
+        "ppsf": null,
+        "beds": null,
+        "bathsDisplay": null,
+        "sqft": null,
+        "yearBuilt": null,
+        "daysOnMarket": null,
+        "concessions": null,
+        "acres": null
+      },
+      "compsFromAdjustment": [],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2025001823",
+          "address": "710 E BOYD DR",
+          "sqft": 1525,
+          "price": 213000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025003923",
+          "address": "710 E BOYD DR",
+          "sqft": 1525,
+          "price": 207000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025011735",
+          "address": "710 E BOYD DR",
+          "sqft": 1525,
+          "price": 208500,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025016262",
+          "address": "710 E BOYD DR",
+          "sqft": 1475,
+          "price": 179900,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025017629",
+          "address": "710 E BOYD DR",
+          "sqft": 1571,
+          "price": 215000,
+          "status": "Closed"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": null,
+        "aireMedianPpsfPrediction": null,
+        "psychologicalThresholdApplied": null
+      },
+      "outcome": {
+        "subjectListPrice": null,
+        "subjectSoldPrice": null,
+        "subjectSoldDate": null,
+        "subjectStatus": null
+      },
+      "errors": {
+        "kendallError": null,
+        "kendallErrorPct": null,
+        "medianPpsfError": null,
+        "medianPpsfErrorPct": null
+      },
+      "kFoldHoldout": {
+        "heldOutComp": {
+          "mls": "2025001823",
+          "soldPrice": 213000,
+          "sqft": 1525
+        },
+        "predictedFromOthers": 207750,
+        "holdoutError": -5250,
+        "holdoutErrorPct": -2.464788732394366
+      },
+      "qualityFlags": [
+        "scrape_error: Could not re-nav to Saved Presentations",
+        "no_adjustment_comps",
+        "no_subject_sold_price"
+      ]
+    },
+    {
+      "cmaId": "52315",
+      "cmaName": "Boone Ave",
+      "subject": {
+        "mls": null,
+        "address": null,
+        "subdivision": null,
+        "city": null,
+        "zip": null,
+        "status": null,
+        "listPrice": null,
+        "soldPrice": null,
+        "soldDate": null,
+        "ppsf": null,
+        "beds": null,
+        "bathsDisplay": null,
+        "sqft": null,
+        "yearBuilt": null,
+        "daysOnMarket": null,
+        "concessions": null,
+        "acres": null
+      },
+      "compsFromAdjustment": [],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2025018820",
+          "address": "553 WYLIE DR",
+          "sqft": 1460,
+          "price": 284000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025008118",
+          "address": "501 WYLIE DR",
+          "sqft": 1360,
+          "price": 250000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2023003772",
+          "address": "1150 WYLIE DR",
+          "sqft": 1473,
+          "price": 263000,
+          "status": "Closed"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": null,
+        "aireMedianPpsfPrediction": null,
+        "psychologicalThresholdApplied": null
+      },
+      "outcome": {
+        "subjectListPrice": null,
+        "subjectSoldPrice": null,
+        "subjectSoldDate": null,
+        "subjectStatus": null
+      },
+      "errors": {
+        "kendallError": null,
+        "kendallErrorPct": null,
+        "medianPpsfError": null,
+        "medianPpsfErrorPct": null
+      },
+      "kFoldHoldout": {
+        "heldOutComp": null,
+        "predictedFromOthers": null,
+        "holdoutError": null,
+        "holdoutErrorPct": null
+      },
+      "qualityFlags": [
+        "scrape_error: Could not re-nav to Saved Presentations",
+        "no_adjustment_comps",
+        "insufficient_comps_for_holdout (3)",
+        "no_subject_sold_price"
+      ]
+    },
+    {
+      "cmaId": "52321",
+      "cmaName": "Todd C",
+      "subject": {
+        "mls": null,
+        "address": null,
+        "subdivision": null,
+        "city": null,
+        "zip": null,
+        "status": null,
+        "listPrice": null,
+        "soldPrice": null,
+        "soldDate": null,
+        "ppsf": null,
+        "beds": null,
+        "bathsDisplay": null,
+        "sqft": null,
+        "yearBuilt": null,
+        "daysOnMarket": null,
+        "concessions": null,
+        "acres": null
+      },
+      "compsFromAdjustment": [],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2024009303",
+          "address": "6844 YORKDALE AVE",
+          "sqft": 1320,
+          "price": 179900,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025002328",
+          "address": "6655 ST FRANCIS AVE",
+          "sqft": 1710,
+          "price": 176000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2023020082",
+          "address": "6356 CELIA AVE",
+          "sqft": 1423,
+          "price": 155000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2023016014",
+          "address": "11544 ELLEN DR",
+          "sqft": 1515,
+          "price": 148900,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025014866",
+          "address": "5321 HALSEY ST",
+          "sqft": 1384,
+          "price": 149900,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2023014589",
+          "address": "6878 YORKDALE AVE",
+          "sqft": 1688,
+          "price": 175000,
+          "status": "Closed"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": null,
+        "aireMedianPpsfPrediction": null,
+        "psychologicalThresholdApplied": null
+      },
+      "outcome": {
+        "subjectListPrice": null,
+        "subjectSoldPrice": null,
+        "subjectSoldDate": null,
+        "subjectStatus": null
+      },
+      "errors": {
+        "kendallError": null,
+        "kendallErrorPct": null,
+        "medianPpsfError": null,
+        "medianPpsfErrorPct": null
+      },
+      "kFoldHoldout": {
+        "heldOutComp": {
+          "mls": "2024009303",
+          "soldPrice": 179900,
+          "sqft": 1320
+        },
+        "predictedFromOthers": 136848,
+        "holdoutError": -43052,
+        "holdoutErrorPct": -23.93107281823235
+      },
+      "qualityFlags": [
+        "scrape_error: Could not re-nav to Saved Presentations",
+        "no_adjustment_comps",
+        "no_subject_sold_price"
+      ]
+    },
+    {
+      "cmaId": "52335",
+      "cmaName": "Eagle Drive Jenny Wilcox",
+      "subject": {
+        "mls": null,
+        "address": null,
+        "subdivision": null,
+        "city": null,
+        "zip": null,
+        "status": null,
+        "listPrice": null,
+        "soldPrice": null,
+        "soldDate": null,
+        "ppsf": null,
+        "beds": null,
+        "bathsDisplay": null,
+        "sqft": null,
+        "yearBuilt": null,
+        "daysOnMarket": null,
+        "concessions": null,
+        "acres": null
+      },
+      "compsFromAdjustment": [],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2025005342",
+          "address": "5407 NEWELL ST",
+          "sqft": 1821,
+          "price": 225000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024022249",
+          "address": "5690 NEWELL ST",
+          "sqft": 1560,
+          "price": 239000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024020609",
+          "address": "2218 MARIE ST",
+          "sqft": 1526,
+          "price": 225000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024019262",
+          "address": "5039 NEWELL ST",
+          "sqft": 1739,
+          "price": 221750,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025004389",
+          "address": "5512 JOAN ST",
+          "sqft": 1476,
+          "price": 250000,
+          "status": "Closed"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": null,
+        "aireMedianPpsfPrediction": null,
+        "psychologicalThresholdApplied": null
+      },
+      "outcome": {
+        "subjectListPrice": null,
+        "subjectSoldPrice": null,
+        "subjectSoldDate": null,
+        "subjectStatus": null
+      },
+      "errors": {
+        "kendallError": null,
+        "kendallErrorPct": null,
+        "medianPpsfError": null,
+        "medianPpsfErrorPct": null
+      },
+      "kFoldHoldout": {
+        "heldOutComp": {
+          "mls": "2025005342",
+          "soldPrice": 225000,
+          "sqft": 1821
+        },
+        "predictedFromOthers": 273741,
+        "holdoutError": 48741,
+        "holdoutErrorPct": 21.662666666666667
+      },
+      "qualityFlags": [
+        "scrape_error: Could not re-nav to Saved Presentations",
+        "no_adjustment_comps",
+        "no_subject_sold_price"
+      ]
+    },
+    {
+      "cmaId": "52342",
+      "cmaName": "greg junghas",
+      "subject": {
+        "mls": null,
+        "address": null,
+        "subdivision": null,
+        "city": null,
+        "zip": null,
+        "status": null,
+        "listPrice": null,
+        "soldPrice": null,
+        "soldDate": null,
+        "ppsf": null,
+        "beds": null,
+        "bathsDisplay": null,
+        "sqft": null,
+        "yearBuilt": null,
+        "daysOnMarket": null,
+        "concessions": null,
+        "acres": null
+      },
+      "compsFromAdjustment": [],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2024021962",
+          "address": "4543 41ST ST",
+          "sqft": 1182,
+          "price": 175000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024007755",
+          "address": "4167 COTTONWOOD ST",
+          "sqft": 1155,
+          "price": 178498,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025000258",
+          "address": "4279 ROBERT ST",
+          "sqft": 1105,
+          "price": 168000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2023008881",
+          "address": "3257 TUPELO ST",
+          "sqft": 1235,
+          "price": 200000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2023014909",
+          "address": "3948 MAIN ST",
+          "sqft": 1032,
+          "price": 165000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024003357",
+          "address": "2734 MARCH ST",
+          "sqft": 1100,
+          "price": 172500,
+          "status": "Closed"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": null,
+        "aireMedianPpsfPrediction": null,
+        "psychologicalThresholdApplied": null
+      },
+      "outcome": {
+        "subjectListPrice": null,
+        "subjectSoldPrice": null,
+        "subjectSoldDate": null,
+        "subjectStatus": null
+      },
+      "errors": {
+        "kendallError": null,
+        "kendallErrorPct": null,
+        "medianPpsfError": null,
+        "medianPpsfErrorPct": null
+      },
+      "kFoldHoldout": {
+        "heldOutComp": {
+          "mls": "2024021962",
+          "soldPrice": 175000,
+          "sqft": 1182
+        },
+        "predictedFromOthers": 185359,
+        "holdoutError": 10359,
+        "holdoutErrorPct": 5.919428571428571
+      },
+      "qualityFlags": [
+        "scrape_error: Could not re-nav to Saved Presentations",
+        "no_adjustment_comps",
+        "no_subject_sold_price"
+      ]
+    },
+    {
+      "cmaId": "52431",
+      "cmaName": "patin dyke rd",
+      "subject": {
+        "mls": null,
+        "address": null,
+        "subdivision": null,
+        "city": null,
+        "zip": null,
+        "status": null,
+        "listPrice": null,
+        "soldPrice": null,
+        "soldDate": null,
+        "ppsf": null,
+        "beds": null,
+        "bathsDisplay": null,
+        "sqft": null,
+        "yearBuilt": null,
+        "daysOnMarket": null,
+        "concessions": null,
+        "acres": null
+      },
+      "compsFromAdjustment": [],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2024017779",
+          "address": "14405 VENTRESS RD",
+          "sqft": 2060,
+          "price": 425000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024015524",
+          "address": "7736 COOKS LANDING DR",
+          "sqft": 1992,
+          "price": 335000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2023001363",
+          "address": "7798 COOKS LANDING DR",
+          "sqft": 1985,
+          "price": 385000,
+          "status": "Closed"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": null,
+        "aireMedianPpsfPrediction": null,
+        "psychologicalThresholdApplied": null
+      },
+      "outcome": {
+        "subjectListPrice": null,
+        "subjectSoldPrice": null,
+        "subjectSoldDate": null,
+        "subjectStatus": null
+      },
+      "errors": {
+        "kendallError": null,
+        "kendallErrorPct": null,
+        "medianPpsfError": null,
+        "medianPpsfErrorPct": null
+      },
+      "kFoldHoldout": {
+        "heldOutComp": null,
+        "predictedFromOthers": null,
+        "holdoutError": null,
+        "holdoutErrorPct": null
+      },
+      "qualityFlags": [
+        "scrape_error: Could not re-nav to Saved Presentations",
+        "no_adjustment_comps",
+        "insufficient_comps_for_holdout (3)",
+        "no_subject_sold_price"
+      ]
+    },
+    {
+      "cmaId": "52432",
+      "cmaName": "Trails End updated",
+      "subject": {
+        "mls": null,
+        "address": null,
+        "subdivision": null,
+        "city": null,
+        "zip": null,
+        "status": null,
+        "listPrice": null,
+        "soldPrice": null,
+        "soldDate": null,
+        "ppsf": null,
+        "beds": null,
+        "bathsDisplay": null,
+        "sqft": null,
+        "yearBuilt": null,
+        "daysOnMarket": null,
+        "concessions": null,
+        "acres": null
+      },
+      "compsFromAdjustment": [],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2024009909",
+          "address": "10754 HOSHMAN RD",
+          "sqft": 1350,
+          "price": 295000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2023009672",
+          "address": "9195 MULBERRY HILL RD",
+          "sqft": 1376,
+          "price": 270000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025020425",
+          "address": "10910 FAIRVIEW LN",
+          "sqft": 991,
+          "price": 265000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024010114",
+          "address": "11849 GRAHAM RD",
+          "sqft": 1086,
+          "price": 235000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2023017895",
+          "address": "10014 TRAILS END",
+          "sqft": 1650,
+          "price": 345000,
+          "status": "Closed"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": null,
+        "aireMedianPpsfPrediction": null,
+        "psychologicalThresholdApplied": null
+      },
+      "outcome": {
+        "subjectListPrice": null,
+        "subjectSoldPrice": null,
+        "subjectSoldDate": null,
+        "subjectStatus": null
+      },
+      "errors": {
+        "kendallError": null,
+        "kendallErrorPct": null,
+        "medianPpsfError": null,
+        "medianPpsfErrorPct": null
+      },
+      "kFoldHoldout": {
+        "heldOutComp": {
+          "mls": "2024009909",
+          "soldPrice": 295000,
+          "sqft": 1350
+        },
+        "predictedFromOthers": 287200,
+        "holdoutError": -7800,
+        "holdoutErrorPct": -2.6440677966101696
+      },
+      "qualityFlags": [
+        "scrape_error: Could not re-nav to Saved Presentations",
+        "no_adjustment_comps",
+        "no_subject_sold_price"
+      ]
+    },
+    {
+      "cmaId": "52465",
+      "cmaName": "743 avenue b",
+      "subject": {
+        "mls": null,
+        "address": null,
+        "subdivision": null,
+        "city": null,
+        "zip": null,
+        "status": null,
+        "listPrice": null,
+        "soldPrice": null,
+        "soldDate": null,
+        "ppsf": null,
+        "beds": null,
+        "bathsDisplay": null,
+        "sqft": null,
+        "yearBuilt": null,
+        "daysOnMarket": null,
+        "concessions": null,
+        "acres": null
+      },
+      "compsFromAdjustment": [],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2025006492",
+          "address": "716 AVENUE B",
+          "sqft": 1356,
+          "price": 204500,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025008423",
+          "address": "548 AVENUE F",
+          "sqft": 1626,
+          "price": 269000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024015015",
+          "address": "618 S RIVER RD",
+          "sqft": 1753,
+          "price": 237000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024021691",
+          "address": "327 AVE B",
+          "sqft": 1666,
+          "price": 225000,
+          "status": "Closed"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": null,
+        "aireMedianPpsfPrediction": null,
+        "psychologicalThresholdApplied": null
+      },
+      "outcome": {
+        "subjectListPrice": null,
+        "subjectSoldPrice": null,
+        "subjectSoldDate": null,
+        "subjectStatus": null
+      },
+      "errors": {
+        "kendallError": null,
+        "kendallErrorPct": null,
+        "medianPpsfError": null,
+        "medianPpsfErrorPct": null
+      },
+      "kFoldHoldout": {
+        "heldOutComp": {
+          "mls": "2025006492",
+          "soldPrice": 204500,
+          "sqft": 1356
+        },
+        "predictedFromOthers": 183327,
+        "holdoutError": -21173,
+        "holdoutErrorPct": -10.35354523227384
+      },
+      "qualityFlags": [
+        "scrape_error: Could not re-nav to Saved Presentations",
+        "no_adjustment_comps",
+        "no_subject_sold_price"
+      ]
+    },
+    {
+      "cmaId": "52530",
+      "cmaName": "Dani and Clint",
+      "subject": {
+        "mls": null,
+        "address": null,
+        "subdivision": null,
+        "city": null,
+        "zip": null,
+        "status": null,
+        "listPrice": null,
+        "soldPrice": null,
+        "soldDate": null,
+        "ppsf": null,
+        "beds": null,
+        "bathsDisplay": null,
+        "sqft": null,
+        "yearBuilt": null,
+        "daysOnMarket": null,
+        "concessions": null,
+        "acres": null
+      },
+      "compsFromAdjustment": [],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2024011169",
+          "address": "1800 POINTE SOUTH DR",
+          "sqft": 1752,
+          "price": 307000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024014544",
+          "address": "4058 DRIFTWOOD DR",
+          "sqft": 1691,
+          "price": 283000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024003639",
+          "address": "1680 POINTE SOUTH DR",
+          "sqft": 1600,
+          "price": 265000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024020593",
+          "address": "4060 DRIFTWOOD DR",
+          "sqft": 1778,
+          "price": 263500,
+          "status": "Closed"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": null,
+        "aireMedianPpsfPrediction": null,
+        "psychologicalThresholdApplied": null
+      },
+      "outcome": {
+        "subjectListPrice": null,
+        "subjectSoldPrice": null,
+        "subjectSoldDate": null,
+        "subjectStatus": null
+      },
+      "errors": {
+        "kendallError": null,
+        "kendallErrorPct": null,
+        "medianPpsfError": null,
+        "medianPpsfErrorPct": null
+      },
+      "kFoldHoldout": {
+        "heldOutComp": {
+          "mls": "2024011169",
+          "soldPrice": 307000,
+          "sqft": 1752
+        },
+        "predictedFromOthers": 290175,
+        "holdoutError": -16825,
+        "holdoutErrorPct": -5.480456026058632
+      },
+      "qualityFlags": [
+        "no_adjustment_comps",
+        "no_subject_sold_price"
+      ]
+    },
+    {
+      "cmaId": "52577",
+      "cmaName": "Gavin Property",
+      "subject": {
+        "mls": null,
+        "address": null,
+        "subdivision": null,
+        "city": null,
+        "zip": null,
+        "status": null,
+        "listPrice": null,
+        "soldPrice": null,
+        "soldDate": null,
+        "ppsf": null,
+        "beds": null,
+        "bathsDisplay": null,
+        "sqft": null,
+        "yearBuilt": null,
+        "daysOnMarket": null,
+        "concessions": null,
+        "acres": null
+      },
+      "compsFromAdjustment": [],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2025004139",
+          "address": "2037 ANTONIO RD",
+          "sqft": 2960,
+          "price": 479000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025008750",
+          "address": "1884 LANDSDOWN DR",
+          "sqft": 1792,
+          "price": 275000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024004534",
+          "address": "2135 N WILLOW RIDGE AVE",
+          "sqft": 1710,
+          "price": 268000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024012330",
+          "address": "4337 MONTEIGNE AVE",
+          "sqft": 1317,
+          "price": 220000,
+          "status": "Closed"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": null,
+        "aireMedianPpsfPrediction": null,
+        "psychologicalThresholdApplied": null
+      },
+      "outcome": {
+        "subjectListPrice": null,
+        "subjectSoldPrice": null,
+        "subjectSoldDate": null,
+        "subjectStatus": null
+      },
+      "errors": {
+        "kendallError": null,
+        "kendallErrorPct": null,
+        "medianPpsfError": null,
+        "medianPpsfErrorPct": null
+      },
+      "kFoldHoldout": {
+        "heldOutComp": {
+          "mls": "2025004139",
+          "soldPrice": 479000,
+          "sqft": 2960
+        },
+        "predictedFromOthers": 463906,
+        "holdoutError": -15094,
+        "holdoutErrorPct": -3.1511482254697283
+      },
+      "qualityFlags": [
+        "scrape_error: Could not re-nav to Saved Presentations",
+        "no_adjustment_comps",
+        "no_subject_sold_price"
+      ]
+    },
+    {
+      "cmaId": "52579",
+      "cmaName": "12361 Pecan Island Rd",
+      "subject": {
+        "mls": "2019019206",
+        "address": "28274 LAKE BRUIN DR",
+        "subdivision": "Lakeside Estates",
+        "city": "Livingston",
+        "zip": "70754",
+        "status": "Closed",
+        "listPrice": 185000,
+        "soldPrice": 186000,
+        "soldDate": "12/20/2019",
+        "ppsf": 131.82,
+        "beds": 3,
+        "bathsDisplay": "2/",
+        "sqft": 1411,
+        "yearBuilt": 2017,
+        "daysOnMarket": 3,
+        "concessions": 5000,
+        "acres": 0.23
+      },
+      "compsFromAdjustment": [
+        {
+          "mls": "2025007871",
+          "address": "28220 LAKE BORGNE AVE",
+          "subdivision": "Lakeside Estates",
+          "city": "Livingston",
+          "zip": "70754",
+          "status": "Closed",
+          "listPrice": 230000,
+          "soldPrice": 230000,
+          "soldDate": "5/30/2025",
+          "ppsf": 166.18,
+          "beds": 3,
+          "bathsDisplay": "2/",
+          "sqft": 1384,
+          "yearBuilt": 2016,
+          "daysOnMarket": 6,
+          "concessions": null,
+          "acres": 0.19,
+          "soldTerms": "FHA"
+        }
+      ],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2025013802",
+          "address": "5035 PECAN LN",
+          "sqft": 2904,
+          "price": 405000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2022009757",
+          "address": "4993 PECAN LN",
+          "sqft": 2014,
+          "price": 375000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024002655",
+          "address": "12405 PECAN ISLAND RD",
+          "sqft": 3307,
+          "price": 367500,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025021002",
+          "address": "12385 PECAN ISLAND RD",
+          "sqft": 3352,
+          "price": 315000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2026001669",
+          "address": "4993 PECAN LN",
+          "sqft": 2014,
+          "price": 495000,
+          "status": "Active"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": 199900,
+        "aireMedianPpsfPrediction": 196782,
+        "psychologicalThresholdApplied": 200000
+      },
+      "outcome": {
+        "subjectListPrice": 185000,
+        "subjectSoldPrice": 186000,
+        "subjectSoldDate": "12/20/2019",
+        "subjectStatus": "Closed"
+      },
+      "errors": {
+        "kendallError": 13900,
+        "kendallErrorPct": 7.473118279569893,
+        "medianPpsfError": 10782,
+        "medianPpsfErrorPct": 5.796774193548387
+      },
+      "kFoldHoldout": {
+        "heldOutComp": {
+          "mls": "2025007871",
+          "soldPrice": 230000,
+          "sqft": 1384
+        },
+        "predictedFromOthers": 173409,
+        "holdoutError": -56591,
+        "holdoutErrorPct": -24.60478260869565
+      },
+      "qualityFlags": []
+    },
+    {
+      "cmaId": "52738",
+      "cmaName": "John Jackson",
+      "subject": {
+        "mls": "2019019206",
+        "address": "28274 LAKE BRUIN DR",
+        "subdivision": "Lakeside Estates",
+        "city": "Livingston",
+        "zip": "70754",
+        "status": "Closed",
+        "listPrice": 185000,
+        "soldPrice": 186000,
+        "soldDate": "12/20/2019",
+        "ppsf": 131.82,
+        "beds": 3,
+        "bathsDisplay": "2/",
+        "sqft": 1411,
+        "yearBuilt": 2017,
+        "daysOnMarket": 3,
+        "concessions": 5000,
+        "acres": 0.23
+      },
+      "compsFromAdjustment": [
+        {
+          "mls": "2025012378",
+          "address": "25320 WHITE LAKE AVE",
+          "subdivision": "Lakeside Estates",
+          "city": "Livingston",
+          "zip": "70754",
+          "status": "Closed",
+          "listPrice": 242500,
+          "soldPrice": 242500,
+          "soldDate": "8/8/2025",
+          "ppsf": 164.74,
+          "beds": 3,
+          "bathsDisplay": "2/",
+          "sqft": 1472,
+          "yearBuilt": 2016,
+          "daysOnMarket": 1,
+          "concessions": null,
+          "acres": 0.26,
+          "soldTerms": "VA"
+        }
+      ],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2025017360",
+          "address": "8257 QUIET CREEK DR",
+          "sqft": 2610,
+          "price": 370000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025018988",
+          "address": "8293 QUIET CREEK DR",
+          "sqft": 2210,
+          "price": 375000,
+          "status": "Canceled"
+        },
+        {
+          "mlsNumber": "2024003226",
+          "address": "8400 QUIET CREEK DR",
+          "sqft": 2199,
+          "price": 399900,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024000949",
+          "address": "8296 QUIET CREEK DR",
+          "sqft": 3275,
+          "price": 499900,
+          "status": "Closed"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": 224900,
+        "aireMedianPpsfPrediction": 223914,
+        "psychologicalThresholdApplied": 225000
+      },
+      "outcome": {
+        "subjectListPrice": 185000,
+        "subjectSoldPrice": 186000,
+        "subjectSoldDate": "12/20/2019",
+        "subjectStatus": "Closed"
+      },
+      "errors": {
+        "kendallError": 38900,
+        "kendallErrorPct": 20.913978494623656,
+        "medianPpsfError": 37914,
+        "medianPpsfErrorPct": 20.383870967741935
+      },
+      "kFoldHoldout": {
+        "heldOutComp": {
+          "mls": "2025012378",
+          "soldPrice": 242500,
+          "sqft": 1472
+        },
+        "predictedFromOthers": 224688,
+        "holdoutError": -17812,
+        "holdoutErrorPct": -7.3451546391752585
+      },
+      "qualityFlags": []
+    },
+    {
+      "cmaId": "52880",
+      "cmaName": "28274 lake bruin",
+      "subject": {
+        "mls": "2019019206",
+        "address": "28274 LAKE BRUIN DR",
+        "subdivision": "Lakeside Estates",
+        "city": "Livingston",
+        "zip": "70754",
+        "status": "Closed",
+        "listPrice": 185000,
+        "soldPrice": 186000,
+        "soldDate": "12/20/2019",
+        "ppsf": 131.82,
+        "beds": 3,
+        "bathsDisplay": "2/",
+        "sqft": 1411,
+        "yearBuilt": 2017,
+        "daysOnMarket": 3,
+        "concessions": 5000,
+        "acres": 0.23
+      },
+      "compsFromAdjustment": [
+        {
+          "mls": "2025014745",
+          "address": "28303 LAKE BISTINEAU DR",
+          "subdivision": "Lakeside Estates",
+          "city": "Livingston",
+          "zip": "70754",
+          "status": "Closed",
+          "listPrice": 224900,
+          "soldPrice": 222000,
+          "soldDate": "9/19/2025",
+          "ppsf": 172.76,
+          "beds": 3,
+          "bathsDisplay": "2/",
+          "sqft": 1285,
+          "yearBuilt": 2014,
+          "daysOnMarket": 14,
+          "concessions": null,
+          "acres": 0.16,
+          "soldTerms": "FHA"
+        }
+      ],
+      "compsFromSavedGrid": [
+        {
+          "mlsNumber": "2025014745",
+          "address": "28303 LAKE BISTINEAU DR",
+          "sqft": 1285,
+          "price": 222000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024017942",
+          "address": "25305 WHITE LAKE AVE",
+          "sqft": 1479,
+          "price": 238000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025012378",
+          "address": "25320 WHITE LAKE AVE",
+          "sqft": 1472,
+          "price": 242500,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025007871",
+          "address": "28220 LAKE BORGNE AVE",
+          "sqft": 1384,
+          "price": 230000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2024004705",
+          "address": "28239 LAKE BORGNE DR",
+          "sqft": 1576,
+          "price": 240000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025002807",
+          "address": "25320 BLACK LAKE AVE",
+          "sqft": 1537,
+          "price": 242000,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2026000984",
+          "address": "25350 WHITE LAKE AVE",
+          "sqft": 1337,
+          "price": 229900,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2026001117",
+          "address": "28350 LAKE BORGNE DR",
+          "sqft": 1224,
+          "price": 222500,
+          "status": "Closed"
+        },
+        {
+          "mlsNumber": "2025004759",
+          "address": "25331 BLACK LAKE AVE",
+          "sqft": 1205,
+          "price": 209000,
+          "status": "Closed"
+        }
+      ],
+      "predictions": {
+        "aireKendallPrediction": 234500,
+        "aireMedianPpsfPrediction": 234487,
+        "psychologicalThresholdApplied": null
+      },
+      "outcome": {
+        "subjectListPrice": 185000,
+        "subjectSoldPrice": 186000,
+        "subjectSoldDate": "12/20/2019",
+        "subjectStatus": "Closed"
+      },
+      "errors": {
+        "kendallError": 48500,
+        "kendallErrorPct": 26.0752688172043,
+        "medianPpsfError": 48487,
+        "medianPpsfErrorPct": 26.06827956989247
+      },
+      "kFoldHoldout": {
+        "heldOutComp": {
+          "mls": "2025014745",
+          "soldPrice": 222000,
+          "sqft": 1285
+        },
+        "predictedFromOthers": 212620,
+        "holdoutError": -9380,
+        "holdoutErrorPct": -4.225225225225225
+      },
+      "qualityFlags": []
+    }
+  ]
+}

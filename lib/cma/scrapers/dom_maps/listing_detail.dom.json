@@ -1,0 +1,180 @@
+{
+  "surface": "listing_detail",
+  "captured_at": "2026-04-13",
+  "captured_via": "chrome-devtools-mcp on MLS 2025014745 (28303 Lake Bistineau Dr)",
+  "deep_link_pattern": "https://mlsbox.paragonrels.com/ParagonLS/Reports/Report.mvc?listingIDs={MLS_ID}&viewID=c51&classID=0&usePDF=false",
+  "deep_link_required_params": {
+    "listingIDs": "MLS# (or comma-separated for multiple)",
+    "viewID": "c51 = '*Agent Full w/Photo' report (richest data view)",
+    "classID": "0 = all classes"
+  },
+  "deep_link_optional_params": {
+    "screenWidth": "for layout sizing only",
+    "ShowAds": "false to suppress ads",
+    "usePDF": "false for HTML, true for PDF download",
+    "searchID": "tab1_1 (set when reached via Power Search)",
+    "uniqueIDs": "alternate to listingIDs"
+  },
+  "frame_tree": [
+    "top: Default.mvc#1,1",
+    "  iframe: Search/Results.mvc/Index/tab1_1?ViewSelected={viewID:c51} (toolbar host)",
+    "    iframe: Reports/Report.mvc?listingIDs={MLS}&viewID=c51 (the spreadsheet content)"
+  ],
+  "toolbar_actions": [
+    { "label": "Checked / All", "purpose": "filter result rows when multiple listings" },
+    { "label": "Email", "purpose": "email the report" },
+    { "label": "Share »", "purpose": "share link" },
+    { "label": "Save »", "purpose": "save to favorites" },
+    { "label": "Print »", "purpose": "print report" },
+    { "label": "Export »", "purpose": "CSV/Excel export — INVESTIGATE for bulk download" },
+    { "label": "Customize »", "purpose": "change report view (different viewIDs)" },
+    { "label": "Correction", "purpose": "submit MLS correction" },
+    { "label": "Actions", "purpose": "more actions menu" },
+    { "label": "More »", "purpose": "additional actions" }
+  ],
+  "report_view_id_known": [
+    { "viewID": "c51", "label": "*Agent Full w/Photo", "richness": "FULL — every field captured here" }
+  ],
+  "field_extraction_strategy": {
+    "method": "h3 (label) followed by sibling generic.StaticText (value) within Reports/Report.mvc frame",
+    "selector_pattern": "h3 + div, h3 + span, or table cells where h3 is the column header label",
+    "value_pattern": "iterate h3 elements; for each, find the next text-bearing sibling/cousin in same row/cell"
+  },
+  "fields": {
+    "identifiers": [
+      { "label": "MLS#", "type": "string", "example": "2025014745" }
+    ],
+    "address": [
+      { "label": "Address", "example": "28303 LAKE BISTINEAU DR" },
+      { "label": "City", "example": "Livingston" },
+      { "label": "Zip", "example": "70754" },
+      { "label": "Parish", "example": "LIVINGSTON (also clickable link to parish gov site)" },
+      { "label": "Area", "example": "LIV MLS Area 80" },
+      { "label": "Subdiv", "example": "Lakeside Estates" },
+      { "label": "Schsystem", "example": "Livingston Parish (clickable link to schools)" },
+      { "label": "Directions", "type": "long_text" },
+      { "label": "Legal", "example": "LOT 84 LAKESIDE ESTATES 2ND FILING SEC 7-7-5" },
+      { "label": "Lot#/PrcID", "example": "84" },
+      { "label": "Unit #" }
+    ],
+    "physical": [
+      { "label": "ListPrice", "type": "currency", "example": "$224,900" },
+      { "label": "Sold Price", "type": "currency", "example": "$222,000" },
+      { "label": "List Price/SqFt Liv", "type": "ppsf", "example": "175.02" },
+      { "label": "Sold $/SqFt Liv", "type": "ppsf", "example": "172.76" },
+      { "label": "LivingSqFt", "type": "int", "example": 1285 },
+      { "label": "Total Sqft", "type": "int", "example": 2074 },
+      { "label": "Living SqFt" },
+      { "label": "Lower SqFt" },
+      { "label": "Upper SqFt" },
+      { "label": "Bonus SqFt" },
+      { "label": "Garage SqFt", "example": 389 },
+      { "label": "Carport SqFt" },
+      { "label": "Storage SqFt" },
+      { "label": "Porch SqFt" },
+      { "label": "Patio Sqft" },
+      { "label": "Deck SqFt" },
+      { "label": "Bedrooms", "type": "int", "example": 3 },
+      { "label": "Baths", "type": "string_or_decimal", "example": "2/" },
+      { "label": "#Stories", "example": 1 },
+      { "label": "Age", "example": "11-15 Years" },
+      { "label": "Style", "example": "Traditional Style" },
+      { "label": "Zoning", "example": "Res Single Family Zone" },
+      { "label": "Acres", "type": "decimal", "example": 0.16 },
+      { "label": "Lot Dim", "example": "50 X 140" },
+      { "label": "St. Front (Ft)" },
+      { "label": "Pool" },
+      { "label": "Mineral Rights", "example": "NEGOTIABLE" },
+      { "label": "Warranty" },
+      { "label": "Builder" },
+      { "label": "Model" }
+    ],
+    "rooms": {
+      "structure": "table with columns: Room Type, Lvl, Dimensions",
+      "example_rows": [
+        { "type": "LIVING ROOM", "lvl": null, "dim": "14.1 X 15.1" },
+        { "type": "KITCHEN", "lvl": null, "dim": "11.6 X 12" },
+        { "type": "PRIMARY BEDROOM", "lvl": null, "dim": "11.9 X 11" },
+        { "type": "BEDROOM", "lvl": null, "dim": "10. X 10.5" },
+        { "type": "BEDROOM", "lvl": null, "dim": "10 X 10.5" }
+      ]
+    },
+    "features": [
+      { "label": "FLOORING", "example": "CARP, CERAM" },
+      { "label": "PARKING", "example": "CPTRE" },
+      { "label": "CONSTRUCT", "example": "Brick Const, Frame Const" },
+      { "label": "FOUNDATION", "example": "Slab: Traditional Found" },
+      { "label": "SIDING", "example": "Brick Siding, Vinyl Siding" },
+      { "label": "ROOF", "example": "Architec. Shingle Roof" },
+      { "label": "FENCING", "example": "Privacy Fence, Wood Fence" },
+      { "label": "EXTERIOR", "example": "Landscaped, Outside Light, Patio: Covered, Rain Gutters" },
+      { "label": "KITCHEN & DINING FEATURES", "example": "CTTIL, DW, MIC, PNTRY, RNGOV" },
+      { "label": "HVAC & UTILITIES", "example": "C/A; CENTR, ELEC" },
+      { "label": "PRIMARY BED & BATH FEATURES", "example": "PBR Ceiling Fan, PBR Walk-In Closets; PBA Double Vanity, PBA Tub: Shower Combo" }
+    ],
+    "dates": [
+      { "label": "Listing Date", "type": "date", "example": "8/7/2025" },
+      { "label": "Pending Date", "type": "date", "example": "8/21/2025" },
+      { "label": "Sold Date", "type": "date", "example": "9/19/2025" },
+      { "label": "Expiration Date", "type": "date" },
+      { "label": "PrjClsDate", "type": "date" },
+      { "label": "Activation Date", "type": "date" },
+      { "label": "DOM/CDOM", "type": "int", "example": 14 }
+    ],
+    "agents": [
+      { "label": "LstAgt", "example": "Shelley S Simmons (B79951)" },
+      { "label": "Co-Agt" },
+      { "label": "LstOff", "example": "Elevate Real Estate Services" },
+      { "label": "Co-Off" },
+      { "label": "Buyer Agt", "example": "Jessica L Landers (B11951)" },
+      { "label": "CoBuyAgt" },
+      { "label": "Buyer", "example": "OFC: 877-366-2213" },
+      { "label": "Lender" },
+      { "label": "Prepared by", "example": "Caleb Jackson" },
+      { "label": "of", "example": "Reve REALTORS" }
+    ],
+    "financial": [
+      { "label": "Terms" },
+      { "label": "Concessions", "example": "$0.00" },
+      { "label": "Concessions Comments", "example": "995698243" },
+      { "label": "Assn Fee $/Year", "example": "$0.00" },
+      { "label": "List Type", "example": "EXCLUSIVE RIGHT" },
+      { "label": "OccBy", "example": "OWNER" },
+      { "label": "Limited Service", "example": "No" },
+      { "label": "FINANCING", "example": "Cash Fin, Conventional Fin, FHA Fin, FMHA/Rural Dev Fin, VA Finance" },
+      { "label": "SPECIAL SALES TYPE", "example": "N/A" },
+      { "label": "Contingency Terms" }
+    ],
+    "narrative": [
+      { "label": "REALTOR® Remarks", "type": "long_text", "example": "The window in the front bedroom will be replaced; measurements not warranted; easy to show" },
+      { "label": "Description (above 'REALTOR Remarks')", "type": "long_text", "example": "Stop scrolling—this is the one!..." }
+    ],
+    "media": [
+      { "label": "Photos", "type": "carousel", "count_example": 18, "url_pattern": "https://zimg.paragon.ice.com/ParagonImages/Property/PL/MLSBOX/{MLS}/0/640/480/{hash}/6/{hash2}/{MLS}-{uuid}.JPG" },
+      { "label": "Virtual Tour", "type": "url", "example": "https://youtu.be/35U729oS-OE" }
+    ],
+    "third_party_integrations": [
+      { "label": "Community Reports", "url": "/Integration/Integration.mvc/ThirdParty/{MLS}/123" },
+      { "label": "Map", "url": "/Integration/Integration.mvc/ThirdParty/{MLS}/11" },
+      { "label": "Cloud CMA: Property Report", "url": "/Integration/Integration.mvc/ThirdParty/{MLS}/133" },
+      { "label": "Associated Docs", "url": "/Integration/Integration.mvc/ThirdParty/{MLS}/61" },
+      { "label": "CRS Data: Property Report", "url": "/Integration/Integration.mvc/ThirdParty/{MLS}/252" },
+      { "label": "Instanet", "url": "/Integration/Integration.mvc/ThirdParty/{MLS}/126" },
+      { "label": "History", "url": "/Integration/Integration.mvc/ThirdParty/{MLS}/10" },
+      { "label": "Quick View", "url": "/Integration/Integration.mvc/ThirdParty/{MLS}/9" },
+      { "label": "Supra Keybox Settings Report", "url": "/Integration/Integration.mvc/ViewSupra/{MLS}/140" }
+    ]
+  },
+  "aire_integration_value": {
+    "verdict": "PRIMARY ENRICHMENT SOURCE for AIRE comp records",
+    "what_we_get": "Every field needed to populate Comp records in Neon: Beds/Baths/Year/Sqft/Lot/Style/Foundation/Roof/Features/Photos/Sold Date/DOM/Agent. The CMA wizard's Step 2 grid only shows ~6 columns; this view has ~80.",
+    "bulk_enrich_pattern": "for each of the 111 unique comp MLS#s captured in saved CMAs, fetch /Reports/Report.mvc?listingIDs={MLS}&viewID=c51 and parse",
+    "rate_limit_caution": "Same B24140 account — bake in 2-3s pause between fetches, captcha guard each iteration, halt on 2 consecutive failures"
+  },
+  "next_actions_after_phase_5": [
+    "Build paragonFetchListingDetail(mlsId) function in mls.ts",
+    "Build batch enrichment script test-cma-enrich-comps.ts",
+    "Run on the 111 unique MLS#s; merge into existing snapshots",
+    "Phase 6 (Customize button) is no longer urgent — direct deep link gives us more data than 'Customize' would add to the Step 2 grid"
+  ]
+}

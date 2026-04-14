@@ -1,0 +1,26 @@
+{
+  "capturedAt": "2026-04-14T02:28:45.799Z",
+  "cmaId": "52321",
+  "cmaName": "Todd C",
+  "indexSubjectMls": "2017019085",
+  "wizardUrl": null,
+  "subject": {
+    "presentationName": null,
+    "subjectAddress": null,
+    "subjectMls": null,
+    "subjectSubdivision": null,
+    "subjectBeds": null,
+    "subjectBaths": null,
+    "subjectSqft": null,
+    "subjectYearBuilt": null,
+    "subjectLotSize": null,
+    "subjectListPrice": null,
+    "subjectSoldPrice": null,
+    "recommendedListPrice": null,
+    "rawText": ""
+  },
+  "comps": [],
+  "reportButtonsFound": [],
+  "durationMs": 1534,
+  "error": "Could not re-nav to Saved Presentations"
+}

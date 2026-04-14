@@ -4,6 +4,8 @@ import prisma from "@/lib/prisma"
 import { MorningBriefActions } from "./actions"
 import { GenerateBriefButton } from "./GenerateBriefButton"
 import { FeedbackButtons } from "@/components/FeedbackButtons"
+import { HairlineDivider } from "@/components/ui/primitives/HairlineDivider"
+import { SectionLabel } from "@/components/ui/primitives/SectionLabel"
 import Link from "next/link"
 
 interface ActionItem { action: string; priority: string; category: string }
@@ -367,17 +369,3 @@ export default async function MorningBriefPage() {
   )
 }
 
-function SectionLabel({ number, title, count }: { number: string; title: string; count?: number }) {
-  return (
-    <div className="flex items-center gap-3">
-      <span className="font-mono text-[11px] text-[#9aab7e]/50">{number}</span>
-      <h2 className="font-[family-name:var(--font-cormorant)] text-[#1e2416] text-lg tracking-wide">
-        {title}
-      </h2>
-      {count !== undefined && (
-        <span className="font-mono text-[10px] text-[#6b7d52]/35">({count})</span>
-      )}
-      <div className="flex-1 h-px bg-[#e8e4d8]/60" />
-    </div>
-  )
-}

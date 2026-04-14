@@ -1,0 +1,26 @@
+{
+  "capturedAt": "2026-04-14T02:28:03.367Z",
+  "cmaId": "52342",
+  "cmaName": "greg junghas",
+  "indexSubjectMls": "2022005978",
+  "wizardUrl": null,
+  "subject": {
+    "presentationName": null,
+    "subjectAddress": null,
+    "subjectMls": null,
+    "subjectSubdivision": null,
+    "subjectBeds": null,
+    "subjectBaths": null,
+    "subjectSqft": null,
+    "subjectYearBuilt": null,
+    "subjectLotSize": null,
+    "subjectListPrice": null,
+    "subjectSoldPrice": null,
+    "recommendedListPrice": null,
+    "rawText": ""
+  },
+  "comps": [],
+  "reportButtonsFound": [],
+  "durationMs": 1524,
+  "error": "Could not re-nav to Saved Presentations"
+}

@@ -1,0 +1,238 @@
+{
+  "capturedAt": "2026-04-13T20:02:17.225Z",
+  "summary": {
+    "total": 28,
+    "withCompsCount": 23,
+    "emptyCount": 5,
+    "avgCompsInActiveCMAs": 4.8,
+    "oldestUpdated": "2025-10-23",
+    "newestUpdated": "2026-04-12",
+    "maxComps": 9
+  },
+  "rows": [
+    {
+      "cmaId": "52902",
+      "name": "drew edwards",
+      "assignedContact": "",
+      "subjectMls": "2026005125",
+      "lastUpdated": "4/12/2026",
+      "comparables": 0
+    },
+    {
+      "cmaId": "52880",
+      "name": "28274 lake bruin",
+      "assignedContact": "",
+      "subjectMls": "2019019206",
+      "lastUpdated": "4/7/2026",
+      "comparables": 9
+    },
+    {
+      "cmaId": "50997",
+      "name": "Austin Gayle",
+      "assignedContact": "",
+      "subjectMls": "2022013941",
+      "lastUpdated": "3/28/2026",
+      "comparables": 4
+    },
+    {
+      "cmaId": "52738",
+      "name": "John Jackson",
+      "assignedContact": "",
+      "subjectMls": "",
+      "lastUpdated": "3/24/2026",
+      "comparables": 4
+    },
+    {
+      "cmaId": "52579",
+      "name": "12361 Pecan Island Rd",
+      "assignedContact": "",
+      "subjectMls": "2019018431",
+      "lastUpdated": "3/23/2026",
+      "comparables": 5
+    },
+    {
+      "cmaId": "52530",
+      "name": "Dani and Clint",
+      "assignedContact": "",
+      "subjectMls": "2020010043",
+      "lastUpdated": "3/18/2026",
+      "comparables": 4
+    },
+    {
+      "cmaId": "52621",
+      "name": "christian purpera",
+      "assignedContact": "",
+      "subjectMls": "2024012393",
+      "lastUpdated": "3/5/2026",
+      "comparables": 0
+    },
+    {
+      "cmaId": "52577",
+      "name": "Gavin Property",
+      "assignedContact": "",
+      "subjectMls": "200914371",
+      "lastUpdated": "3/2/2026",
+      "comparables": 4
+    },
+    {
+      "cmaId": "51674",
+      "name": "Jenny Wilcox",
+      "assignedContact": "",
+      "subjectMls": "2021007777",
+      "lastUpdated": "2/27/2026",
+      "comparables": 6
+    },
+    {
+      "cmaId": "52335",
+      "name": "Eagle Drive Jenny Wilcox",
+      "assignedContact": "",
+      "subjectMls": "2021007777",
+      "lastUpdated": "2/27/2026",
+      "comparables": 5
+    },
+    {
+      "cmaId": "52376",
+      "name": "2026000363",
+      "assignedContact": "",
+      "subjectMls": "2026000363",
+      "lastUpdated": "2/23/2026",
+      "comparables": 0
+    },
+    {
+      "cmaId": "52465",
+      "name": "743 avenue b",
+      "assignedContact": "",
+      "subjectMls": "2024021636",
+      "lastUpdated": "2/20/2026",
+      "comparables": 4
+    },
+    {
+      "cmaId": "52342",
+      "name": "greg junghas",
+      "assignedContact": "",
+      "subjectMls": "2022005978",
+      "lastUpdated": "2/18/2026",
+      "comparables": 6
+    },
+    {
+      "cmaId": "52431",
+      "name": "patin dyke rd",
+      "assignedContact": "",
+      "subjectMls": "2025019330",
+      "lastUpdated": "2/9/2026",
+      "comparables": 3
+    },
+    {
+      "cmaId": "52432",
+      "name": "Trails End updated",
+      "assignedContact": "",
+      "subjectMls": "2024000356",
+      "lastUpdated": "2/9/2026",
+      "comparables": 5
+    },
+    {
+      "cmaId": "52321",
+      "name": "Todd C",
+      "assignedContact": "",
+      "subjectMls": "2017019085",
+      "lastUpdated": "1/25/2026",
+      "comparables": 6
+    },
+    {
+      "cmaId": "52315",
+      "name": "Boone Ave",
+      "assignedContact": "",
+      "subjectMls": "2026001208",
+      "lastUpdated": "1/23/2026",
+      "comparables": 3
+    },
+    {
+      "cmaId": "50999",
+      "name": "Mallory Hoover",
+      "assignedContact": "",
+      "subjectMls": "2019011231",
+      "lastUpdated": "1/21/2026",
+      "comparables": 0
+    },
+    {
+      "cmaId": "52275",
+      "name": "gina",
+      "assignedContact": "",
+      "subjectMls": "NO2180761",
+      "lastUpdated": "1/20/2026",
+      "comparables": 5
+    },
+    {
+      "cmaId": "51395",
+      "name": "Heather Clement",
+      "assignedContact": "",
+      "subjectMls": "2020010741",
+      "lastUpdated": "1/19/2026",
+      "comparables": 3
+    },
+    {
+      "cmaId": "52198",
+      "name": "109 Morningside Street",
+      "assignedContact": "",
+      "subjectMls": "2022012769",
+      "lastUpdated": "1/12/2026",
+      "comparables": 7
+    },
+    {
+      "cmaId": "51810",
+      "name": "Bo Myers",
+      "assignedContact": "",
+      "subjectMls": "2024000356",
+      "lastUpdated": "1/1/2026",
+      "comparables": 4
+    },
+    {
+      "cmaId": "52059",
+      "name": "109 Morningside st",
+      "assignedContact": "",
+      "subjectMls": "2022012769",
+      "lastUpdated": "12/16/2025",
+      "comparables": 6
+    },
+    {
+      "cmaId": "52058",
+      "name": "Jacob Askins",
+      "assignedContact": "",
+      "subjectMls": "2022004694",
+      "lastUpdated": "12/16/2025",
+      "comparables": 4
+    },
+    {
+      "cmaId": "51784",
+      "name": "13902 Ouachita ave",
+      "assignedContact": "",
+      "subjectMls": "2021016790",
+      "lastUpdated": "11/26/2025",
+      "comparables": 6
+    },
+    {
+      "cmaId": "51629",
+      "name": "The Taylors",
+      "assignedContact": "",
+      "subjectMls": "2023017390",
+      "lastUpdated": "11/26/2025",
+      "comparables": 0
+    },
+    {
+      "cmaId": "51959",
+      "name": "kaeleigh",
+      "assignedContact": "",
+      "subjectMls": "2025021269",
+      "lastUpdated": "11/25/2025",
+      "comparables": 4
+    },
+    {
+      "cmaId": "51456",
+      "name": "Emily Vince",
+      "assignedContact": "",
+      "subjectMls": "2020011401",
+      "lastUpdated": "10/23/2025",
+      "comparables": 4
+    }
+  ]
+}

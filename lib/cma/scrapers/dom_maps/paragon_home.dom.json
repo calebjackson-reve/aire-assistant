@@ -1,0 +1,134 @@
+{
+  "surface": "paragon_home",
+  "captured_at": "2026-04-13",
+  "captured_via": "chrome-devtools-mcp + take_snapshot",
+  "url": "https://mlsbox.paragonrels.com/ParagonLS/Default.mvc",
+  "frame_tree": [
+    "top: Default.mvc",
+    "  iframe[0]: Preferences/Wizard.mvc/Start (User Preferences Wizard - dismissable)",
+    "  iframe[1]: Home/Page.mvc (main home shell with widgets)",
+    "    iframe: Home/Page.mvc/Message?homepageMessageType=2 (news embed)",
+    "      iframe: mlsbox.info (WordPress news feed)",
+    "    iframe: Home/Page.mvc/ShowingTime (ShowingTime widget)"
+  ],
+  "top_chrome": {
+    "power_search": {
+      "label": "POWER SEARCH",
+      "selector": "input[role='searchbox'][aria-label*='POWER SEARCH']",
+      "voice_input": "img[alt='Power Search Voice'] (mic)",
+      "purpose": "global search by MLS#, address, agent, etc. Best entry point for listing detail."
+    },
+    "home_tab_link": {
+      "selector": "a[href='#HomeTab']",
+      "url_anchor": "Default.mvc#HomeTab"
+    },
+    "user_label": "Caleb Jackson"
+  },
+  "top_nav_tabs_known": {
+    "labels": ["HOME", "SEARCH", "LISTINGS", "CMA", "CONTACTS", "FINANCIALS", "TAX", "ROSTER", "RESOURCES", "PREFERENCES CONNECT"],
+    "render": "icon-sprite buttons; visible text but text-indented offscreen",
+    "click_strategy": "JS dispatchEvent on the <a> with own text matching label, OR via dropdown items pre-rendered in DOM (CMA → Saved Presentations / Create Presentation / EasyCMA / etc.)",
+    "verified_paths": [
+      "CMA → Saved Presentations: Phase 1-4 fully scraped",
+      "CMA → Create Presentation: dropdown item present, not yet exercised",
+      "EasyCMA: dropdown item present"
+    ]
+  },
+  "widgets": {
+    "paragon_news": { "frame": "Home/Page.mvc", "selector": "h3:has-text('PARAGON NEWS')" },
+    "contact_activity": {
+      "frame": "Home/Page.mvc",
+      "fields": ["new_count (Activity link text)", "Comments", "Searches", "Sellers (named contacts)"],
+      "current_value": "6 New activities, 0 comments, 0 searches, 1 seller (Gavin Shaw)"
+    },
+    "message_center": {
+      "links": ["MESSAGE HISTORY", "Bulletin Board (with count badge)"],
+      "current_count": 3
+    },
+    "quick_search": {
+      "form_selector": "h3:has-text('QUICK SEARCH') ~ form",
+      "saved_searches_visible": 8,
+      "saved_search_link_pattern": "javascript:void(0); with description attr containing the saved query string",
+      "load_saved_url": "/Search/Property.mvc/LoadSavedSearch?searchType=QUICK_SEARCH",
+      "fields": [
+        { "name": "Class", "lookup_url": "/Controls/ClassPartial.mvc/Index/2?controlId=f_2__1-2-3-4-5&multiselect=True" },
+        { "name": "MLS#", "selector": "input[aria-label='MLS#']" },
+        { "name": "Address-Number Min/Max", "type": "range" },
+        { "name": "Pre Dir/Street Name", "lookup": "AddressStreetLookupPartial.mvc" },
+        { "name": "Status", "lookup_url": "/Controls/Status.mvc?controlID=f_11__1-2-3-4-5" },
+        { "name": "Parish", "lookup_url": "/Controls/LookupPartial.mvc/Index/1/79?controlID=f_79__1-2-3-4-5" },
+        { "name": "Property Type", "lookup_url": "/Controls/PropertyTypePartial.mvc/Index/0?controlID=f_3__1-2-3-4-5" },
+        { "name": "Area", "lookup_url": "/Controls/AreaPartial.mvc/Index/1?controlID=f_4__1-2-3-4-5" },
+        { "name": "Subdivision", "lookup_url": "/Controls/LookupPartial.mvc/Index/1/81?controlID=f_81__1-2-3-4-5" },
+        { "name": "Price Low/High", "type": "range_currency" },
+        { "name": "Status Date Begin/End", "type": "date_range" },
+        { "name": "Buyer's Agent", "lookup_url": "/Controls/UserPartial.mvc/Index/46" },
+        { "name": "List Agent", "lookup_url": "/Controls/UserPartial.mvc/Index/27" },
+        { "name": "Acres Min/Max", "type": "range" },
+        { "name": "City", "lookup_url": "/Controls/LookupPartial.mvc/Index/1/8?controlID=f_8__1-2-3-4-5" }
+      ],
+      "actions": [
+        { "label": "Count", "purpose": "preview match count without running search" },
+        { "label": "Clear" },
+        { "label": "Search" }
+      ],
+      "purpose": "PRIMARY automation surface for searching comps. All fields are available without entering Search tab."
+    },
+    "market_monitor": {
+      "frame": "Home/Page.mvc",
+      "tabs": ["MY INFO", "MARKET", "OFFICE", "TEAM"],
+      "current_tab": "MARKET (default)",
+      "metrics_table_selector": "h3:has-text('MARKET MONITOR') ~ table",
+      "day_range_input_selector": "input[value='1']:near('DAY(S)')",
+      "refresh_link_selector": "a[description='Refresh Market Monitor']:has-text('REFRESH')",
+      "metrics": [
+        { "name": "New", "value_at_capture": 280, "tooltip": "Total newly created listings" },
+        { "name": "Back on Market", "value_at_capture": 64 },
+        { "name": "Hot List", "value_at_capture": 1529 },
+        { "name": "Price Change", "value_at_capture": 331 },
+        { "name": "Open House", "value_at_capture": 103 },
+        { "name": "Tours", "value_at_capture": 61 },
+        { "name": "Pending", "value_at_capture": 6026 },
+        { "name": "Sold", "value_at_capture": 168 },
+        { "name": "Expired", "value_at_capture": 58 }
+      ],
+      "scrape_strategy": "iterate <table> rows under h3 'MARKET MONITOR' heading. First col = label, second col = count. Set day-range input + click REFRESH for different windows.",
+      "aire_integration": "Feed daily to Morning Brief — market velocity signal (absorption rate = Sold / (Active+Pending), price-reduction % = Price Change / Active)"
+    },
+    "showingtime": {
+      "frame": "Home/Page.mvc/ShowingTime (separate iframe)",
+      "metrics": ["Feedback Received", "Feedback Requested", "Confirmed Appts I've Requested", "Confirmed Appts On My Listings"],
+      "current_values": [null, 3, 1, 0],
+      "links_via_sso": "https://setup-sso.showingtime.com/config?... (SSO token included in URL — fresh per page load)"
+    },
+    "calendar": {
+      "frame": "Home/Page.mvc",
+      "current_day": "Apr 13th, 2026 (Monday) - DAY 103/365"
+    }
+  },
+  "footer_quick_links": {
+    "session_clock_selector": "*:has-text('Session Time Remaining:')",
+    "current_value_at_capture": "1:54:56",
+    "session_max_idle": "3:00:00 (default Paragon)",
+    "hotsheet_link": {
+      "selector": "a:has-text('Hotsheet')",
+      "url": "javascript:;",
+      "behavior": "Click triggers JS handler — likely opens hotsheet panel/page in same iframe. Need to click + capture to map."
+    },
+    "saved_property_searches_link": {
+      "selector": "a:has-text('Saved Property Searches')",
+      "url": "javascript:;",
+      "behavior": "Click triggers JS handler — likely loads saved searches list."
+    },
+    "customize_quick_action_links_button": {
+      "selector": "img[alt='Customize Quick Action Links']"
+    }
+  },
+  "session_intel": {
+    "user": "Caleb Jackson (B24140)",
+    "session_clock_visible": true,
+    "session_idle_timeout_min": 180,
+    "captcha_observed": false,
+    "wizard_dismissed": true
+  }
+}

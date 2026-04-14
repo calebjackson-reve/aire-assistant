@@ -1,0 +1,26 @@
+{
+  "capturedAt": "2026-04-14T02:29:29.836Z",
+  "cmaId": "52198",
+  "cmaName": "109 Morningside Street",
+  "indexSubjectMls": "2022012769",
+  "wizardUrl": null,
+  "subject": {
+    "presentationName": null,
+    "subjectAddress": null,
+    "subjectMls": null,
+    "subjectSubdivision": null,
+    "subjectBeds": null,
+    "subjectBaths": null,
+    "subjectSqft": null,
+    "subjectYearBuilt": null,
+    "subjectLotSize": null,
+    "subjectListPrice": null,
+    "subjectSoldPrice": null,
+    "recommendedListPrice": null,
+    "rawText": ""
+  },
+  "comps": [],
+  "reportButtonsFound": [],
+  "durationMs": 1564,
+  "error": "Could not re-nav to Saved Presentations"
+}

@@ -54,10 +54,13 @@
 
 ### Font Stack
 ```css
---font-display: 'Playfair Display', Georgia, serif;
---font-body: 'Space Grotesk', system-ui, sans-serif;
---font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+/* Display font has latitude — see ~/.claude/projects/.../feedback_font_latitude.md */
+--font-display: 'Cormorant Garamond', Georgia, serif;  /* canonical as of 2026-04-13 */
+--font-body: 'Space Grotesk', system-ui, sans-serif;   /* LOCKED */
+--font-mono: 'IBM Plex Mono', 'Courier New', monospace; /* LOCKED */
 ```
+
+**Cormorant Garamond** is the current display font, replacing Playfair Display per `commit 310cede` ("LUNA-2 dashboard upgrade"). The italic feels editorial, the regular 500 weight reads warmer than Playfair at small sizes, and it pairs cleanly with Space Grotesk. Display font is the only one with latitude — Space Grotesk and IBM Plex Mono are locked.
 
 ### Type Hierarchy
 | Element | Font | Weight | Size | Line Height | Tracking |

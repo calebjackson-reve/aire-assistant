@@ -1,0 +1,26 @@
+{
+  "capturedAt": "2026-04-14T02:30:32.426Z",
+  "cmaId": "51959",
+  "cmaName": "kaeleigh",
+  "indexSubjectMls": "2025021269",
+  "wizardUrl": null,
+  "subject": {
+    "presentationName": null,
+    "subjectAddress": null,
+    "subjectMls": null,
+    "subjectSubdivision": null,
+    "subjectBeds": null,
+    "subjectBaths": null,
+    "subjectSqft": null,
+    "subjectYearBuilt": null,
+    "subjectLotSize": null,
+    "subjectListPrice": null,
+    "subjectSoldPrice": null,
+    "recommendedListPrice": null,
+    "rawText": ""
+  },
+  "comps": [],
+  "reportButtonsFound": [],
+  "durationMs": 1570,
+  "error": "Could not re-nav to Saved Presentations"
+}

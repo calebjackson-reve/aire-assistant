@@ -1,0 +1,1374 @@
+{
+  "generatedAt": "2026-04-13T20:56:08.857Z",
+  "totalPdfsScanned": 3017,
+  "results": [
+    {
+      "cmaId": "52902",
+      "cmaName": "drew edwards",
+      "subjectMls": "2026005125",
+      "comparables": 0,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "filename": "1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/336_Seyburn_Dr_CMA.pdf",
+          "filename": "336_Seyburn_Dr_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/825_Bourbon_Ave_CMA.pdf",
+          "filename": "825_Bourbon_Ave_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (1).pdf",
+          "filename": "CMA (1).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (2).pdf",
+          "filename": "CMA (2).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "52880",
+      "cmaName": "28274 lake bruin",
+      "subjectMls": "2019019206",
+      "comparables": 9,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "filename": "1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/336_Seyburn_Dr_CMA.pdf",
+          "filename": "336_Seyburn_Dr_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/825_Bourbon_Ave_CMA.pdf",
+          "filename": "825_Bourbon_Ave_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (1).pdf",
+          "filename": "CMA (1).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (2).pdf",
+          "filename": "CMA (2).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "50997",
+      "cmaName": "Austin Gayle",
+      "subjectMls": "2022013941",
+      "comparables": 4,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "filename": "1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/336_Seyburn_Dr_CMA.pdf",
+          "filename": "336_Seyburn_Dr_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/825_Bourbon_Ave_CMA.pdf",
+          "filename": "825_Bourbon_Ave_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (1).pdf",
+          "filename": "CMA (1).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (2).pdf",
+          "filename": "CMA (2).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "52738",
+      "cmaName": "John Jackson",
+      "subjectMls": "",
+      "comparables": 4,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/Misc/Caleb_Jackson_CMA_Pricing_Strategy_30787_DunnRd.pdf",
+          "filename": "Caleb_Jackson_CMA_Pricing_Strategy_30787_DunnRd.pdf",
+          "score": 8,
+          "reasons": [
+            "client tokens: jackson",
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Financial/2023 Individual JACKSOC1 (Jackson, Caleb J) ClientCopy.pdf",
+          "filename": "2023 Individual JACKSOC1 (Jackson, Caleb J) ClientCopy.pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: jackson"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Financial/2025_Tax_Comparison_Caleb_Jackson.pdf",
+          "filename": "2025_Tax_Comparison_Caleb_Jackson.pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: jackson"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Legal - Wells/Discovery Verification - Caleb J. Jackson.pdf",
+          "filename": "Discovery Verification - Caleb J. Jackson.pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: jackson"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Misc/351 JACKSON Avenue.pdf",
+          "filename": "351 JACKSON Avenue.pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: jackson"
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "52579",
+      "cmaName": "12361 Pecan Island Rd",
+      "subjectMls": "2019018431",
+      "comparables": 5,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/12361 Pecan Island Rd.pdf",
+          "filename": "12361 Pecan Island Rd.pdf",
+          "score": 15,
+          "reasons": [
+            "address match: \"12361 Pecan\"",
+            "client tokens: island"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Property Files/12361-12363 Pecan Island Rd/12361 Pecan Island Rd.pdf",
+          "filename": "12361 Pecan Island Rd.pdf",
+          "score": 15,
+          "reasons": [
+            "address match: \"12361 Pecan\"",
+            "client tokens: island"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/12361 & 12363 Pecan Island Rd Invoice.pdf",
+          "filename": "12361 & 12363 Pecan Island Rd Invoice.pdf",
+          "score": 12,
+          "reasons": [
+            "address fragment: \"12361 ... pecan\"",
+            "client tokens: island"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Property Files/12361-12363 Pecan Island Rd/12361 & 12363 Pecan Island Rd Invoice.pdf",
+          "filename": "12361 & 12363 Pecan Island Rd Invoice.pdf",
+          "score": 12,
+          "reasons": [
+            "address fragment: \"12361 ... pecan\"",
+            "client tokens: island"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Property Files/12361-12363 Pecan Island Rd/12363 Pecan Island Rd Vacant Land.pdf",
+          "filename": "12363 Pecan Island Rd Vacant Land.pdf",
+          "score": 12,
+          "reasons": [
+            "address fragment: \"12361 ... pecan\"",
+            "client tokens: island"
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "52530",
+      "cmaName": "Dani and Clint",
+      "subjectMls": "2020010043",
+      "comparables": 4,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/Properties/Clinton Property/CMA_10808_PlankRd_ClintonLA.pdf",
+          "filename": "CMA_10808_PlankRd_ClintonLA.pdf",
+          "score": 8,
+          "reasons": [
+            "client tokens: clint",
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/12361 & 12363 Pecan Island Rd Invoice.pdf",
+          "filename": "12361 & 12363 Pecan Island Rd Invoice.pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: and"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/12361 Pecan Island Rd.pdf",
+          "filename": "12361 Pecan Island Rd.pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: and"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/12363 Pecan Island Rd Vacant Land.pdf",
+          "filename": "12363 Pecan Island Rd Vacant Land.pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: and"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/AIRE BRAND Core values Master file.pdf",
+          "filename": "AIRE BRAND Core values Master file.pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: and"
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "52621",
+      "cmaName": "christian purpera",
+      "subjectMls": "2024012393",
+      "comparables": 0,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "filename": "1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/336_Seyburn_Dr_CMA.pdf",
+          "filename": "336_Seyburn_Dr_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/825_Bourbon_Ave_CMA.pdf",
+          "filename": "825_Bourbon_Ave_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (1).pdf",
+          "filename": "CMA (1).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (2).pdf",
+          "filename": "CMA (2).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "52577",
+      "cmaName": "Gavin Property",
+      "subjectMls": "200914371",
+      "comparables": 4,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/Misc/03142024_Property Evaluation.pdf",
+          "filename": "03142024_Property Evaluation.pdf",
+          "score": 8,
+          "reasons": [
+            "client tokens: property",
+            "+CMA kw: \"property evaluation\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Properties/Clinton Property/CMA_10808_PlankRd_ClintonLA.pdf",
+          "filename": "CMA_10808_PlankRd_ClintonLA.pdf",
+          "score": 8,
+          "reasons": [
+            "client tokens: property",
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Property Files/1368 Buffalo Hollow Ct/1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "filename": "1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "score": 8,
+          "reasons": [
+            "client tokens: property",
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Property Files/336 Seyburn Dr/336_Seyburn_Dr_CMA.pdf",
+          "filename": "336_Seyburn_Dr_CMA.pdf",
+          "score": 8,
+          "reasons": [
+            "client tokens: property",
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Property Files/825 Bourbon Ave/825_Bourbon_Ave_CMA.pdf",
+          "filename": "825_Bourbon_Ave_CMA.pdf",
+          "score": 8,
+          "reasons": [
+            "client tokens: property",
+            "+CMA kw: \"cma\""
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "51674",
+      "cmaName": "Jenny Wilcox",
+      "subjectMls": "2021007777",
+      "comparables": 6,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "filename": "1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/336_Seyburn_Dr_CMA.pdf",
+          "filename": "336_Seyburn_Dr_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/825_Bourbon_Ave_CMA.pdf",
+          "filename": "825_Bourbon_Ave_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (1).pdf",
+          "filename": "CMA (1).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (2).pdf",
+          "filename": "CMA (2).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "52335",
+      "cmaName": "Eagle Drive Jenny Wilcox",
+      "subjectMls": "2021007777",
+      "comparables": 5,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/OneDrive/1928 E Eagle Drive - For and in consideration of the Price and Sum ors 80.pdf",
+          "filename": "1928 E Eagle Drive - For and in consideration of the Price and Sum ors 80.pdf",
+          "score": 10,
+          "reasons": [
+            "client tokens: eagle,drive"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/OneDrive/Pictures/PDF e eagle.pdf",
+          "filename": "PDF e eagle.pdf",
+          "score": 10,
+          "reasons": [
+            "client tokens: eagle,drive"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/OneDrive/Pictures/CMA.pdf",
+          "filename": "CMA.pdf",
+          "score": 8,
+          "reasons": [
+            "client tokens: drive",
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/1928 E Eagle Drive - Executed Contract (version 1).pdf",
+          "filename": "1928 E Eagle Drive - Executed Contract (version 1).pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: eagle,drive",
+            "-TC doc: \"contract\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/eagle report.pdf",
+          "filename": "eagle report.pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: eagle"
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "52376",
+      "cmaName": "2026000363",
+      "subjectMls": "2026000363",
+      "comparables": 0,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "filename": "1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/336_Seyburn_Dr_CMA.pdf",
+          "filename": "336_Seyburn_Dr_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/825_Bourbon_Ave_CMA.pdf",
+          "filename": "825_Bourbon_Ave_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (1).pdf",
+          "filename": "CMA (1).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (2).pdf",
+          "filename": "CMA (2).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "52465",
+      "cmaName": "743 avenue b",
+      "subjectMls": "2024021636",
+      "comparables": 4,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/Misc/743 Avenue B - LREC - Residential Agreement to Buy or Sell.pdf",
+          "filename": "743 Avenue B - LREC - Residential Agreement to Buy or Sell.pdf",
+          "score": 5,
+          "reasons": [
+            "address match: \"743 avenue b\"",
+            "-TC doc: \"agreement\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "filename": "1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/336_Seyburn_Dr_CMA.pdf",
+          "filename": "336_Seyburn_Dr_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/825_Bourbon_Ave_CMA.pdf",
+          "filename": "825_Bourbon_Ave_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (1).pdf",
+          "filename": "CMA (1).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "52342",
+      "cmaName": "greg junghas",
+      "subjectMls": "2022005978",
+      "comparables": 6,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/Misc/greg sign.pdf",
+          "filename": "greg sign.pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: greg"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Misc/Gregory Mcclay.pdf",
+          "filename": "Gregory Mcclay.pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: greg"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "filename": "1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/336_Seyburn_Dr_CMA.pdf",
+          "filename": "336_Seyburn_Dr_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/825_Bourbon_Ave_CMA.pdf",
+          "filename": "825_Bourbon_Ave_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "52431",
+      "cmaName": "patin dyke rd",
+      "subjectMls": "2025019330",
+      "comparables": 3,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/Properties/14436 Patin Dyke/14436 PATIN DYKE RD - Private SeweragePrivate Water Well Inspection and Options Agreement (Rev 12.pdf",
+          "filename": "14436 PATIN DYKE RD - Private SeweragePrivate Water Well Inspection and Options Agreement (Rev 12.pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: patin,dyke",
+            "-TC doc: \"agreement\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "filename": "1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/336_Seyburn_Dr_CMA.pdf",
+          "filename": "336_Seyburn_Dr_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/825_Bourbon_Ave_CMA.pdf",
+          "filename": "825_Bourbon_Ave_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (1).pdf",
+          "filename": "CMA (1).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "52432",
+      "cmaName": "Trails End updated",
+      "subjectMls": "2024000356",
+      "comparables": 5,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/Properties/10006 Trails End/10006_Trails_End__Summary_Report.pdf",
+          "filename": "10006_Trails_End__Summary_Report.pdf",
+          "score": 10,
+          "reasons": [
+            "client tokens: trails,end"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Properties/10006 Trails End/Trails end PDf.pdf",
+          "filename": "Trails end PDf.pdf",
+          "score": 10,
+          "reasons": [
+            "client tokens: trails,end"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/trails end.pdf",
+          "filename": "trails end.pdf",
+          "score": 10,
+          "reasons": [
+            "client tokens: trails,end"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Misc/Updated_CMA_10808_PlankRd.pdf",
+          "filename": "Updated_CMA_10808_PlankRd.pdf",
+          "score": 8,
+          "reasons": [
+            "client tokens: updated",
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Certificates & Training/647678_FHAAmendatoryClauseandRealEstateCertificate.pdf",
+          "filename": "647678_FHAAmendatoryClauseandRealEstateCertificate.pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: end"
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "52321",
+      "cmaName": "Todd C",
+      "subjectMls": "2017019085",
+      "comparables": 6,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "filename": "1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/336_Seyburn_Dr_CMA.pdf",
+          "filename": "336_Seyburn_Dr_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/825_Bourbon_Ave_CMA.pdf",
+          "filename": "825_Bourbon_Ave_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (1).pdf",
+          "filename": "CMA (1).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (2).pdf",
+          "filename": "CMA (2).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "52315",
+      "cmaName": "Boone Ave",
+      "subjectMls": "2026001208",
+      "comparables": 3,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/825_Bourbon_Ave_CMA.pdf",
+          "filename": "825_Bourbon_Ave_CMA.pdf",
+          "score": 8,
+          "reasons": [
+            "client tokens: ave",
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Property Files/825 Bourbon Ave/825_Bourbon_Ave_CMA.pdf",
+          "filename": "825_Bourbon_Ave_CMA.pdf",
+          "score": 8,
+          "reasons": [
+            "client tokens: ave",
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/4660 Lane Ave (1).pdf",
+          "filename": "4660 Lane Ave (1).pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: ave"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/4660 Lane Ave.pdf",
+          "filename": "4660 Lane Ave.pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: ave"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Brave Brand Blueprint.pdf",
+          "filename": "Brave Brand Blueprint.pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: ave"
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "50999",
+      "cmaName": "Mallory Hoover",
+      "subjectMls": "2019011231",
+      "comparables": 0,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "filename": "1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/336_Seyburn_Dr_CMA.pdf",
+          "filename": "336_Seyburn_Dr_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/825_Bourbon_Ave_CMA.pdf",
+          "filename": "825_Bourbon_Ave_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (1).pdf",
+          "filename": "CMA (1).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (2).pdf",
+          "filename": "CMA (2).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "52275",
+      "cmaName": "gina",
+      "subjectMls": "NO2180761",
+      "comparables": 5,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "filename": "1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/336_Seyburn_Dr_CMA.pdf",
+          "filename": "336_Seyburn_Dr_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/825_Bourbon_Ave_CMA.pdf",
+          "filename": "825_Bourbon_Ave_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (1).pdf",
+          "filename": "CMA (1).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (2).pdf",
+          "filename": "CMA (2).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "51395",
+      "cmaName": "Heather Clement",
+      "subjectMls": "2020010741",
+      "comparables": 3,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "filename": "1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/336_Seyburn_Dr_CMA.pdf",
+          "filename": "336_Seyburn_Dr_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/825_Bourbon_Ave_CMA.pdf",
+          "filename": "825_Bourbon_Ave_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (1).pdf",
+          "filename": "CMA (1).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (2).pdf",
+          "filename": "CMA (2).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "52198",
+      "cmaName": "109 Morningside Street",
+      "subjectMls": "2022012769",
+      "comparables": 7,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/Properties/109 Morningside/109_Morningside_St___Residential_Report.pdf",
+          "filename": "109_Morningside_St___Residential_Report.pdf",
+          "score": 10,
+          "reasons": [
+            "address match: \"109 Morningside\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/39th street report.pdf",
+          "filename": "39th street report.pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: street"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/4406 39th Street - IMG_9510.pdf",
+          "filename": "4406 39th Street - IMG_9510.pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: street"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/AIRE_Jules_Wall_Street_Onboarding (1).pdf",
+          "filename": "AIRE_Jules_Wall_Street_Onboarding (1).pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: street"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/AIRE_Jules_Wall_Street_Onboarding.pdf",
+          "filename": "AIRE_Jules_Wall_Street_Onboarding.pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: street"
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "51810",
+      "cmaName": "Bo Myers",
+      "subjectMls": "2024000356",
+      "comparables": 4,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "filename": "1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/336_Seyburn_Dr_CMA.pdf",
+          "filename": "336_Seyburn_Dr_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/825_Bourbon_Ave_CMA.pdf",
+          "filename": "825_Bourbon_Ave_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (1).pdf",
+          "filename": "CMA (1).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (2).pdf",
+          "filename": "CMA (2).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "52059",
+      "cmaName": "109 Morningside st",
+      "subjectMls": "2022012769",
+      "comparables": 6,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/Properties/109 Morningside/109 Morningside St Addendum for no Repairs.pdf",
+          "filename": "109 Morningside St Addendum for no Repairs.pdf",
+          "score": 5,
+          "reasons": [
+            "address match: \"109 Morningside st\"",
+            "-TC doc: \"addendum\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Properties/109 Morningside/109 Morningside St ADDENDUM FOR PRICE.pdf",
+          "filename": "109 Morningside St ADDENDUM FOR PRICE.pdf",
+          "score": 5,
+          "reasons": [
+            "address match: \"109 Morningside st\"",
+            "-TC doc: \"addendum\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Properties/109 Morningside/109 Morningside St Addendum to addjust closing cost and floor allowance.pdf",
+          "filename": "109 Morningside St Addendum to addjust closing cost and floor allowance.pdf",
+          "score": 5,
+          "reasons": [
+            "address match: \"109 Morningside st\"",
+            "-TC doc: \"addendum\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Properties/109 Morningside/109 Morningside St. Addendum for removal of personal items.pdf",
+          "filename": "109 Morningside St. Addendum for removal of personal items.pdf",
+          "score": 5,
+          "reasons": [
+            "address match: \"109 Morningside st\"",
+            "-TC doc: \"addendum\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Properties/109 Morningside/109 Morningside St. Sellers Inspection Response FINAL 2.pdf",
+          "filename": "109 Morningside St. Sellers Inspection Response FINAL 2.pdf",
+          "score": 5,
+          "reasons": [
+            "address match: \"109 Morningside st\"",
+            "-TC doc: \"inspection\""
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "52058",
+      "cmaName": "Jacob Askins",
+      "subjectMls": "2022004694",
+      "comparables": 4,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/Misc/Jacob askins customer information.pdf",
+          "filename": "Jacob askins customer information.pdf",
+          "score": 10,
+          "reasons": [
+            "client tokens: jacob,askins"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "filename": "1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/336_Seyburn_Dr_CMA.pdf",
+          "filename": "336_Seyburn_Dr_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/825_Bourbon_Ave_CMA.pdf",
+          "filename": "825_Bourbon_Ave_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (1).pdf",
+          "filename": "CMA (1).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "51784",
+      "cmaName": "13902 Ouachita ave",
+      "subjectMls": "2021016790",
+      "comparables": 6,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "filename": "1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/336_Seyburn_Dr_CMA.pdf",
+          "filename": "336_Seyburn_Dr_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/825_Bourbon_Ave_CMA.pdf",
+          "filename": "825_Bourbon_Ave_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (1).pdf",
+          "filename": "CMA (1).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (2).pdf",
+          "filename": "CMA (2).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "51629",
+      "cmaName": "The Taylors",
+      "subjectMls": "2023017390",
+      "comparables": 0,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/Financial/Darlene other invoice.pdf",
+          "filename": "Darlene other invoice.pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: the"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/For and in consideration of the Price and Sum ors 80 (1).pdf",
+          "filename": "For and in consideration of the Price and Sum ors 80 (1).pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: the"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/For and in consideration of the Price and Sum ors 80.pdf",
+          "filename": "For and in consideration of the Price and Sum ors 80.pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: the"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Misc/Berthelot-Pre-Qualification-Letter.pdf",
+          "filename": "Berthelot-Pre-Qualification-Letter.pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: the"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/Misc/P2.THE_PRICING_PROCESS_CHECKLIST.pdf",
+          "filename": "P2.THE_PRICING_PROCESS_CHECKLIST.pdf",
+          "score": 5,
+          "reasons": [
+            "client tokens: the"
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "51959",
+      "cmaName": "kaeleigh",
+      "subjectMls": "2025021269",
+      "comparables": 4,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "filename": "1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/336_Seyburn_Dr_CMA.pdf",
+          "filename": "336_Seyburn_Dr_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/825_Bourbon_Ave_CMA.pdf",
+          "filename": "825_Bourbon_Ave_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (1).pdf",
+          "filename": "CMA (1).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (2).pdf",
+          "filename": "CMA (2).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        }
+      ]
+    },
+    {
+      "cmaId": "51456",
+      "cmaName": "Emily Vince",
+      "subjectMls": "2020011401",
+      "comparables": 4,
+      "candidates": [
+        {
+          "path": "C:/Users/cjjfr/Downloads/Misc/Seller_Report_EmilyVince.pdf",
+          "filename": "Seller_Report_EmilyVince.pdf",
+          "score": 10,
+          "reasons": [
+            "client tokens: emily,vince"
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "filename": "1368_Buffalo_Hollow_Ct_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/336_Seyburn_Dr_CMA.pdf",
+          "filename": "336_Seyburn_Dr_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/825_Bourbon_Ave_CMA.pdf",
+          "filename": "825_Bourbon_Ave_CMA.pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        },
+        {
+          "path": "C:/Users/cjjfr/Downloads/CMA (1).pdf",
+          "filename": "CMA (1).pdf",
+          "score": 3,
+          "reasons": [
+            "+CMA kw: \"cma\""
+          ]
+        }
+      ]
+    }
+  ]
+}
