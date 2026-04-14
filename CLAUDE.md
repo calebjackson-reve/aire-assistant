@@ -87,6 +87,13 @@ Schema source of truth: `prisma/schema.prisma` — never duplicate schemas elsew
 | Error Memory API | COMPLETE | `app/api/learning/errors/route.ts` (GET patterns, POST resolve) |
 | Learning Cron | COMPLETE | `app/api/cron/learning/route.ts` (weekly analysis, flags underperforming features) |
 | Feedback UI | COMPLETE | `components/FeedbackButtons.tsx` (integrated in morning brief, voice overlay, contract form) |
+| System Status Page (admin) | COMPLETE | `app/aire/system-status/`, `app/api/system-status/route.ts`, `lib/ops/health.ts`, `lib/ops/cron-registry.ts` — 16 cron last-run + 7d success rate, DB probe, 8 external services, auto-refresh 30s |
+| Learning Insights Page (admin) | COMPLETE | `app/aire/learning/`, `app/api/learning/insights/route.ts`, `app/api/learning/resolve/route.ts`, `app/api/learning/seed/route.ts`, `lib/ops/learning-insights.ts` — top 10 error patterns w/ resolve+ignore, per-feature feedback 30d + 7d trend, weekly digest |
+| Admin Gate | COMPLETE | `lib/auth/admin.ts` — email allowlist via `ADMIN_EMAILS` env, falls back to caleb@aireintel.org |
+| Revenue Activation — 7d Trial | COMPLETE | `lib/billing/trial.ts`, `app/api/billing/trial/route.ts`, `app/api/billing/event/route.ts`, `components/billing/TrialUpgradeModal.tsx`, `components/billing/FreeTierUpgradeBanner.tsx`, `components/billing/useTrialGate.ts` — Stripe `trial_period_days`, lazy expiry in `/aire` layout, ConversionEvent funnel |
+| ConversionEvent Model | COMPLETE | `prisma/schema.prisma` — viewed_upgrade, clicked_upgrade, started_trial, converted, trial_expired |
+| Segment Error Boundaries | COMPLETE | `components/ui/SegmentErrorBoundary.tsx` + 20 segment `error.tsx` files across /aire/* — logs to error memory via `/api/learning/errors/log` |
+| Global Toast System | COMPLETE | `components/ui/Toast.tsx` (ToastProvider + useToast, sage/olive/error kinds) |
 
 ## DO NOT REBUILD
 - Document classifier, extractor, memory, multi-pass pipeline

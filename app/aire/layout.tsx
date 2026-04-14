@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import prisma from "@/lib/prisma"
 import { DarkLayoutWithBadges } from "./DarkLayoutWithBadges"
 import { WisprShell } from "@/components/voice"
+import { expireTrialIfOver } from "@/lib/billing/trial"
 import "./ui-lab/_theme.css"
 
 // FOUC-safe: set data-theme on the .ui-lab-scope wrapper before first paint.
@@ -26,6 +27,9 @@ export default async function AireLayout({ children }: { children: React.ReactNo
 
   if (!user) redirect("/sign-in")
   if (user.onboarded === false) redirect("/onboarding")
+
+  // Lazy trial expiry — demotes user to FREE if trial ended without checkout.
+  await expireTrialIfOver(user.id)
 
   // Lightweight count queries — integers only, no heavy joins
   const [activeCount, overdueCount] = await Promise.all([

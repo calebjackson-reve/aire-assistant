@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
+import { transcribeAudio } from "@/lib/voice/whisper"
 
 // Wispr voice API
 // POST /api/voice/wispr
@@ -66,28 +67,8 @@ export async function POST(req: Request): Promise<Response> {
   }
 
   try {
-    const whisperForm = new FormData()
-    // Whisper needs a file-like with a name
-    const asFile = audio instanceof File ? audio : new File([audio], "audio.webm", { type: audio.type || "audio/webm" })
-    whisperForm.append("file", asFile)
-    whisperForm.append("model", "whisper-1")
-    whisperForm.append("response_format", "json")
-
-    const res = await fetch("https://api.openai.com/v1/audio/transcriptions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${openaiKey}` },
-      body: whisperForm,
-    })
-    if (!res.ok) {
-      const detail = await res.text().catch(() => "")
-      return json<Err>({
-        ok: false,
-        error: "Transcription failed",
-        detail: detail.slice(0, 180) || `HTTP ${res.status}`,
-      })
-    }
-    const data = (await res.json()) as { text?: string }
-    transcript = (data.text || "").trim()
+    // Use shared helper so LA glossary + OpenAI client caching apply.
+    transcript = (await transcribeAudio(audio)).trim()
   } catch (err) {
     return json<Err>({
       ok: false,

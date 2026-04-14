@@ -4,6 +4,8 @@ import prisma from "@/lib/prisma"
 import Link from "next/link"
 import { HairlineDivider } from "@/components/ui/primitives/HairlineDivider"
 import { SectionLabel } from "@/components/ui/primitives/SectionLabel"
+import { FreeTierUpgradeBanner } from "@/components/billing/FreeTierUpgradeBanner"
+import { computeTrialState } from "@/lib/billing/trial"
 
 type StatusTone = "active" | "pending" | "overdue" | "info" | "closing"
 
@@ -65,6 +67,8 @@ export default async function AirePage() {
     },
   })
   if (!user) redirect("/sign-in")
+
+  const trialState = computeTrialState(user)
 
   const now = new Date()
   const threeDays = new Date(now.getTime() + 3 * 86_400_000)
@@ -169,6 +173,12 @@ export default async function AirePage() {
             <HairlineDivider tone="light" />
           </div>
         </header>
+
+        <FreeTierUpgradeBanner
+          tier={user.tier}
+          trialStatus={trialState.status}
+          trialDaysRemaining={trialState.daysRemaining}
+        />
 
         {user.transactions.length === 0 ? (
           <div className="py-24 text-center">

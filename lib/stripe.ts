@@ -28,11 +28,13 @@ export async function createCheckoutSession({
   email,
   priceId,
   customerId,
+  trialDays,
 }: {
   userId: string;
   email: string;
   priceId: string;
   customerId?: string;
+  trialDays?: number;
 }) {
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
@@ -45,6 +47,7 @@ export async function createCheckoutSession({
     metadata: { userId },
     subscription_data: {
       metadata: { userId },
+      ...(trialDays && trialDays > 0 ? { trial_period_days: trialDays } : {}),
     },
   });
 

@@ -4,7 +4,7 @@
  * Enforces feature access based on user's subscription tier.
  * Use in API routes and server components to block unauthorized access.
  *
- * Tiers: FREE → PRO ($47/mo) → INVESTOR ($147/mo)
+ * Tiers: FREE → PRO ($97/mo) → INVESTOR ($197/mo)
  */
 
 import { auth } from "@clerk/nextjs/server";

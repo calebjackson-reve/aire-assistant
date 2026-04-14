@@ -47,6 +47,17 @@ export async function POST(req: NextRequest) {
           },
         });
 
+        // Funnel event — converted (trialing counts as converted; real payment
+        // lands as a subscription.updated status=active webhook below)
+        await prisma.conversionEvent.create({
+          data: {
+            userId,
+            event: "converted",
+            tier,
+            metadata: { subscriptionStatus: subscription.status },
+          },
+        }).catch(() => {});
+
         console.log(`[Billing] User ${userId} upgraded to ${tier}`);
         break;
       }

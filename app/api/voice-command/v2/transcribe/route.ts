@@ -3,17 +3,16 @@ import { auth } from "@clerk/nextjs/server"
 import { transcribeAudio } from "@/lib/voice/whisper"
 
 /**
- * Whisper transcription endpoint.
- * Accepts multipart/form-data with an "audio" blob, returns { text }.
- * Skips gracefully with 503 when OPENAI_API_KEY is missing so the client
- * can fall back to Web Speech API.
+ * Alias of /api/voice/transcribe — exposed under the v2 voice pipeline
+ * namespace so callers can stay within the single /api/voice-command/v2/*
+ * surface. Both routes share the same Whisper helper.
  */
 export async function POST(req: NextRequest) {
   const { userId } = await auth()
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   if (!process.env.OPENAI_API_KEY) {
-    console.warn("[Whisper] OPENAI_API_KEY not set — skipping transcription gracefully")
+    console.warn("[Whisper v2] OPENAI_API_KEY not set — fallback to Web Speech")
     return NextResponse.json(
       { error: "OPENAI_API_KEY not configured", fallback: "web-speech" },
       { status: 503 }
@@ -30,11 +29,10 @@ export async function POST(req: NextRequest) {
 
     const text = await transcribeAudio(audioFile)
     const ms = Date.now() - start
-    console.log(`[Whisper] Transcribed ${audioFile.size}B in ${ms}ms`)
-
+    console.log(`[Whisper v2] Transcribed ${audioFile.size}B in ${ms}ms`)
     return NextResponse.json({ text, ms })
   } catch (err) {
-    console.error("[Whisper] Transcription failed:", err)
+    console.error("[Whisper v2] Transcription failed:", err)
     return NextResponse.json({ error: "Transcription failed" }, { status: 500 })
   }
 }
