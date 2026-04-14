@@ -67,7 +67,7 @@ export function ContactForm() {
   }
 
   const inputClass =
-    "w-full bg-white border border-[#d4c8b8]/60 rounded-lg px-4 py-2.5 text-[#1e2416] placeholder:text-[#6a6a60]/50 focus:outline-none focus:border-[#9aab7e]"
+    "w-full bg-surface-elevated border border-[#d4c8b8]/60 rounded-lg px-4 py-2.5 text-[#1e2416] placeholder:text-[#6a6a60]/50 focus:outline-none focus:border-[#9aab7e]"
 
   return (
     <div className="max-w-2xl mx-auto py-10 px-4">
