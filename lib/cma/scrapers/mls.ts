@@ -44,7 +44,7 @@ const MAX_CONSECUTIVE_LOGIN_FAILURES = 2
 /** Login marker heuristic — ROAM redirects from clareityiam.net to clareity.net
  *  after SSO hand-off. Treat any non-IAM clareity.net host as logged in, and
  *  fall back to body text for skins on other hosts. */
-async function isParagonLoggedIn(page: Page): Promise<boolean> {
+export async function isParagonLoggedIn(page: Page): Promise<boolean> {
   const url = page.url().toLowerCase()
   if (url.includes("login") || url.includes("signin") || url.includes("authenticate")) return false
   // Strong positive signal: we're on the ROAM MLS shell, not the IAM.
@@ -54,7 +54,7 @@ async function isParagonLoggedIn(page: Page): Promise<boolean> {
 }
 
 /** Human-paced Paragon login. Defers selector-specific tuning to the first live run. */
-async function paragonLogin(page: Page, creds: VendorCredentials): Promise<void> {
+export async function paragonLogin(page: Page, creds: VendorCredentials): Promise<void> {
   await page.waitForLoadState("domcontentloaded")
   await humanPause(500, 1200)
 
@@ -291,7 +291,7 @@ export interface ParagonCompSearchResult {
 }
 
 /** Dismisses the ROAM dashboard announcement modal ("Coming Soon Listings…"). */
-async function dismissDashboardModal(page: Page): Promise<boolean> {
+export async function dismissDashboardModal(page: Page): Promise<boolean> {
   const candidates = [
     'button[aria-label="Close"]',
     'button[aria-label="close"]',
@@ -313,7 +313,7 @@ async function dismissDashboardModal(page: Page): Promise<boolean> {
  *  `__name(fn, "name")` calls around named function expressions when
  *  emitting .evaluate() callbacks — the browser has no such global and
  *  throws ReferenceError. Shim is a no-op that returns the function. */
-async function injectNameShim(target: Page | import("playwright").Frame): Promise<void> {
+export async function injectNameShim(target: Page | import("playwright").Frame): Promise<void> {
   await target.evaluate(() => {
     const w = window as unknown as Record<string, unknown>
     if (typeof w.__name !== "function") {
@@ -325,7 +325,7 @@ async function injectNameShim(target: Page | import("playwright").Frame): Promis
 /** Opens the Paragon app by clicking the "Paragon" favorites tile icon.
  *  The label is text "Paragon"; the clickable tile is the icon ~50px above it.
  *  Returns the popup page once it loads, or throws. */
-async function openParagonPopup(
+export async function openParagonPopup(
   page: Page,
   context: import("playwright").BrowserContext,
 ): Promise<Page> {
@@ -352,7 +352,7 @@ async function openParagonPopup(
 }
 
 /** Closes the Paragon "User Preferences Wizard" first-run modal. */
-async function dismissUserPreferencesWizard(page: Page): Promise<boolean> {
+export async function dismissUserPreferencesWizard(page: Page): Promise<boolean> {
   // The wizard has a "Close" button in the top-right of its header.
   const candidates = [
     'button:has-text("Close")',
@@ -923,7 +923,7 @@ async function readCMAListPage(frame: import("playwright").Frame): Promise<{
 /** Forces jqGrid page size to the largest option (30). Paragon's saved-CMA
  *  grid exposes "10 20 30" page sizes. Setting 30 is cleaner than pager
  *  clicks when total ≤ 30. Returns the selected size or null if no select. */
-async function setCMAPageSizeMax(frame: import("playwright").Frame): Promise<number | null> {
+export async function setCMAPageSizeMax(frame: import("playwright").Frame): Promise<number | null> {
   return await frame.evaluate(() => {
     const selects = Array.from(document.querySelectorAll("select")) as HTMLSelectElement[]
     // jqGrid page-size select typically has class "ui-pg-selbox" and options 10/20/30
@@ -2036,6 +2036,288 @@ export async function paragonListSavedPresentations(): Promise<SavedPresentation
     recordFailure(VENDOR)
     await logScrapeRun({ vendor: VENDOR, subject: "saved_cmas_recon", status: "failure", durationMs: Date.now() - started, error: message })
     return finish("FAIL", message)
+  } finally {
+    if (session?.context) {
+      await session.context.close().catch(() => {})
+    }
+  }
+}
+
+// ── Day 5: Deep-link listing detail fetcher ─────────────────────────────
+//
+// Paragon exposes listing detail at /Reports/Report.mvc?listingIDs={MLS}&viewID=c51
+// which is the "*Agent Full w/Photo" view containing ~80 fields per listing.
+// Bypasses the CMA wizard entirely. DOM map: dom_maps/listing_detail.dom.json
+
+export interface ListingDetail {
+  mlsId: string
+  address: string | null
+  city: string | null
+  state: string | null
+  zip: string | null
+  parish: string | null
+  area: string | null
+  subdivision: string | null
+  legal: string | null
+  listPrice: number | null
+  soldPrice: number | null
+  listPpsf: number | null
+  soldPpsf: number | null
+  livingSqft: number | null
+  totalSqft: number | null
+  bedrooms: number | null
+  baths: string | null
+  stories: number | null
+  yearAge: string | null
+  style: string | null
+  acres: number | null
+  lotDim: string | null
+  pool: string | null
+  mineralRights: string | null
+  garageSqft: number | null
+  porchSqft: number | null
+  patioSqft: number | null
+  deckSqft: number | null
+  listingDate: string | null
+  pendingDate: string | null
+  soldDate: string | null
+  dom: number | null
+  status: string | null
+  listAgent: string | null
+  listOffice: string | null
+  buyerAgent: string | null
+  financing: string | null
+  concessions: string | null
+  flooring: string | null
+  parking: string | null
+  construct: string | null
+  foundation: string | null
+  siding: string | null
+  roof: string | null
+  fencing: string | null
+  exterior: string | null
+  hvac: string | null
+  kitchenFeatures: string | null
+  primaryBedBath: string | null
+  realtorRemarks: string | null
+  rawFieldMap: Record<string, string>
+}
+
+export interface FetchListingResult {
+  status: "PASS" | "FAIL" | "HALT"
+  reason?: string
+  loginPath: "fresh" | "reused"
+  mlsId: string
+  listing: ListingDetail | null
+  durationMs: number
+  screenshotPath?: string
+}
+
+function parseNumSafe(s: string | null | undefined): number | null {
+  if (!s) return null
+  const cleaned = String(s).replace(/[$,]/g, "").trim()
+  const n = parseFloat(cleaned)
+  return Number.isFinite(n) ? n : null
+}
+
+/** Extract all h3 → value pairs from a document (DOM-map-driven). */
+async function extractListingFields(frame: import("playwright").Frame): Promise<Record<string, string>> {
+  return await frame.evaluate(() => {
+    const out: Record<string, string> = {}
+    const h3s = Array.from(document.querySelectorAll("h3")) as HTMLHeadingElement[]
+    for (const h of h3s) {
+      const label = (h.textContent || "").trim()
+      if (!label || label.length > 80) continue
+
+      let val = ""
+      let sib = h.nextElementSibling as HTMLElement | null
+      while (sib && !val) {
+        const sibText = (sib.textContent || "").trim()
+        if (sibText && sibText !== label && !sib.matches("h3, h2, h1")) {
+          val = sibText
+          break
+        }
+        sib = sib.nextElementSibling as HTMLElement | null
+      }
+
+      if (!val && h.parentElement) {
+        const parentTd = h.closest("td")
+        if (parentTd) {
+          const row = parentTd.parentElement
+          if (row) {
+            const cells = Array.from(row.querySelectorAll("td"))
+            const myIdx = cells.indexOf(parentTd)
+            if (myIdx >= 0 && myIdx + 1 < cells.length) {
+              val = (cells[myIdx + 1].textContent || "").trim()
+            }
+          }
+        }
+      }
+
+      if (val && val !== label && val.length < 800) {
+        if (out[label]) {
+          for (let i = 2; i < 10; i += 1) {
+            if (!out[`${label}#${i}`]) { out[`${label}#${i}`] = val; break }
+          }
+        } else {
+          out[label] = val
+        }
+      }
+    }
+
+    // Address heuristic for when address isn't under an h3
+    const allGen = Array.from(document.querySelectorAll("div, span, p"))
+    for (const g of allGen) {
+      const own = Array.from(g.childNodes).filter((n) => n.nodeType === 3).map((n) => (n.textContent || "").trim()).join(" ").trim()
+      if (!own || own.length > 120) continue
+      if (/^\d+\s+[A-Z][A-Z0-9 ]{2,}(?:DR|RD|AVE|LN|ST|HWY|CIR|PL|CT|WAY|BLVD|PKWY)\b/i.test(own)) {
+        if (!out["_address_guess"]) out["_address_guess"] = own
+      }
+    }
+    return out
+  }) as Promise<Record<string, string>>
+}
+
+function structureListing(mlsId: string, m: Record<string, string>): ListingDetail {
+  const g = (k: string): string | null => (m[k] ?? null)
+  const num = (k: string) => parseNumSafe(g(k))
+  const int = (k: string): number | null => {
+    const n = num(k)
+    return n == null ? null : Math.round(n)
+  }
+  return {
+    mlsId,
+    address: g("Address") || m["_address_guess"] || null,
+    city: g("City"),
+    state: null,
+    zip: g("Zip"),
+    parish: g("Parish"),
+    area: g("Area"),
+    subdivision: g("Subdiv"),
+    legal: g("Legal"),
+    listPrice: num("ListPrice"),
+    soldPrice: num("Sold Price"),
+    listPpsf: num("List Price/SqFt Liv"),
+    soldPpsf: num("Sold $/SqFt Liv"),
+    livingSqft: int("LivingSqFt") ?? int("Living SqFt"),
+    totalSqft: int("Total Sqft"),
+    bedrooms: int("Bedrooms"),
+    baths: g("Baths"),
+    stories: int("#Stories"),
+    yearAge: g("Age"),
+    style: g("Style"),
+    acres: num("Acres"),
+    lotDim: g("Lot Dim"),
+    pool: g("Pool"),
+    mineralRights: g("Mineral Rights"),
+    garageSqft: int("Garage SqFt"),
+    porchSqft: int("Porch SqFt"),
+    patioSqft: int("Patio Sqft"),
+    deckSqft: int("Deck SqFt"),
+    listingDate: g("Listing Date"),
+    pendingDate: g("Pending Date"),
+    soldDate: g("Sold Date"),
+    dom: int("DOM/CDOM"),
+    status: g("Status"),
+    listAgent: g("LstAgt"),
+    listOffice: g("LstOff"),
+    buyerAgent: g("Buyer Agt") ?? g("Buy Agt"),
+    financing: g("FINANCING"),
+    concessions: g("Concessions"),
+    flooring: g("FLOORING"),
+    parking: g("PARKING"),
+    construct: g("CONSTRUCT"),
+    foundation: g("FOUNDATION"),
+    siding: g("SIDING"),
+    roof: g("ROOF"),
+    fencing: g("FENCING"),
+    exterior: g("EXTERIOR"),
+    hvac: g("HVAC & UTILITIES"),
+    kitchenFeatures: g("KITCHEN & DINING FEATURES"),
+    primaryBedBath: g("PRIMARY BED & BATH FEATURES"),
+    realtorRemarks: g("REALTOR® Remarks") ?? g("REALTOR Remarks"),
+    rawFieldMap: m,
+  }
+}
+
+/** Fetch one listing's full detail via deep-link URL. Single-shot. */
+export async function paragonFetchListingDetail(mlsId: string): Promise<FetchListingResult> {
+  const started = Date.now()
+  let session: VendorSession | null = null
+  try {
+    session = await rateLimited(VENDOR, () =>
+      openVendorSession({
+        vendor: VENDOR,
+        probeUrl: "https://roam.clareity.net/layouts",
+        login: paragonLogin,
+        isLoggedIn: isParagonLoggedIn,
+        sessionMaxAgeDays: 7,
+      }),
+    )
+    const { context } = session
+    const fetchPage = await context.newPage()
+    const deepLink =
+      `https://mlsbox.paragonrels.com/ParagonLS/Reports/Report.mvc` +
+      `?listingIDs=${encodeURIComponent(mlsId)}&viewID=c51&classID=0&usePDF=false&ShowAds=false`
+
+    await fetchPage.goto(deepLink, { timeout: 30000, waitUntil: "domcontentloaded" }).catch(() => {})
+    await fetchPage.waitForLoadState("networkidle", { timeout: 20000 }).catch(() => {})
+    await fetchPage.waitForTimeout(800)
+
+    const cap = await detectCaptcha(fetchPage)
+    if (cap.present) {
+      const shot = await captureLandingScreenshot(fetchPage, `listing_captcha_${mlsId}`)
+      await fetchPage.close().catch(() => {})
+      throw new ScraperHaltError(`Captcha on listing detail for ${mlsId}`, VENDOR, shot)
+    }
+
+    await injectNameShim(fetchPage)
+    for (const f of fetchPage.frames()) await injectNameShim(f)
+
+    // Find the Report.mvc frame (main frame OR child iframe)
+    const deadline = Date.now() + 15000
+    let reportFrame: import("playwright").Frame | null = null
+    while (Date.now() < deadline && !reportFrame) {
+      if (/Reports\/Report\.mvc/i.test(fetchPage.url())) {
+        const h3c = await fetchPage.mainFrame().evaluate(() => document.querySelectorAll("h3").length).catch(() => 0)
+        if (h3c > 10) { reportFrame = fetchPage.mainFrame(); break }
+      }
+      for (const f of fetchPage.frames()) {
+        if (/Reports\/Report\.mvc/i.test(f.url())) {
+          const h3c = await f.evaluate(() => document.querySelectorAll("h3").length).catch(() => 0)
+          if (h3c > 10) { reportFrame = f; break }
+        }
+      }
+      if (!reportFrame) await fetchPage.waitForTimeout(500)
+    }
+
+    if (!reportFrame) {
+      const shot = await captureLandingScreenshot(fetchPage, `listing_no_report_${mlsId}`)
+      await fetchPage.close().catch(() => {})
+      return { status: "FAIL", reason: "Report.mvc frame never rendered with fields", loginPath: session.refreshed ? "fresh" : "reused", mlsId, listing: null, durationMs: Date.now() - started, screenshotPath: shot }
+    }
+
+    await injectNameShim(reportFrame)
+    const fieldMap = await extractListingFields(reportFrame)
+    const shot = await captureLandingScreenshot(fetchPage, `listing_ok_${mlsId}`)
+    await fetchPage.close().catch(() => {})
+
+    if (Object.keys(fieldMap).length < 5) {
+      return { status: "FAIL", reason: `Only ${Object.keys(fieldMap).length} fields extracted`, loginPath: session.refreshed ? "fresh" : "reused", mlsId, listing: null, durationMs: Date.now() - started, screenshotPath: shot }
+    }
+
+    const listing = structureListing(mlsId, fieldMap)
+    recordSuccess(VENDOR)
+    await logScrapeRun({ vendor: VENDOR, subject: `listing_${mlsId}`, status: "success", durationMs: Date.now() - started })
+
+    return { status: "PASS", loginPath: session.refreshed ? "fresh" : "reused", mlsId, listing, durationMs: Date.now() - started, screenshotPath: shot }
+  } catch (err) {
+    if (err instanceof ScraperHaltError) {
+      return { status: "HALT", reason: err.reason, loginPath: session?.refreshed ? "fresh" : "reused", mlsId, listing: null, durationMs: Date.now() - started, screenshotPath: err.screenshotPath }
+    }
+    const message = err instanceof Error ? err.message : String(err)
+    recordFailure(VENDOR)
+    return { status: "FAIL", reason: message, loginPath: session?.refreshed ? "fresh" : "reused", mlsId, listing: null, durationMs: Date.now() - started }
   } finally {
     if (session?.context) {
       await session.context.close().catch(() => {})
