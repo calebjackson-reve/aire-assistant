@@ -31,11 +31,14 @@ export { SectionLabel } from "./primitives/SectionLabel"
 // Use between editorial sections (SectionLabel → content → HairlineDivider).
 type HairlineProps = {
   variant?: "light" | "dark"
+  /** Alias for variant — accepted for backward compat with cluster agents */
+  tone?: "light" | "dark"
   className?: string
 }
 
-export function HairlineDivider({ variant = "light", className = "" }: HairlineProps) {
-  const base = variant === "dark"
+export function HairlineDivider({ variant, tone, className = "" }: HairlineProps) {
+  const resolved = variant ?? tone ?? "light"
+  const base = resolved === "dark"
     ? "bg-[#e8e4d8]/20"  // Linen/20 on Nocturne
     : "bg-[#6b7d52]/20"  // Olive/20 on Daylight
   return <div role="separator" className={`h-px w-full ${base} ${className}`} />

@@ -598,3 +598,51 @@ export const tools: ToolDefinition[] = [
 export function getTool(name: string): ToolDefinition | undefined {
   return tools.find((t) => t.name === name)
 }
+
+// ─── ASSISTANT UI LAYER ─────────────────────────────────────────────────────
+// Used by /aire/assistant landing page to display capabilities by category.
+
+export type ToolCategory =
+  | "brief"
+  | "transactions"
+  | "intelligence"
+  | "contracts"
+  | "airsign"
+  | "communications"
+  | "compliance"
+
+export const TOOL_CATEGORY_LABEL: Record<ToolCategory, string> = {
+  brief: "Morning Brief",
+  transactions: "Transactions",
+  intelligence: "Market Intelligence",
+  contracts: "Contracts",
+  airsign: "AirSign",
+  communications: "Communications",
+  compliance: "Compliance",
+}
+
+export interface AssistantTool {
+  name: string
+  label: string
+  description: string
+  category: ToolCategory
+  confirmRequired?: boolean
+}
+
+export const ASSISTANT_TOOLS: AssistantTool[] = [
+  { name: "trigger_morning_brief", label: "Morning Brief", description: "Generate or retrieve your morning intelligence brief", category: "brief" },
+  { name: "log_feedback", label: "Leave Feedback", description: "Log feedback about an AIRE response or feature", category: "brief" },
+  { name: "get_pipeline", label: "Pipeline Overview", description: "View your active transaction pipeline and deal status", category: "transactions" },
+  { name: "create_transaction", label: "New Transaction", description: "Create a new real estate transaction", category: "transactions", confirmRequired: true },
+  { name: "advance_workflow", label: "Advance Workflow", description: "Advance a transaction to the next workflow stage", category: "transactions", confirmRequired: true },
+  { name: "schedule_vendor", label: "Schedule Vendor", description: "Schedule a vendor for an inspection or service", category: "transactions", confirmRequired: true },
+  { name: "run_cma", label: "Run CMA", description: "Run a comparative market analysis for a property", category: "intelligence" },
+  { name: "find_comps", label: "Find Comps", description: "Find comparable properties near a target address", category: "intelligence" },
+  { name: "write_contract", label: "Write Contract", description: "Generate an LREC-compliant real estate contract", category: "contracts", confirmRequired: true },
+  { name: "send_envelope", label: "Send for Signature", description: "Create and send an AirSign signature envelope", category: "airsign", confirmRequired: true },
+  { name: "send_update", label: "Send Update", description: "Send a communication to a transaction party", category: "communications", confirmRequired: true },
+  { name: "draft_reply", label: "Draft Reply", description: "Draft a reply to an email or message", category: "communications" },
+  { name: "scan_email", label: "Scan Email", description: "Scan Gmail for deals, deadlines, and action items", category: "communications" },
+  { name: "scan_compliance", label: "Compliance Scan", description: "Check a transaction for Louisiana compliance issues", category: "compliance" },
+  { name: "classify_doc", label: "Classify Document", description: "Classify and extract data from a real estate document", category: "compliance" },
+]
