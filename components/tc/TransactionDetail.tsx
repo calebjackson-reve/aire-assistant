@@ -5,7 +5,19 @@ import { WorkflowTimeline } from "@/components/dashboard/WorkflowTimeline"
 import { WorkflowAdvance } from "@/components/dashboard/WorkflowAdvance"
 import { TransactionTimeline } from "@/components/tc/TransactionTimeline"
 import { CopilotDrawer, CopilotTrigger } from "@/components/tc/CopilotDrawer"
-import { SectionLabel, HairlineDivider } from "@/components/ui/primitives"
+import { HairlineDivider } from "@/components/ui/primitives"
+
+// Local section label — matches DESIGN.md § Label / caption spec
+function SubLabel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <p
+      className={`text-[10px] font-medium tracking-[0.15em] uppercase ${className}`}
+      style={{ color: "#6b7d52", fontFamily: "var(--font-body)" }}
+    >
+      {children}
+    </p>
+  )
+}
 import { getSmartSuggestions, type SmartSuggestion } from "@/lib/tc/smart-suggestions"
 import Link from "next/link"
 
@@ -719,7 +731,7 @@ export function TransactionDetail({ transaction: initial }: { transaction: Trans
             {activeTab === "overview" && (
               <>
                 <div className="card-glass !rounded-xl !p-5">
-                  <SectionLabel>Deal Info</SectionLabel>
+                  <SubLabel>Deal Info</SubLabel>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm mt-3">
                     <InfoField label="List Price" value={formatCurrency(txn.listPrice)} />
                     <InfoField label="Offer" value={formatCurrency(txn.offerPrice)} />
@@ -731,7 +743,7 @@ export function TransactionDetail({ transaction: initial }: { transaction: Trans
                 </div>
 
                 <div className="card-glass !rounded-xl !p-5">
-                  <SectionLabel>Parties</SectionLabel>
+                  <SubLabel>Parties</SubLabel>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm mt-3">
                     <PartyCard
                       label="Buyer" name={txn.buyerName} email={txn.buyerEmail}
@@ -761,7 +773,7 @@ export function TransactionDetail({ transaction: initial }: { transaction: Trans
                 )}
                 {completedDeadlines.length > 0 && (
                   <div className="card-glass !rounded-xl !p-5">
-                    <SectionLabel>Completed ({completedDeadlines.length})</SectionLabel>
+                    <SubLabel>Completed ({completedDeadlines.length})</SubLabel>
                     <div className="space-y-1.5 mt-3">
                       {completedDeadlines.map(d => (
                         <div key={d.id} className="flex items-center gap-3 py-1 opacity-50">
@@ -1015,7 +1027,7 @@ export function TransactionDetail({ transaction: initial }: { transaction: Trans
 
                 {!sendPreview && (
                   <div className="card-glass !rounded-xl !p-5">
-                    <SectionLabel>Send Communication</SectionLabel>
+                    <SubLabel>Send Communication</SubLabel>
                     <p className="text-xs mb-4 mt-1" style={{ color: "rgba(107, 125, 82, 0.40)" }}>
                       Pick a template. You can preview and edit before sending.
                     </p>
@@ -1043,7 +1055,7 @@ export function TransactionDetail({ transaction: initial }: { transaction: Trans
                 )}
 
                 <div className="card-glass !rounded-xl !p-5">
-                  <SectionLabel>Party Contacts</SectionLabel>
+                  <SubLabel>Party Contacts</SubLabel>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm mt-3">
                     <PartyCard label="Buyer" name={txn.buyerName} email={txn.buyerEmail} phone={txn.buyerPhone} updatedAt={txn.updatedAt} />
                     <PartyCard label="Seller" name={txn.sellerName} email={txn.sellerEmail} phone={txn.sellerPhone} updatedAt={txn.updatedAt} />
@@ -1067,7 +1079,7 @@ export function TransactionDetail({ transaction: initial }: { transaction: Trans
 
             {!["CLOSED", "CANCELLED"].includes(txn.status) && (
               <div className="card-glass !rounded-xl !p-4">
-                <SectionLabel className="mb-2">Advance Status</SectionLabel>
+                <SubLabel className="mb-2">Advance Status</SubLabel>
                 <WorkflowAdvance
                   transactionId={txn.id}
                   onAdvanced={() => window.location.reload()}
@@ -1078,7 +1090,7 @@ export function TransactionDetail({ transaction: initial }: { transaction: Trans
             <WorkflowTimeline transactionId={txn.id} />
 
             <div className="card-glass !rounded-xl !p-4">
-              <SectionLabel className="mb-3">Quick Actions</SectionLabel>
+              <SubLabel className="mb-3">Quick Actions</SubLabel>
               <div className="space-y-2">
                 <Link href="/airsign/new" className="block text-sm py-1 transition" style={{ color: "#6b7d52" }}>
                   Create &amp; send in AirSign
