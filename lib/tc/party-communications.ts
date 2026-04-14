@@ -58,6 +58,8 @@ export interface SendResult {
   role: PartyRole
   emailSent: boolean
   smsSent: boolean
+  smsSkipped?: boolean
+  smsSkipReason?: string
   emailError?: string
   smsError?: string
 }
@@ -287,12 +289,18 @@ export function generateMessage(
 
 /**
  * Send a templated communication to a party via email + SMS.
+ *
+ * TCPA note: when `userId` is supplied, SMS is routed through
+ * `sendSmsWithConsent` and is silently skipped if no active ClientConsent row
+ * exists for (userId, party.phone, SMS). Legacy callers without userId still
+ * work for email, but SMS will be skipped with `smsSkipReason: "NO_USER_CTX"`.
  */
 export async function sendPartyUpdate(
   type: TemplateType,
   ctx: TemplateContext,
   to: PartyInfo,
-  transactionId?: string
+  transactionId?: string,
+  userId?: string
 ): Promise<SendResult> {
   const msg = generateMessage(type, ctx, to)
   const result: SendResult = { party: to.name, role: to.role, emailSent: false, smsSent: false }
@@ -304,9 +312,21 @@ export async function sendPartyUpdate(
   }
 
   if (to.phone) {
-    const smsRes = await sendSms(to.phone, msg.smsBody)
-    result.smsSent = smsRes.ok
-    result.smsError = smsRes.error
+    if (!userId) {
+      result.smsSkipped = true
+      result.smsSkipReason = "NO_USER_CTX"
+      console.warn(`[TC Comms] SMS skipped — no userId passed for consent check`)
+    } else {
+      const { sendSmsWithConsent } = await import("@/lib/consent")
+      const smsRes = await sendSmsWithConsent({ userId, to: to.phone, body: msg.smsBody })
+      if (smsRes.skipped) {
+        result.smsSkipped = true
+        result.smsSkipReason = smsRes.reason
+      } else {
+        result.smsSent = smsRes.ok
+        result.smsError = smsRes.error
+      }
+    }
   }
 
   // Log to WorkflowEvent for transaction timeline
@@ -345,11 +365,13 @@ export async function sendPartyUpdate(
 export async function notifyAllParties(
   type: TemplateType,
   ctx: TemplateContext,
-  parties: PartyInfo[]
+  parties: PartyInfo[],
+  transactionId?: string,
+  userId?: string
 ): Promise<SendResult[]> {
   const results: SendResult[] = []
   for (const party of parties) {
-    const r = await sendPartyUpdate(type, ctx, party)
+    const r = await sendPartyUpdate(type, ctx, party, transactionId, userId)
     results.push(r)
   }
   return results

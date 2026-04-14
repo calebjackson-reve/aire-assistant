@@ -38,63 +38,63 @@ enum ComplianceStatus {
 }
 
 model User {
-  id              String    @id @default(cuid())
-  clerkId         String    @unique
-  email           String    @unique
-  firstName       String?
-  lastName        String?
-  tier            Tier      @default(FREE)
-  stripeCustomerId String?  @unique
-  subscriptionId  String?
+  id                 String  @id @default(cuid())
+  clerkId            String  @unique
+  email              String  @unique
+  firstName          String?
+  lastName           String?
+  tier               Tier    @default(FREE)
+  stripeCustomerId   String? @unique
+  subscriptionId     String?
   subscriptionStatus String?
 
   // Trial state — managed by Stripe checkout with trial_period_days
-  trialStartedAt  DateTime?
-  trialEndsAt     DateTime?
+  trialStartedAt DateTime?
+  trialEndsAt    DateTime?
 
   // Onboarding (Day One)
-  onboarded               Boolean   @default(false)
-  onboardedAt             DateTime?
-  onboardingData          Json?
-  avatarUrl               String?
-  brokerageName           String?
-  licenseNumber           String?
-  defaultCommissionSplit  Decimal?
-  preferredTitleCompany   String?
-  signatureData           String?   @db.Text
-  voiceProfile            Json?     // extracted writing-style profile for AI reply tone matching
+  onboarded              Boolean   @default(false)
+  onboardedAt            DateTime?
+  onboardingData         Json?
+  avatarUrl              String?
+  brokerageName          String?
+  licenseNumber          String?
+  defaultCommissionSplit Decimal?
+  preferredTitleCompany  String?
+  signatureData          String?   @db.Text
+  voiceProfile           Json? // extracted writing-style profile for AI reply tone matching
 
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  transactions    Transaction[]
-  deadlines       Deadline[]
-  voiceCommands   VoiceCommand[]
-  documentMemories DocumentMemory[]
-  contacts        Contact[]
+  transactions          Transaction[]
+  deadlines             Deadline[]
+  voiceCommands         VoiceCommand[]
+  documentMemories      DocumentMemory[]
+  contacts              Contact[]
   relationshipIntelLogs RelationshipIntelLog[]
-  morningBriefs   MorningBrief[]
-  airSignEnvelopes AirSignEnvelope[]
-  emailAccounts   EmailAccount[]
-  communicationLogs CommunicationLog[]
-  missedCallLogs  MissedCallLog[]
-  vendors         Vendor[]
-  contentCampaigns ContentCampaign[]
-  cmaAnalyses     CMAAnalysis[]
-  leadScoreLogs   LeadScoreLog[]
-  kpiLogs         KPILog[]
-  dealHealthLogs  DealHealthLog[]
-  complianceAuditLogs ComplianceAuditLog[]
-  pricingAnalysisLogs PricingAnalysisLog[]
-  negotiationLogs NegotiationLog[]
-  agentRuns       AgentRun[]
-  feedbackLogs    FeedbackLog[]
-  errorMemories   ErrorMemory[]
-  managedSessions ManagedAgentSession[]
-  compSets        CompSet[]
-  tcsSessions     TCSSession[]
-  brokerageMembership BrokerageMember?
-  conversionEvents ConversionEvent[]
+  morningBriefs         MorningBrief[]
+  airSignEnvelopes      AirSignEnvelope[]
+  emailAccounts         EmailAccount[]
+  communicationLogs     CommunicationLog[]
+  missedCallLogs        MissedCallLog[]
+  vendors               Vendor[]
+  contentCampaigns      ContentCampaign[]
+  cmaAnalyses           CMAAnalysis[]
+  leadScoreLogs         LeadScoreLog[]
+  kpiLogs               KPILog[]
+  dealHealthLogs        DealHealthLog[]
+  complianceAuditLogs   ComplianceAuditLog[]
+  pricingAnalysisLogs   PricingAnalysisLog[]
+  negotiationLogs       NegotiationLog[]
+  agentRuns             AgentRun[]
+  feedbackLogs          FeedbackLog[]
+  errorMemories         ErrorMemory[]
+  managedSessions       ManagedAgentSession[]
+  compSets              CompSet[]
+  tcsSessions           TCSSession[]
+  brokerageMembership   BrokerageMember?
+  conversionEvents      ConversionEvent[]
 
   // v2 AirSign
   airSignTemplates           AirSignTemplate[]
@@ -102,115 +102,119 @@ model User {
   complianceReviewsAssigned  ComplianceReview[] @relation("ComplianceReviewer")
   bulkSendBatches            BulkSendBatch[]
   loopImports                LoopImport[]
+
+  // Client-contact consent log (TCPA gate for SMS + voice)
+  clientConsents ClientConsent[]
 }
 
 // ============== PHASE 2: Transaction Core ==============
 
 model Transaction {
-  id                String            @id @default(cuid())
-  userId            String
-  user              User              @relation(fields: [userId], references: [id])
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 
   // Property info
-  propertyAddress   String
-  propertyCity      String            @default("Baton Rouge")
-  propertyState     String            @default("LA")
-  propertyZip       String?
-  propertyType      String?           // residential, commercial, land
-  mlsNumber         String?
+  propertyAddress String
+  propertyCity    String  @default("Baton Rouge")
+  propertyState   String  @default("LA")
+  propertyZip     String?
+  propertyType    String? // residential, commercial, land
+  mlsNumber       String?
 
   // Deal info
-  listPrice         Float?
-  offerPrice        Float?
-  acceptedPrice     Float?
-  status            TransactionStatus  @default(DRAFT)
-  complianceStatus  ComplianceStatus   @default(PENDING)
+  listPrice        Float?
+  offerPrice       Float?
+  acceptedPrice    Float?
+  status           TransactionStatus @default(DRAFT)
+  complianceStatus ComplianceStatus  @default(PENDING)
 
   // Parties
-  buyerName         String?
-  buyerEmail        String?
-  buyerPhone        String?
-  sellerName        String?
-  sellerEmail       String?
-  sellerPhone       String?
-  lenderName        String?
-  titleCompany      String?
+  buyerName    String?
+  buyerEmail   String?
+  buyerPhone   String?
+  sellerName   String?
+  sellerEmail  String?
+  sellerPhone  String?
+  lenderName   String?
+  titleCompany String?
 
   // Key dates
-  contractDate      DateTime?
+  contractDate       DateTime?
   inspectionDeadline DateTime?
   appraisalDeadline  DateTime?
   financingDeadline  DateTime?
   closingDate        DateTime?
 
   // Dotloop integration
-  dotloopLoopId     String?
+  dotloopLoopId String?
 
   // MLS Paragon Listing Fields
-  taxId              String?
-  lotNumber          String?
-  lotDimensions      String?
-  acres              Decimal?
-  bedroomCount       Int?
-  bathroomsFull      Int?
-  bathroomsHalf      Int?
-  sqftLiving         Int?
-  sqftLower          Int?
-  sqftTotal          Int?
-  sqftSource         String?   // "APPRAISAL" | "ASSESSMENT" | "MEASURED"
-  stories            Int?
-  approxAge          String?
-  schoolSystem       String?
-  subdivision        String?
-  yearBuilt          Int?
+  taxId         String?
+  lotNumber     String?
+  lotDimensions String?
+  acres         Decimal?
+  bedroomCount  Int?
+  bathroomsFull Int?
+  bathroomsHalf Int?
+  sqftLiving    Int?
+  sqftLower     Int?
+  sqftTotal     Int?
+  sqftSource    String? // "APPRAISAL" | "ASSESSMENT" | "MEASURED"
+  stories       Int?
+  approxAge     String?
+  schoolSystem  String?
+  subdivision   String?
+  yearBuilt     Int?
 
   // Property Features
-  featureCooling     String?
-  featureHeating     String?
-  featureFoundation  String?
-  featureSiding      String?
-  featureStyle       String?
-  featureParking     String?
-  featureUtilGas     String?
-  featureUtilElec    String?
-  featureWaterSewer  String?
-  mineralRights      String?   // "INCLUDED" | "EXCLUDED" | "NEGOTIABLE"
+  featureCooling    String?
+  featureHeating    String?
+  featureFoundation String?
+  featureSiding     String?
+  featureStyle      String?
+  featureParking    String?
+  featureUtilGas    String?
+  featureUtilElec   String?
+  featureWaterSewer String?
+  mineralRights     String? // "INCLUDED" | "EXCLUDED" | "NEGOTIABLE"
 
   // Listing metadata
-  occupiedBy         String?
-  listType           String?
-  limitedService     Boolean?
+  occupiedBy          String?
+  listType            String?
+  limitedService      Boolean?
   showingInstructions String?
-  mlsSource          String?   // "PARAGON" | "APPRAISAL_EXTRACT" | "OLD_LISTING"
-  mlsLastSyncedAt    DateTime?
+  mlsSource           String? // "PARAGON" | "APPRAISAL_EXTRACT" | "OLD_LISTING"
+  mlsLastSyncedAt     DateTime?
 
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  deadlines         Deadline[]
-  documents         Document[]
-  voiceCommands     VoiceCommand[]
-  documentMemories  DocumentMemory[]
-  workflowEvents    WorkflowEvent[]
-  contentCampaigns  ContentCampaign[]
-  domProjections    DOMProjection[]
-  dealHealthLogs    DealHealthLog[]
+  deadlines           Deadline[]
+  documents           Document[]
+  voiceCommands       VoiceCommand[]
+  documentMemories    DocumentMemory[]
+  workflowEvents      WorkflowEvent[]
+  contentCampaigns    ContentCampaign[]
+  domProjections      DOMProjection[]
+  dealHealthLogs      DealHealthLog[]
   complianceAuditLogs ComplianceAuditLog[]
-  negotiationLogs   NegotiationLog[]
-  tcsSessions       TCSSession[]
+  negotiationLogs     NegotiationLog[]
+  tcsSessions         TCSSession[]
+  clientConsents      ClientConsent[]
 
   // Multi-tenant
-  brokerageId       String?
-  brokerage         Brokerage?        @relation(fields: [brokerageId], references: [id], onDelete: SetNull)
-  officeId          String?
-  office            Office?           @relation(fields: [officeId], references: [id], onDelete: SetNull)
-  teamId            String?
-  assignedTcId      String?
+  brokerageId  String?
+  brokerage    Brokerage? @relation(fields: [brokerageId], references: [id], onDelete: SetNull)
+  officeId     String?
+  office       Office?    @relation(fields: [officeId], references: [id], onDelete: SetNull)
+  teamId       String?
+  assignedTcId String?
 
   // v2: Loop Data Model — canonical data blob. Keys defined in lib/airsign/v2/data-keys.ts
-  loopData          Json?
+  loopData Json?
 
-  archivedAt        DateTime?
+  archivedAt DateTime?
 
   @@index([userId])
   @@index([brokerageId])
@@ -226,8 +230,8 @@ model WorkflowEvent {
   transaction   Transaction @relation(fields: [transactionId], references: [id])
   fromStatus    String?
   toStatus      String
-  trigger       String      // "document_uploaded" | "deadline_passed" | "deadline_completed" | "manual" | "voice_command" | "system"
-  triggeredBy   String?     // userId or "system"
+  trigger       String // "document_uploaded" | "deadline_passed" | "deadline_completed" | "manual" | "voice_command" | "system"
+  triggeredBy   String? // userId or "system"
   metadata      Json?
   createdAt     DateTime    @default(now())
 
@@ -235,49 +239,49 @@ model WorkflowEvent {
 }
 
 model Deadline {
-  id              String      @id @default(cuid())
-  userId          String
-  user            User        @relation(fields: [userId], references: [id])
-  transactionId   String
-  transaction     Transaction @relation(fields: [transactionId], references: [id])
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
 
-  name            String      // e.g., "Inspection Deadline", "Financing Contingency"
-  dueDate         DateTime
-  alertSent              Boolean     @default(false)
-  completedAt            DateTime?
-  notes                  String?
-  googleCalendarEventId  String?     // GWS: synced Calendar event ID
+  name                  String // e.g., "Inspection Deadline", "Financing Contingency"
+  dueDate               DateTime
+  alertSent             Boolean   @default(false)
+  completedAt           DateTime?
+  notes                 String?
+  googleCalendarEventId String? // GWS: synced Calendar event ID
 
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId, dueDate])
   @@index([dueDate, alertSent])
 }
 
 model Document {
-  id              String      @id @default(cuid())
-  transactionId   String?
-  transaction     Transaction? @relation(fields: [transactionId], references: [id])
+  id            String       @id @default(cuid())
+  transactionId String?
+  transaction   Transaction? @relation(fields: [transactionId], references: [id])
 
   name            String
-  type            String      // purchase_agreement, property_disclosure, agency_disclosure, lead_paint, inspection_response, addendum, amendment, disclosure, contract
-  category        String?     // mandatory, addendum, federal, broker
+  type            String // purchase_agreement, property_disclosure, agency_disclosure, lead_paint, inspection_response, addendum, amendment, disclosure, contract
+  category        String? // mandatory, addendum, federal, broker
   templateId      String?
-  filledData      Json?       // AI-extracted field values
-  extractedText   String?     // Raw text extracted from PDF
-  classification  Json?       // AI classification result with confidence
-  fileUrl         String?     // Path or URL to uploaded file
+  filledData      Json? // AI-extracted field values
+  extractedText   String? // Raw text extracted from PDF
+  classification  Json? // AI classification result with confidence
+  fileUrl         String? // Path or URL to uploaded file
   fileSize        Int?
   pageCount       Int?
   dotloopDocId    String?
-  signatureStatus String?     // draft, sent, signed, declined
-  checklistStatus String?     // missing, uploaded, extracted, verified
-  driveFileId     String?     // GWS: Google Drive file ID after upload
-  driveFolderPath String?     // GWS: Drive folder path e.g. "AIRE Transactions/123 Main St"
+  signatureStatus String? // draft, sent, signed, declined
+  checklistStatus String? // missing, uploaded, extracted, verified
+  driveFileId     String? // GWS: Google Drive file ID after upload
+  driveFolderPath String? // GWS: Drive folder path e.g. "AIRE Transactions/123 Main St"
 
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([transactionId])
 }
@@ -293,36 +297,36 @@ enum DocumentMemoryStatus {
 }
 
 model DocumentMemory {
-  id                String               @id @default(cuid())
-  userId            String
-  user              User                 @relation(fields: [userId], references: [id])
-  transactionId     String?
-  transaction       Transaction?         @relation(fields: [transactionId], references: [id])
+  id            String       @id @default(cuid())
+  userId        String
+  user          User         @relation(fields: [userId], references: [id])
+  transactionId String?
+  transaction   Transaction? @relation(fields: [transactionId], references: [id])
 
   // Document fingerprint
-  fileHash          String               // SHA-256 of file content
-  fileName          String
-  fileSize          Int
-  pageCount         Int?
+  fileHash  String // SHA-256 of file content
+  fileName  String
+  fileSize  Int
+  pageCount Int?
 
   // Classification result
-  classifiedType    String
-  classifiedConf    Float
-  formNumber        String?
-  extractionMethod  String?
+  classifiedType   String
+  classifiedConf   Float
+  formNumber       String?
+  extractionMethod String?
 
   // Extracted fields snapshot
-  extractedFields   Json?
+  extractedFields Json?
 
   // Learning/feedback state
-  status            DocumentMemoryStatus @default(AUTO_FILED)
-  correctedType     String?
-  correctedBy       String?
-  correctedAt       DateTime?
-  correctionNotes   String?
+  status          DocumentMemoryStatus @default(AUTO_FILED)
+  correctedType   String?
+  correctedBy     String?
+  correctedAt     DateTime?
+  correctionNotes String?
 
-  createdAt         DateTime             @default(now())
-  updatedAt         DateTime             @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([fileHash])
   @@index([classifiedType])
@@ -331,20 +335,20 @@ model DocumentMemory {
 }
 
 model VoiceCommand {
-  id              String       @id @default(cuid())
-  userId          String
-  user            User         @relation(fields: [userId], references: [id])
-  transactionId   String?
-  transaction     Transaction? @relation(fields: [transactionId], references: [id])
+  id            String       @id @default(cuid())
+  userId        String
+  user          User         @relation(fields: [userId], references: [id])
+  transactionId String?
+  transaction   Transaction? @relation(fields: [transactionId], references: [id])
 
-  rawTranscript   String
-  parsedIntent    String?
-  parsedEntities  Json?
-  confidence      Float?
-  result          Json?
-  status          String       @default("pending") // pending, processing, completed, failed
+  rawTranscript  String
+  parsedIntent   String?
+  parsedEntities Json?
+  confidence     Float?
+  result         Json?
+  status         String  @default("pending") // pending, processing, completed, failed
 
-  createdAt       DateTime     @default(now())
+  createdAt DateTime @default(now())
 }
 
 // ============== Consensus Engine ==============
@@ -367,45 +371,45 @@ model ConsensusLog {
 // ============== Relationship Intelligence ==============
 
 model Contact {
-  id               String    @id @default(cuid())
-  agentId          String
-  firstName        String
-  lastName         String
-  email            String?
-  phone            String?
-  type             String    @default("LEAD")      // LEAD | BUYER | SELLER | PAST_CLIENT | REFERRAL_SOURCE | VENDOR
-  source           String?                         // how they came in: zillow | referral | open_house | sign_call | etc
-  notes            String?
+  id        String  @id @default(cuid())
+  agentId   String
+  firstName String
+  lastName  String
+  email     String?
+  phone     String?
+  type      String  @default("LEAD") // LEAD | BUYER | SELLER | PAST_CLIENT | REFERRAL_SOURCE | VENDOR
+  source    String? // how they came in: zillow | referral | open_house | sign_call | etc
+  notes     String?
 
   // Address / property context
-  neighborhood     String?
-  parish           String?
-  currentAddress   String?
-  priceRange       String?                         // "$200K-$300K"
-  timeline         String?                         // "60-90 days", "just looking"
+  neighborhood   String?
+  parish         String?
+  currentAddress String?
+  priceRange     String? // "$200K-$300K"
+  timeline       String? // "60-90 days", "just looking"
 
   // Relationship tracking
-  lastContactedAt  DateTime?
-  lastResponseAt   DateTime?
-  contactCount     Int       @default(0)
-  responseCount    Int       @default(0)
-  tags             String[]
+  lastContactedAt DateTime?
+  lastResponseAt  DateTime?
+  contactCount    Int       @default(0)
+  responseCount   Int       @default(0)
+  tags            String[]
 
   // AI scoring
-  relationshipScore Int      @default(50)          // 0-100, updated weekly
-  lastScoredAt     DateTime?
-  scoreReason      String?
+  relationshipScore Int       @default(50) // 0-100, updated weekly
+  lastScoredAt      DateTime?
+  scoreReason       String?
 
   // Lifecycle
-  convertedAt      DateTime?
-  transactionId    String?
+  convertedAt   DateTime?
+  transactionId String?
 
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user             User    @relation(fields: [agentId], references: [id])
-  intelLogs        RelationshipIntelLog[]
-  leadScoreLogs    LeadScoreLog[]
+  user          User                   @relation(fields: [agentId], references: [id])
+  intelLogs     RelationshipIntelLog[]
+  leadScoreLogs LeadScoreLog[]
 
   @@index([agentId, relationshipScore])
   @@index([agentId, lastContactedAt])
@@ -419,7 +423,7 @@ model Vendor {
   userId    String
   name      String
   company   String?
-  category  String   // inspector, appraiser, title, surveyor, pest, other
+  category  String // inspector, appraiser, title, surveyor, pest, other
   phone     String?
   email     String?
   notes     String?
@@ -427,22 +431,22 @@ model Vendor {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user      User     @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 
   @@index([userId, category])
 }
 
 model RelationshipIntelLog {
-  id               String   @id @default(cuid())
-  agentId          String
-  contactId        String
-  runDate          DateTime @default(now())
+  id        String   @id @default(cuid())
+  agentId   String
+  contactId String
+  runDate   DateTime @default(now())
 
   // Individual agent scores (0-100 each)
-  behavioralScore  Int
-  lifeEventScore   Int
+  behavioralScore   Int
+  lifeEventScore    Int
   marketTimingScore Int
-  recencyScore     Int
+  recencyScore      Int
 
   // Synthesis
   finalScore       Int
@@ -453,13 +457,13 @@ model RelationshipIntelLog {
   priority         String
 
   // Consensus metadata
-  consensusAgreed  Boolean  @default(false)
-  consensusLogId   String?
+  consensusAgreed Boolean @default(false)
+  consensusLogId  String?
 
-  createdAt        DateTime @default(now())
+  createdAt DateTime @default(now())
 
-  user             User     @relation(fields: [agentId], references: [id])
-  contact          Contact  @relation(fields: [contactId], references: [id])
+  user    User    @relation(fields: [agentId], references: [id])
+  contact Contact @relation(fields: [contactId], references: [id])
 
   @@index([agentId, runDate])
   @@index([agentId, finalScore])
@@ -468,33 +472,33 @@ model RelationshipIntelLog {
 // ============== Morning Brief ==============
 
 model MorningBrief {
-  id              String   @id @default(cuid())
-  userId          String
-  user            User     @relation(fields: [userId], references: [id])
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 
-  briefDate       DateTime @db.Date
-  status          String   @default("pending") // pending, approved, dismissed
+  briefDate DateTime @db.Date
+  status    String   @default("pending") // pending, approved, dismissed
 
   // Researcher outputs (raw JSON from each researcher)
-  deadlineData    Json?
-  pipelineData    Json?
-  contactData     Json?
+  deadlineData Json?
+  pipelineData Json?
+  contactData  Json?
 
   // QA validation
-  qaFlags         Json?    // Fair Housing flags, LREC compliance issues
-  qaPassedAt      DateTime?
+  qaFlags    Json? // Fair Housing flags, LREC compliance issues
+  qaPassedAt DateTime?
 
   // Synthesized brief (Claude output)
-  summary         String?  // The actual morning brief text
-  actionItems     Json?    // Structured action items for UI buttons
+  summary     String? // The actual morning brief text
+  actionItems Json? // Structured action items for UI buttons
 
   // Human approval gate
-  approvedAt      DateTime?
-  approvedBy      String?  // clerkId of approver
-  dismissedAt     DateTime?
+  approvedAt  DateTime?
+  approvedBy  String? // clerkId of approver
+  dismissedAt DateTime?
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([userId, briefDate])
   @@index([userId, status])
@@ -568,40 +572,40 @@ enum ComplianceReviewStatus {
 }
 
 model AirSignEnvelope {
-  id              String         @id @default(cuid())
-  userId          String
-  user            User           @relation(fields: [userId], references: [id])
-  transactionId   String?
+  id            String  @id @default(cuid())
+  userId        String
+  user          User    @relation(fields: [userId], references: [id])
+  transactionId String?
 
   // v2: brokerage tenancy (nullable for backwards compat with pre-v2 envelopes)
-  brokerageId     String?
-  brokerage       Brokerage?     @relation(fields: [brokerageId], references: [id], onDelete: SetNull)
-  officeId        String?
-  office          Office?        @relation(fields: [officeId], references: [id], onDelete: SetNull)
+  brokerageId String?
+  brokerage   Brokerage? @relation(fields: [brokerageId], references: [id], onDelete: SetNull)
+  officeId    String?
+  office      Office?    @relation(fields: [officeId], references: [id], onDelete: SetNull)
 
-  name            String         // e.g., "Purchase Agreement - 123 Main St"
-  status          EnvelopeStatus @default(DRAFT)
-  documentUrl     String?        // Vercel Blob URL for the PDF
-  pageCount       Int?
+  name        String // e.g., "Purchase Agreement - 123 Main St"
+  status      EnvelopeStatus @default(DRAFT)
+  documentUrl String? // Vercel Blob URL for the PDF
+  pageCount   Int?
 
   // v2: sender options captured at send time
-  customMessage   String?        @db.Text
-  attachPdf       Boolean        @default(false)
+  customMessage String? @db.Text
+  attachPdf     Boolean @default(false)
 
   // v2: Loop Data Model snapshot at envelope creation — pre-fills TEXT/DATE/NAME fields via template dataBindings
   loopDataSnapshot Json?
 
   // v2: compliance gate
-  requiresReview  Boolean        @default(false)
+  requiresReview Boolean @default(false)
 
   // v2: provenance — which template this envelope was instantiated from (null for direct PDF uploads)
-  templateId      String?
-  template        AirSignTemplate? @relation("EnvelopeTemplate", fields: [templateId], references: [id], onDelete: SetNull)
+  templateId             String?
+  template               AirSignTemplate? @relation("EnvelopeTemplate", fields: [templateId], references: [id], onDelete: SetNull)
   templateInstantiatedAt DateTime?
 
   // v2: bulk-send batch grouping (one template → many envelopes)
   bulkSendBatchId String?
-  bulkSendBatch   BulkSendBatch?   @relation(fields: [bulkSendBatchId], references: [id], onDelete: SetNull)
+  bulkSendBatch   BulkSendBatch? @relation(fields: [bulkSendBatchId], references: [id], onDelete: SetNull)
 
   // v2: brokerage AirSign settings snapshot — frozen at send-time so branding is stable
   brokerageSettingsId String?
@@ -611,24 +615,24 @@ model AirSignEnvelope {
   requireAuthMethod SignerAuthMethod?
 
   // v2: Dotloop import link (null for non-imported envelopes)
-  loopImportId    String?
-  loopImport      LoopImport?     @relation(fields: [loopImportId], references: [id], onDelete: SetNull)
+  loopImportId String?
+  loopImport   LoopImport? @relation(fields: [loopImportId], references: [id], onDelete: SetNull)
 
   // Delivery
-  sentAt          DateTime?
-  completedAt     DateTime?
-  expiresAt       DateTime?
-  voidedAt        DateTime?
-  voidReason      String?
-  archivedAt      DateTime?
+  sentAt      DateTime?
+  completedAt DateTime?
+  expiresAt   DateTime?
+  voidedAt    DateTime?
+  voidReason  String?
+  archivedAt  DateTime?
 
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  signers         AirSignSigner[]
-  fields          AirSignField[]
-  auditEvents     AirSignAuditEvent[]
-  reminders       AirSignReminder[]
+  signers          AirSignSigner[]
+  fields           AirSignField[]
+  auditEvents      AirSignAuditEvent[]
+  reminders        AirSignReminder[]
   complianceReview ComplianceReview?
 
   @@index([userId, status])
@@ -638,91 +642,91 @@ model AirSignEnvelope {
 }
 
 model AirSignSigner {
-  id              String         @id @default(cuid())
-  envelopeId      String
-  envelope        AirSignEnvelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+  id         String          @id @default(cuid())
+  envelopeId String
+  envelope   AirSignEnvelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
 
-  name            String
-  email           String
-  phone           String?
-  role            String         @default("SIGNER") // SIGNER, WITNESS, NOTARY, CC
-  order           Int            @default(1)        // signing order
-  signingOrder    Int            @default(0)        // sequential signing gate: lowest value signs first
+  name         String
+  email        String
+  phone        String?
+  role         String  @default("SIGNER") // SIGNER, WITNESS, NOTARY, CC
+  order        Int     @default(1) // signing order
+  signingOrder Int     @default(0) // sequential signing gate: lowest value signs first
 
   // v2: per-recipient permission + auth
-  permission      SignerPermission @default(CAN_SIGN)
-  authMethod      SignerAuthMethod @default(EMAIL_LINK)
-  authSecret      String?        // hashed OTP target / access-code hash
-  authVerifiedAt  DateTime?      // session-level verification timestamp
-  otpAttempts     Int            @default(0)
-  kbaProviderRef  String?        // Persona/Jumio inquiry id
+  permission     SignerPermission @default(CAN_SIGN)
+  authMethod     SignerAuthMethod @default(EMAIL_LINK)
+  authSecret     String? // hashed OTP target / access-code hash
+  authVerifiedAt DateTime? // session-level verification timestamp
+  otpAttempts    Int              @default(0)
+  kbaProviderRef String? // Persona/Jumio inquiry id
 
   // Signing state
-  token           String         @unique @default(cuid()) // unique link token for /sign/[token]
-  tokenExpiresAt  DateTime?      // per-signer token expiration (default +14d on create)
-  viewedAt        DateTime?
-  signedAt        DateTime?
-  declinedAt      DateTime?
-  declineReason   String?
-  ipAddress       String?
-  userAgent       String?
+  token          String    @unique @default(cuid()) // unique link token for /sign/[token]
+  tokenExpiresAt DateTime? // per-signer token expiration (default +14d on create)
+  viewedAt       DateTime?
+  signedAt       DateTime?
+  declinedAt     DateTime?
+  declineReason  String?
+  ipAddress      String?
+  userAgent      String?
 
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  fields          AirSignField[]
-  auditEvents     AirSignAuditEvent[]
+  fields      AirSignField[]
+  auditEvents AirSignAuditEvent[]
 
   @@index([envelopeId])
   @@index([token])
 }
 
 model AirSignField {
-  id              String         @id @default(cuid())
-  envelopeId      String
-  envelope        AirSignEnvelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
-  signerId        String?
-  signer          AirSignSigner?  @relation(fields: [signerId], references: [id], onDelete: SetNull)
+  id         String          @id @default(cuid())
+  envelopeId String
+  envelope   AirSignEnvelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+  signerId   String?
+  signer     AirSignSigner?  @relation(fields: [signerId], references: [id], onDelete: SetNull)
 
-  type            FieldType      @default(SIGNATURE)
-  label           String?
-  required        Boolean        @default(true)
+  type     FieldType @default(SIGNATURE)
+  label    String?
+  required Boolean   @default(true)
 
   // Position on page (percentage-based for responsiveness)
-  page            Int            @default(1)
-  xPercent        Float          // 0-100, left edge
-  yPercent        Float          // 0-100, top edge
-  widthPercent    Float          // 0-100
-  heightPercent   Float          // 0-100
+  page          Int   @default(1)
+  xPercent      Float // 0-100, left edge
+  yPercent      Float // 0-100, top edge
+  widthPercent  Float // 0-100
+  heightPercent Float // 0-100
 
   // Value after signing
-  value           String?
-  filledAt        DateTime?
+  value    String?
+  filledAt DateTime?
 
   // v2: data-key binding to Loop Data Model (null for pure signer fields)
-  dataKey         String?        // e.g., "loop.property.street"
-  options         Json?          // RADIO/DROPDOWN choices: ["Yes", "No", "N/A"]
+  dataKey String? // e.g., "loop.property.street"
+  options Json? // RADIO/DROPDOWN choices: ["Yes", "No", "N/A"]
 
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([envelopeId, page])
   @@index([signerId])
 }
 
 model AirSignAuditEvent {
-  id              String         @id @default(cuid())
-  envelopeId      String
-  envelope        AirSignEnvelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
-  signerId        String?
-  signer          AirSignSigner?  @relation(fields: [signerId], references: [id], onDelete: SetNull)
+  id         String          @id @default(cuid())
+  envelopeId String
+  envelope   AirSignEnvelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+  signerId   String?
+  signer     AirSignSigner?  @relation(fields: [signerId], references: [id], onDelete: SetNull)
 
-  action          String         // created, sent, viewed, signed, declined, voided, completed, resent
-  ipAddress       String?
-  userAgent       String?
-  metadata        Json?
+  action    String // created, sent, viewed, signed, declined, voided, completed, resent
+  ipAddress String?
+  userAgent String?
+  metadata  Json?
 
-  createdAt       DateTime       @default(now())
+  createdAt DateTime @default(now())
 
   @@index([envelopeId, createdAt])
 }
@@ -734,7 +738,7 @@ model EmailAccount {
   userId       String
   user         User      @relation(fields: [userId], references: [id])
   email        String
-  provider     String    // "gmail" | "outlook"
+  provider     String // "gmail" | "outlook"
   accessToken  String?   @db.Text
   refreshToken String?   @db.Text
   tokenExpiry  DateTime?
@@ -743,26 +747,26 @@ model EmailAccount {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
-  scans        EmailScan[]
+  scans EmailScan[]
 
   @@unique([userId, email])
   @@index([userId, isActive])
 }
 
 model EmailScan {
-  id               String         @id @default(cuid())
+  id               String       @id @default(cuid())
   accountId        String
-  account          EmailAccount   @relation(fields: [accountId], references: [id])
-  scanStart        DateTime       @default(now())
+  account          EmailAccount @relation(fields: [accountId], references: [id])
+  scanStart        DateTime     @default(now())
   scanEnd          DateTime?
-  emailsScanned    Int            @default(0)
-  attachmentsFound Int            @default(0)
-  documentsCreated Int            @default(0)
-  status           String         @default("running") // running | complete | failed
-  error            String?        @db.Text
-  createdAt        DateTime       @default(now())
+  emailsScanned    Int          @default(0)
+  attachmentsFound Int          @default(0)
+  documentsCreated Int          @default(0)
+  status           String       @default("running") // running | complete | failed
+  error            String?      @db.Text
+  createdAt        DateTime     @default(now())
 
-  attachments      EmailAttachment[]
+  attachments EmailAttachment[]
 
   @@index([accountId, createdAt])
 }
@@ -790,8 +794,8 @@ model EmailAttachment {
 
 model AgentActivity {
   id        String   @id @default(cuid())
-  agent     String   // "agent-1" | "agent-2" | "agent-3" | "agent-4"
-  action    String   // "phase_complete" | "error" | "blocker" | "metric" | "started" | "idle"
+  agent     String // "agent-1" | "agent-2" | "agent-3" | "agent-4"
+  action    String // "phase_complete" | "error" | "blocker" | "metric" | "started" | "idle"
   phase     Int?
   message   String   @db.Text
   metadata  Json?
@@ -804,7 +808,7 @@ model AgentActivity {
 
 model BuildMetric {
   id        String   @id @default(cuid())
-  name      String   // "api_routes" | "type_errors" | "build_time" | "phase_progress"
+  name      String // "api_routes" | "type_errors" | "build_time" | "phase_progress"
   value     Float
   agent     String?
   metadata  Json?
@@ -816,25 +820,25 @@ model BuildMetric {
 // ============== COMMUNICATION MONITOR ==============
 
 model CommunicationLog {
-  id              String    @id @default(cuid())
-  userId          String
-  user            User      @relation(fields: [userId], references: [id])
-  contactId       String?
-  channel         String    // "email" | "sms" | "call"
-  direction       String    // "inbound" | "outbound"
-  externalId      String?   // Gmail message ID, Twilio SID, etc.
-  threadId        String?   // Gmail thread ID for grouping
-  fromAddress     String    // email, phone number
-  toAddress       String
-  subject         String?
-  bodyPreview     String?   @db.Text
-  sentAt          DateTime
-  status          String    @default("delivered") // "delivered" | "read" | "replied" | "missed" | "unanswered"
-  respondedAt     DateTime?
-  responseLogId   String?   // ID of the reply CommunicationLog
-  draftReply      String?   @db.Text
-  metadata        Json?
-  createdAt       DateTime  @default(now())
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  contactId     String?
+  channel       String // "email" | "sms" | "call"
+  direction     String // "inbound" | "outbound"
+  externalId    String? // Gmail message ID, Twilio SID, etc.
+  threadId      String? // Gmail thread ID for grouping
+  fromAddress   String // email, phone number
+  toAddress     String
+  subject       String?
+  bodyPreview   String?   @db.Text
+  sentAt        DateTime
+  status        String    @default("delivered") // "delivered" | "read" | "replied" | "missed" | "unanswered"
+  respondedAt   DateTime?
+  responseLogId String? // ID of the reply CommunicationLog
+  draftReply    String?   @db.Text
+  metadata      Json?
+  createdAt     DateTime  @default(now())
 
   @@unique([externalId])
   @@index([userId, status, sentAt])
@@ -844,17 +848,17 @@ model CommunicationLog {
 }
 
 model MissedCallLog {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
   callerPhone String
   callerName  String?
   contactId   String?
   callTime    DateTime
-  duration    Int      @default(0) // seconds, 0 = missed
-  returned    Boolean  @default(false)
+  duration    Int       @default(0) // seconds, 0 = missed
+  returned    Boolean   @default(false)
   returnedAt  DateTime?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
 
   @@index([userId, returned, callTime])
 }
@@ -871,35 +875,35 @@ enum ContentStatus {
 }
 
 model ContentCampaign {
-  id               String        @id @default(cuid())
-  userId           String
-  user             User          @relation(fields: [userId], references: [id])
-  transactionId    String?
-  transaction      Transaction?  @relation(fields: [transactionId], references: [id])
-  propertyAddress  String?
-  mlsNumber        String?
+  id              String       @id @default(cuid())
+  userId          String
+  user            User         @relation(fields: [userId], references: [id])
+  transactionId   String?
+  transaction     Transaction? @relation(fields: [transactionId], references: [id])
+  propertyAddress String?
+  mlsNumber       String?
 
   // Multi-format content
-  mlsDescription   String?       @db.Text
-  instagramCaption String?       @db.Text
-  facebookPost     String?       @db.Text
-  linkedinPost     String?       @db.Text
-  emailTemplate    String?       @db.Text
+  mlsDescription   String? @db.Text
+  instagramCaption String? @db.Text
+  facebookPost     String? @db.Text
+  linkedinPost     String? @db.Text
+  emailTemplate    String? @db.Text
   smsTemplate      String?
 
   // Approval workflow
   status           ContentStatus @default(DRAFT)
-  fairHousingCheck Json?         // { passed: bool, warnings: string[] }
+  fairHousingCheck Json? // { passed: bool, warnings: string[] }
   submittedAt      DateTime?
   approvedAt       DateTime?
 
   // Scheduling
-  scheduledFor     DateTime?
-  publishedAt      DateTime?
-  calendarDays     Json?         // 30-day posting schedule
+  scheduledFor DateTime?
+  publishedAt  DateTime?
+  calendarDays Json? // 30-day posting schedule
 
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId, status])
   @@index([transactionId])
@@ -908,80 +912,80 @@ model ContentCampaign {
 // ============== Agent 6: Intelligence Engine ==============
 
 model CMAAnalysis {
-  id               String   @id @default(cuid())
-  userId           String
-  user             User     @relation(fields: [userId], references: [id])
-  transactionId    String?
-  propertyAddress  String
+  id              String  @id @default(cuid())
+  userId          String
+  user            User    @relation(fields: [userId], references: [id])
+  transactionId   String?
+  propertyAddress String
 
-  selectedComps    Json?    // [{ address, price, soldDate, adjustments }]
-  cmaEstimate      Float?
-  confidence       Float?   // 0-1
-  adjustments      Json?    // [{ factor: "pool", amount: 15000 }]
+  selectedComps Json? // [{ address, price, soldDate, adjustments }]
+  cmaEstimate   Float?
+  confidence    Float? // 0-1
+  adjustments   Json? // [{ factor: "pool", amount: 15000 }]
 
-  bpsScore         Float?   // Buyer Perception Score
-  ppsScore         Float?   // Pricing Position Score
-  uriScore         Float?   // Unknown Repair Index
+  bpsScore Float? // Buyer Perception Score
+  ppsScore Float? // Pricing Position Score
+  uriScore Float? // Unknown Repair Index
 
-  createdAt        DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([userId, createdAt])
   @@index([propertyAddress])
 }
 
 model LeadScoreLog {
-  id                    String   @id @default(cuid())
-  userId                String
-  user                  User     @relation(fields: [userId], references: [id])
-  contactId             String
-  contact               Contact  @relation(fields: [contactId], references: [id])
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  contactId String
+  contact   Contact @relation(fields: [contactId], references: [id])
 
   communicationFrequency Float
   lifeEventSignals       Float
   marketTiming           Float
   recencyWarmth          Float
   finalScore             Float
-  recommendation         String   // "high" | "warm" | "cool" | "dormant"
+  recommendation         String // "high" | "warm" | "cool" | "dormant"
 
-  createdAt              DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([userId, createdAt])
   @@index([contactId])
 }
 
 model DOMProjection {
-  id               String   @id @default(cuid())
-  transactionId    String
-  transaction      Transaction @relation(fields: [transactionId], references: [id])
+  id            String      @id @default(cuid())
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
 
-  listPrice        Float
-  projectedDOM30   Int?
-  projectedDOM60   Int?
-  projectedDOM90   Int?
+  listPrice      Float
+  projectedDOM30 Int?
+  projectedDOM60 Int?
+  projectedDOM90 Int?
 
-  netProceeds30    Float?
-  netProceeds60    Float?
-  netProceeds90    Float?
+  netProceeds30 Float?
+  netProceeds60 Float?
+  netProceeds90 Float?
 
-  createdAt        DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([transactionId])
 }
 
 model KPILog {
-  id                  String   @id @default(cuid())
-  userId              String
-  user                User     @relation(fields: [userId], references: [id])
-  period              String   // "2026-03" (month), "2026-Q1" (quarter), "2026" (year)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+  period String // "2026-03" (month), "2026-Q1" (quarter), "2026" (year)
 
-  closedTransactions  Int      @default(0)
-  avgDaysToClose      Float?
-  totalCommission     Float?
-  avgCommission       Float?
-  pipelineValue       Float?
-  activeDeals         Int      @default(0)
+  closedTransactions Int    @default(0)
+  avgDaysToClose     Float?
+  totalCommission    Float?
+  avgCommission      Float?
+  pipelineValue      Float?
+  activeDeals        Int    @default(0)
 
-  createdAt           DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@unique([userId, period])
 }
@@ -989,21 +993,21 @@ model KPILog {
 // ============== Team 2: Deal Rescue ==============
 
 model DealHealthLog {
-  id                String      @id @default(cuid())
-  userId            String
-  user              User        @relation(fields: [userId], references: [id])
-  transactionId     String
-  transaction       Transaction @relation(fields: [transactionId], references: [id])
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
 
-  timelineScore     Float       // 0-10
-  communicationScore Float      // 0-10
-  documentScore     Float       // 0-10
-  sentimentScore    Float       // 0-10
-  finalHealthScore  Float       // weighted average 1-10
+  timelineScore      Float // 0-10
+  communicationScore Float // 0-10
+  documentScore      Float // 0-10
+  sentimentScore     Float // 0-10
+  finalHealthScore   Float // weighted average 1-10
 
-  recommendation    String      // "critical" | "at_risk" | "healthy" | "closing"
-  rescueBrief       String?     @db.Text  // AI-generated action plan
-  runDate           DateTime    @default(now())
+  recommendation String // "critical" | "at_risk" | "healthy" | "closing"
+  rescueBrief    String?  @db.Text // AI-generated action plan
+  runDate        DateTime @default(now())
 
   @@index([userId, runDate])
   @@index([transactionId])
@@ -1013,19 +1017,19 @@ model DealHealthLog {
 // ============== Team 3: LREC Guardian ==============
 
 model ComplianceAuditLog {
-  id                String      @id @default(cuid())
-  userId            String
-  user              User        @relation(fields: [userId], references: [id])
-  transactionId     String
-  transaction       Transaction @relation(fields: [transactionId], references: [id])
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
 
-  documentCheck     Json        // { category, required, present, missing[] }
-  deadlineCheck     Json        // { name, dueDate, completed, overdue }
-  disclosureCheck   Json        // { type, signed, signerName, signedDate }
+  documentCheck   Json // { category, required, present, missing[] }
+  deadlineCheck   Json // { name, dueDate, completed, overdue }
+  disclosureCheck Json // { type, signed, signerName, signedDate }
 
-  finalStatus       String      // "green" | "yellow" | "red"
-  blockers          String[]    // exact items preventing submission
-  runDate           DateTime    @default(now())
+  finalStatus String // "green" | "yellow" | "red"
+  blockers    String[] // exact items preventing submission
+  runDate     DateTime @default(now())
 
   @@index([userId, runDate])
   @@index([transactionId])
@@ -1034,27 +1038,27 @@ model ComplianceAuditLog {
 // ============== Team 4: Seller Pricing War Room ==============
 
 model PricingAnalysisLog {
-  id                String   @id @default(cuid())
-  userId            String
-  user              User     @relation(fields: [userId], references: [id])
-  contactId         String?
-  propertyAddress   String
+  id              String  @id @default(cuid())
+  userId          String
+  user            User    @relation(fields: [userId], references: [id])
+  contactId       String?
+  propertyAddress String
 
-  cmaEstimate       Float?
-  zillowestimate    Float?
-  avmGapPct         Float?   // gap between Zillow and CMA
+  cmaEstimate    Float?
+  zillowestimate Float?
+  avmGapPct      Float? // gap between Zillow and CMA
 
   conservativePrice Float?
   targetPrice       Float?
   aggressivePrice   Float?
   recommendedPrice  Float?
 
-  domProjection30   Int?
-  domProjection60   Int?
-  domProjection90   Int?
+  domProjection30 Int?
+  domProjection60 Int?
+  domProjection90 Int?
 
-  objections        Json?    // [{ objection, response }]
-  createdAt         DateTime @default(now())
+  objections Json? // [{ objection, response }]
+  createdAt  DateTime @default(now())
 
   @@index([userId, createdAt])
 }
@@ -1062,26 +1066,26 @@ model PricingAnalysisLog {
 // ============== Team 6: Negotiation Intelligence ==============
 
 model NegotiationLog {
-  id                   String      @id @default(cuid())
-  userId               String
-  user                 User        @relation(fields: [userId], references: [id])
-  transactionId        String
-  transaction          Transaction @relation(fields: [transactionId], references: [id])
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
 
-  incomingOfferPrice   Float?
-  incomingTerms        Json?       // { earnestMoney, inspectionDays, financingDays, closingDate }
-  marketAnalysis       Json?       // { cmaEstimate, competitive, fairness }
-  sellerMotivation     String?     // "flexible" | "firm" | "desperate" | "time_constrained"
+  incomingOfferPrice Float?
+  incomingTerms      Json? // { earnestMoney, inspectionDays, financingDays, closingDate }
+  marketAnalysis     Json? // { cmaEstimate, competitive, fairness }
+  sellerMotivation   String? // "flexible" | "firm" | "desperate" | "time_constrained"
 
   // Recommendations
-  recommendedAction    String?     // "accept" | "counter" | "reject"
-  recommendedCounter   Float?
-  acceptanceProbability Float?     // 0-1
-  expectedClosingDays  Int?
-  expectedNetProceeds  Float?
+  recommendedAction     String? // "accept" | "counter" | "reject"
+  recommendedCounter    Float?
+  acceptanceProbability Float? // 0-1
+  expectedClosingDays   Int?
+  expectedNetProceeds   Float?
 
-  scenarios            Json?       // [{ action, price, probability, netProceeds }]
-  createdAt            DateTime    @default(now())
+  scenarios Json? // [{ action, price, probability, netProceeds }]
+  createdAt DateTime @default(now())
 
   @@index([userId, createdAt])
   @@index([transactionId])
@@ -1093,7 +1097,7 @@ model AgentRun {
   id             String    @id @default(cuid())
   userId         String?
   user           User?     @relation(fields: [userId], references: [id])
-  agentName      String    // "morning_brief", "deal_rescue", "email_scan", etc.
+  agentName      String // "morning_brief", "deal_rescue", "email_scan", etc.
   status         String    @default("running") // "running" | "success" | "failed"
   startedAt      DateTime  @default(now())
   completedAt    DateTime?
@@ -1108,17 +1112,17 @@ model AgentRun {
 // ============== Self-Learning Engine ==============
 
 model FeedbackLog {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  feature     String   // "morning_brief" | "voice" | "contract" | "compliance" | "document" | "email"
-  rating      Int?     // 1 (thumbs down) or 5 (thumbs up)
-  inputHash   String?  // hash of the AI input
-  outputHash  String?  // hash of the AI output
-  correction  Json?    // { field: "buyerName", before: "John", after: "Jonathan" }
-  dismissed   Boolean  @default(false) // user dismissed a suggestion/alert
-  metadata    Json?    // extra context
-  createdAt   DateTime @default(now())
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  feature    String // "morning_brief" | "voice" | "contract" | "compliance" | "document" | "email"
+  rating     Int? // 1 (thumbs down) or 5 (thumbs up)
+  inputHash  String? // hash of the AI input
+  outputHash String? // hash of the AI output
+  correction Json? // { field: "buyerName", before: "John", after: "Jonathan" }
+  dismissed  Boolean  @default(false) // user dismissed a suggestion/alert
+  metadata   Json? // extra context
+  createdAt  DateTime @default(now())
 
   @@index([userId, feature, createdAt])
   @@index([feature, rating])
@@ -1126,21 +1130,21 @@ model FeedbackLog {
 }
 
 model ErrorMemory {
-  id           String   @id @default(cuid())
-  agentName    String   // "morning_brief" | "voice" | "content" | etc.
-  errorType    String   // "transient" | "permanent" | "data_quality" | "prompt_failure"
+  id           String    @id @default(cuid())
+  agentName    String // "morning_brief" | "voice" | "content" | etc.
+  errorType    String // "transient" | "permanent" | "data_quality" | "prompt_failure"
   errorMessage String
-  input        Json?    // what was sent to the AI
-  output       Json?    // what came back (if anything)
-  context      Json?    // extra context (userId, transactionId, etc.)
-  occurrences  Int      @default(1) // how many times this exact error has happened
-  lastSeenAt   DateTime @default(now())
-  resolved     Boolean  @default(false)
+  input        Json? // what was sent to the AI
+  output       Json? // what came back (if anything)
+  context      Json? // extra context (userId, transactionId, etc.)
+  occurrences  Int       @default(1) // how many times this exact error has happened
+  lastSeenAt   DateTime  @default(now())
+  resolved     Boolean   @default(false)
   resolvedAt   DateTime?
-  resolution   String?  // what fixed it
+  resolution   String? // what fixed it
   userId       String?
-  user         User?    @relation(fields: [userId], references: [id])
-  createdAt    DateTime @default(now())
+  user         User?     @relation(fields: [userId], references: [id])
+  createdAt    DateTime  @default(now())
 
   @@index([agentName, errorType, resolved])
   @@index([agentName, createdAt])
@@ -1155,8 +1159,8 @@ model ConversionEvent {
   user      User?    @relation(fields: [userId], references: [id])
   // "viewed_upgrade" | "clicked_upgrade" | "started_trial" | "converted" | "trial_expired"
   event     String
-  feature   String?  // which gated feature triggered the event
-  tier      String?  // which plan they viewed / started
+  feature   String? // which gated feature triggered the event
+  tier      String? // which plan they viewed / started
   metadata  Json?
   createdAt DateTime @default(now())
 
@@ -1165,14 +1169,14 @@ model ConversionEvent {
 }
 
 model PromptVersion {
-  id          String   @id @default(cuid())
-  agentName   String   // "voice_classifier" | "contract_writer" | "morning_brief" | etc.
-  version     Int
-  promptText  String   @db.Text
-  metrics     Json?    // { successRate: 0.92, avgRating: 4.1, errorRate: 0.03, sampleSize: 150 }
-  active      Boolean  @default(true)
-  notes       String?  // what changed from previous version
-  createdAt   DateTime @default(now())
+  id         String   @id @default(cuid())
+  agentName  String // "voice_classifier" | "contract_writer" | "morning_brief" | etc.
+  version    Int
+  promptText String   @db.Text
+  metrics    Json? // { successRate: 0.92, avgRating: 4.1, errorRate: 0.03, sampleSize: 150 }
+  active     Boolean  @default(true)
+  notes      String? // what changed from previous version
+  createdAt  DateTime @default(now())
 
   @@unique([agentName, version])
   @@index([agentName, active])
@@ -1181,15 +1185,15 @@ model PromptVersion {
 // ============== Managed Agent Sessions ==============
 
 model ManagedAgentSession {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  agentName   String   // "morning_brief" | "deal_rescue" | "learning"
-  sessionId   String   @unique // Anthropic managed agent session ID
-  status      String   @default("active") // "active" | "expired" | "cancelled"
-  expiresAt   DateTime
-  metadata    Json?
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  agentName String // "morning_brief" | "deal_rescue" | "learning"
+  sessionId String   @unique // Anthropic managed agent session ID
+  status    String   @default("active") // "active" | "expired" | "cancelled"
+  expiresAt DateTime
+  metadata  Json?
+  createdAt DateTime @default(now())
 
   @@index([userId, agentName, status])
 }
@@ -1197,45 +1201,45 @@ model ManagedAgentSession {
 // ============== CMA Engine ==============
 
 model CompSet {
-  id                       String   @id @default(cuid())
-  userId                   String
-  user                     User     @relation(fields: [userId], references: [id])
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 
-  subjectAddress           String
-  subjectPropertyId        String?
-  subjectLat               Float?
-  subjectLng               Float?
-  subjectSqft              Int?
-  subjectBeds              Int?
-  subjectBaths             Float?
-  subjectYearBuilt         Int?
-  subjectLotSize           Int?
-  subjectCondition         String?  // 'excellent' | 'good' | 'average' | 'fair' | 'poor'
-  subjectFeatures          Json?    // { pool, garage_bays, fireplace, waterfront, ... }
+  subjectAddress    String
+  subjectPropertyId String?
+  subjectLat        Float?
+  subjectLng        Float?
+  subjectSqft       Int?
+  subjectBeds       Int?
+  subjectBaths      Float?
+  subjectYearBuilt  Int?
+  subjectLotSize    Int?
+  subjectCondition  String? // 'excellent' | 'good' | 'average' | 'fair' | 'poor'
+  subjectFeatures   Json? // { pool, garage_bays, fireplace, waterfront, ... }
 
   mlsSuggestedPrice        Float?
   propstreamSuggestedPrice Float?
   rprSuggestedPrice        Float?
 
-  aireEstimate             Float?
-  aireRangeLow             Float?
-  aireRangeHigh            Float?
-  confidenceTier           String?  // HIGH | MEDIUM | LOW
-  confidenceScore          Float?   // 0-1
-  disagreementPct          Float?
+  aireEstimate    Float?
+  aireRangeLow    Float?
+  aireRangeHigh   Float?
+  confidenceTier  String? // HIGH | MEDIUM | LOW
+  confidenceScore Float? // 0-1
+  disagreementPct Float?
 
-  vendorsResponded         Int      @default(0) // 0-3
-  degradationBand          String   @default("full") // full | partial | degraded
-  excludedFromTraining     Boolean  @default(false)
+  vendorsResponded     Int     @default(0) // 0-3
+  degradationBand      String  @default("full") // full | partial | degraded
+  excludedFromTraining Boolean @default(false)
 
-  mortgageContext          Json?
-  status                   String   @default("active") // active | listed | sold | abandoned | degraded
+  mortgageContext Json?
+  status          String @default("active") // active | listed | sold | abandoned | degraded
 
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  comps                    Comp[]
-  accuracyLog              AccuracyLog?
+  comps       Comp[]
+  accuracyLog AccuracyLog?
 
   @@index([userId, createdAt])
   @@index([subjectAddress])
@@ -1243,40 +1247,40 @@ model CompSet {
 }
 
 model Comp {
-  id                 String   @id @default(cuid())
-  compSetId          String
-  compSet            CompSet  @relation(fields: [compSetId], references: [id], onDelete: Cascade)
+  id        String  @id @default(cuid())
+  compSetId String
+  compSet   CompSet @relation(fields: [compSetId], references: [id], onDelete: Cascade)
 
-  source             String   // 'mls_paragon' | 'propstream' | 'rpr'
-  address            String
-  lat                Float?
-  lng                Float?
+  source  String // 'mls_paragon' | 'propstream' | 'rpr'
+  address String
+  lat     Float?
+  lng     Float?
 
-  soldPrice          Float
-  soldDate           DateTime
-  listPrice          Float?
-  daysOnMarket       Int?
+  soldPrice    Float
+  soldDate     DateTime
+  listPrice    Float?
+  daysOnMarket Int?
 
-  sqft               Int?
-  beds               Int?
-  baths              Float?
-  yearBuilt          Int?
-  lotSize            Int?
-  garageBays         Int?
-  condition          String?
-  features           Json?
-  distanceMiles      Float?
+  sqft          Int?
+  beds          Int?
+  baths         Float?
+  yearBuilt     Int?
+  lotSize       Int?
+  garageBays    Int?
+  condition     String?
+  features      Json?
+  distanceMiles Float?
 
-  similarityScore    Float    @default(0) // 0-1
-  selected           Boolean  @default(false)
-  adjustments        Json?    // [{ factor, amount, reason }]
-  adjustedValue      Float?
-  weight             Float?
-  overAdjusted       Boolean  @default(false)
+  similarityScore Float   @default(0) // 0-1
+  selected        Boolean @default(false)
+  adjustments     Json? // [{ factor, amount, reason }]
+  adjustedValue   Float?
+  weight          Float?
+  overAdjusted    Boolean @default(false)
 
-  rawPayload         Json?    // normalized vendor payload (no HTML)
+  rawPayload Json? // normalized vendor payload (no HTML)
 
-  createdAt          DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([compSetId, selected])
   @@index([source])
@@ -1284,76 +1288,76 @@ model Comp {
 }
 
 model AccuracyLog {
-  id                    String   @id @default(cuid())
-  compSetId             String   @unique
-  compSet               CompSet  @relation(fields: [compSetId], references: [id], onDelete: Cascade)
+  id        String  @id @default(cuid())
+  compSetId String  @unique
+  compSet   CompSet @relation(fields: [compSetId], references: [id], onDelete: Cascade)
 
-  actualListPrice       Float?
-  actualSoldPrice       Float?
-  actualDOM             Int?
-  actualSoldDate        DateTime?
+  actualListPrice Float?
+  actualSoldPrice Float?
+  actualDOM       Int?
+  actualSoldDate  DateTime?
 
-  mlsError              Float?   // (mlsSuggested - soldPrice) / soldPrice
-  propstreamError       Float?
-  rprError              Float?
-  aireError             Float?
+  mlsError        Float? // (mlsSuggested - soldPrice) / soldPrice
+  propstreamError Float?
+  rprError        Float?
+  aireError       Float?
 
-  winner                String?  // 'mls' | 'propstream' | 'rpr' | 'aire'
-  notes                 String?
+  winner String? // 'mls' | 'propstream' | 'rpr' | 'aire'
+  notes  String?
 
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([createdAt])
   @@index([winner])
 }
 
 model ScraperSession {
-  id               String   @id @default(cuid())
-  vendor           String   @unique // 'mls_paragon' | 'propstream' | 'rpr'
+  id               String    @id @default(cuid())
+  vendor           String    @unique // 'mls_paragon' | 'propstream' | 'rpr'
   storagePath      String
   lastLoginAt      DateTime
   lastProbeAt      DateTime?
-  status           String   @default("healthy") // 'healthy' | 'expired' | 'locked'
-  ttlMinutes       Int      @default(60)
-  failureCount     Int      @default(0)
+  status           String    @default("healthy") // 'healthy' | 'expired' | 'locked'
+  ttlMinutes       Int       @default(60)
+  failureCount     Int       @default(0)
   circuitOpenUntil DateTime?
   notes            String?
-  updatedAt        DateTime @updatedAt
+  updatedAt        DateTime  @updatedAt
 }
 
 // ============== PHASE 8: TCS (Transaction Coordination System) ==============
 
 model TCSSession {
-  id              String            @id @default(cuid())
-  userId          String
-  user            User              @relation(fields: [userId], references: [id])
-  transactionId   String?
-  transaction     Transaction?      @relation(fields: [transactionId], references: [id])
+  id            String       @id @default(cuid())
+  userId        String
+  user          User         @relation(fields: [userId], references: [id])
+  transactionId String?
+  transaction   Transaction? @relation(fields: [transactionId], references: [id])
 
-  side            String            // "BUYER" | "LISTING" | "DUAL"
-  currentStage    TransactionStatus @default(DRAFT)
-  messages        Json              @default("[]")
-  answers         Json              @default("{}")
-  silentActions   Json              @default("[]")
+  side          String // "BUYER" | "LISTING" | "DUAL"
+  currentStage  TransactionStatus @default(DRAFT)
+  messages      Json              @default("[]")
+  answers       Json              @default("{}")
+  silentActions Json              @default("[]")
 
-  completedAt     DateTime?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@index([userId, createdAt])
   @@index([transactionId])
 }
 
 model TCSQuestion {
-  id             String             @id @default(cuid())
+  id             String            @id @default(cuid())
   stage          TransactionStatus
-  key            String             @unique
-  promptTemplate String             @db.Text
+  key            String            @unique
+  promptTemplate String            @db.Text
   quickReplies   Json?
-  required       Boolean            @default(true)
-  orderHint      Int                @default(0)
-  createdAt      DateTime           @default(now())
+  required       Boolean           @default(true)
+  orderHint      Int               @default(0)
+  createdAt      DateTime          @default(now())
 
   @@index([stage, orderHint])
 }
@@ -1361,38 +1365,38 @@ model TCSQuestion {
 // ============== PHASE 9: Broker-Tenant Model ==============
 
 model Brokerage {
-  id             String    @id @default(cuid())
+  id             String  @id @default(cuid())
   name           String
-  slug           String    @unique
+  slug           String  @unique
   logoUrl        String?
   primaryContact String?
   billingEmail   String?
-  seatCount      Int       @default(1)
-  tier           String    @default("STANDARD") // "STANDARD" | "ENTERPRISE"
+  seatCount      Int     @default(1)
+  tier           String  @default("STANDARD") // "STANDARD" | "ENTERPRISE"
 
   // v2 AirSign fields
   licenseNumber     String?
-  state             String?                               // "LA"
-  accentColor       String?                               // hex, layered on DESIGN.md palette
-  emailFooter       String?  @db.Text
-  requireReview     Boolean  @default(false)              // gate sends through broker review
+  state             String? // "LA"
+  accentColor       String? // hex, layered on DESIGN.md palette
+  emailFooter       String?          @db.Text
+  requireReview     Boolean          @default(false) // gate sends through broker review
   defaultSignerAuth SignerAuthMethod @default(EMAIL_LINK)
-  stripeCustomerId  String?  @unique
-  seatsPaid         Int      @default(0)
+  stripeCustomerId  String?          @unique
+  seatsPaid         Int              @default(0)
 
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  members        BrokerageMember[]
-  teams          Team[]
+  members BrokerageMember[]
+  teams   Team[]
 
   // v2 AirSign relations
-  offices          Office[]
-  transactions     Transaction[]
-  airSignEnvelopes AirSignEnvelope[]
-  airSignTemplates AirSignTemplate[]
+  offices           Office[]
+  transactions      Transaction[]
+  airSignEnvelopes  AirSignEnvelope[]
+  airSignTemplates  AirSignTemplate[]
   complianceReviews ComplianceReview[]
-  airSignSettings  BrokerageAirSignSettings? @relation("BrokerageAirSignSettings")
+  airSignSettings   BrokerageAirSignSettings? @relation("BrokerageAirSignSettings")
 }
 
 // ============== v2: Office (physical branch within Brokerage) ==============
@@ -1401,7 +1405,7 @@ model Office {
   id          String    @id @default(cuid())
   brokerageId String
   brokerage   Brokerage @relation(fields: [brokerageId], references: [id], onDelete: Cascade)
-  name        String                          // "Baton Rouge"
+  name        String // "Baton Rouge"
   slug        String
   address     String?
   phone       String?
@@ -1419,46 +1423,46 @@ model Office {
 // ============== v2: AirSign Template Library ==============
 
 model AirSignTemplate {
-  id            String        @id @default(cuid())
-  scope         TemplateScope
-  kind          TemplateKind
-  name          String
-  description   String?
+  id          String        @id @default(cuid())
+  scope       TemplateScope
+  kind        TemplateKind
+  name        String
+  description String?
 
   // Scope owners (exactly one set based on scope)
-  userId        String?
-  user          User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  brokerageId   String?
-  brokerage     Brokerage?    @relation(fields: [brokerageId], references: [id], onDelete: Cascade)
-  officeId      String?
-  office        Office?       @relation(fields: [officeId], references: [id], onDelete: Cascade)
+  userId      String?
+  user        User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  brokerageId String?
+  brokerage   Brokerage? @relation(fields: [brokerageId], references: [id], onDelete: Cascade)
+  officeId    String?
+  office      Office?    @relation(fields: [officeId], references: [id], onDelete: Cascade)
 
   // DOCUMENT kind
-  pdfBlobUrl    String?
-  pageCount     Int?
-  formCode      String?        // "LREC-RPA", "LREC-BRA", etc.
+  pdfBlobUrl String?
+  pageCount  Int?
+  formCode   String? // "LREC-RPA", "LREC-BRA", etc.
 
   // Field layout — [{ type, label, page, xPct, yPct, wPct, hPct, dataKey, signerRole, required, options }]
-  fieldLayout   Json?
+  fieldLayout Json?
 
   // Data-key bindings for autofill hydration (also encoded inside fieldLayout, but this is the quick-lookup index)
-  dataBindings  Json?          // { "<fieldId>": "loop.property.street", ... }
+  dataBindings Json? // { "<fieldId>": "loop.property.street", ... }
 
   // Taxonomy
-  folder        String?        // "Purchase & Sale" / "Listing & Agency"
-  tags          String[]
+  folder String? // "Purchase & Sale" / "Listing & Agency"
+  tags   String[]
 
   // CLAUSE kind
-  clauseBody    String?        @db.Text
+  clauseBody String? @db.Text
 
   // TASK_LIST kind — [{ name, offsetDays, assignee, required }]
-  taskList      Json?
+  taskList Json?
 
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // v2 back-relation: envelopes instantiated from this template
-  envelopes     AirSignEnvelope[] @relation("EnvelopeTemplate")
+  envelopes AirSignEnvelope[] @relation("EnvelopeTemplate")
 
   @@index([scope, kind, folder])
   @@index([userId, scope])
@@ -1470,22 +1474,22 @@ model AirSignTemplate {
 // ============== v2: Compliance Review ==============
 
 model ComplianceReview {
-  id             String                 @id @default(cuid())
-  envelopeId     String                 @unique
-  envelope       AirSignEnvelope        @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
-  brokerageId    String
-  brokerage      Brokerage              @relation(fields: [brokerageId], references: [id], onDelete: Cascade)
+  id          String          @id @default(cuid())
+  envelopeId  String          @unique
+  envelope    AirSignEnvelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+  brokerageId String
+  brokerage   Brokerage       @relation(fields: [brokerageId], references: [id], onDelete: Cascade)
 
-  submittedById  String
-  submittedBy    User                   @relation("ComplianceSubmitter", fields: [submittedById], references: [id])
-  submittedAt    DateTime               @default(now())
+  submittedById String
+  submittedBy   User     @relation("ComplianceSubmitter", fields: [submittedById], references: [id])
+  submittedAt   DateTime @default(now())
 
-  reviewerId     String?
-  reviewer       User?                  @relation("ComplianceReviewer", fields: [reviewerId], references: [id])
-  reviewedAt     DateTime?
+  reviewerId String?
+  reviewer   User?     @relation("ComplianceReviewer", fields: [reviewerId], references: [id])
+  reviewedAt DateTime?
 
-  status         ComplianceReviewStatus @default(PENDING)
-  reviewerNote   String?                @db.Text
+  status          ComplianceReviewStatus @default(PENDING)
+  reviewerNote    String?                @db.Text
   requiredChanges String[]
 
   @@index([brokerageId, status, submittedAt])
@@ -1498,31 +1502,31 @@ model ComplianceReview {
 // that can be added/modified without touching Brokerage.
 
 enum ComplianceMode {
-  OFF                 // no broker review required
-  REVIEW_BEFORE_SEND  // envelope must be approved before delivery
+  OFF // no broker review required
+  REVIEW_BEFORE_SEND // envelope must be approved before delivery
   REVIEW_BEFORE_CLOSE // review triggers on final signer completion
 }
 
 model BrokerageAirSignSettings {
-  id              String          @id @default(cuid())
-  brokerageId     String          @unique
-  brokerage       Brokerage       @relation("BrokerageAirSignSettings", fields: [brokerageId], references: [id], onDelete: Cascade)
+  id          String    @id @default(cuid())
+  brokerageId String    @unique
+  brokerage   Brokerage @relation("BrokerageAirSignSettings", fields: [brokerageId], references: [id], onDelete: Cascade)
 
   // Branding — rendered on signer pages + emails + Certificate of Completion
-  brandingJson    Json?           // { logoUrl, accentColor, emailFooter, fontFamily, wordmark }
+  brandingJson Json? // { logoUrl, accentColor, emailFooter, fontFamily, wordmark }
 
   // Signer authentication policy
   defaultSignerAuth SignerAuthMethod @default(EMAIL_LINK)
-  requireSignerAuth Boolean       @default(false)  // force all signers to use >= default
+  requireSignerAuth Boolean          @default(false) // force all signers to use >= default
 
   // Compliance mode — how broker review gates envelope flow
-  complianceMode  ComplianceMode  @default(OFF)
+  complianceMode ComplianceMode @default(OFF)
 
   // Retention / audit
-  certificateTemplate String?     @db.Text       // optional markdown override for CoC copy
+  certificateTemplate String? @db.Text // optional markdown override for CoC copy
 
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   envelopeSnapshots AirSignEnvelope[]
 
@@ -1541,24 +1545,24 @@ enum BulkSendStatus {
 }
 
 model BulkSendBatch {
-  id              String          @id @default(cuid())
-  userId          String
-  user            User            @relation(fields: [userId], references: [id])
-  brokerageId     String?
-  templateId      String?         // source template (null if from uploaded PDF)
+  id          String  @id @default(cuid())
+  userId      String
+  user        User    @relation(fields: [userId], references: [id])
+  brokerageId String?
+  templateId  String? // source template (null if from uploaded PDF)
 
-  name            String          // agent-chosen batch label, e.g. "Q2 seller disclosures"
-  totalCount      Int             @default(0)
-  createdCount    Int             @default(0)
-  sentCount       Int             @default(0)
-  failedCount     Int             @default(0)
-  errors          Json?           // [{ rowIndex, error, signerEmail? }]
-  status          BulkSendStatus  @default(PENDING)
+  name         String // agent-chosen batch label, e.g. "Q2 seller disclosures"
+  totalCount   Int            @default(0)
+  createdCount Int            @default(0)
+  sentCount    Int            @default(0)
+  failedCount  Int            @default(0)
+  errors       Json? // [{ rowIndex, error, signerEmail? }]
+  status       BulkSendStatus @default(PENDING)
 
-  createdAt       DateTime        @default(now())
-  completedAt     DateTime?
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
 
-  envelopes       AirSignEnvelope[]
+  envelopes AirSignEnvelope[]
 
   @@index([userId, createdAt])
   @@index([brokerageId, status])
@@ -1573,29 +1577,29 @@ enum LoopImportStatus {
   PARSING
   PARSED
   FAILED
-  IMPORTED     // envelopes/txn created
+  IMPORTED // envelopes/txn created
 }
 
 model LoopImport {
-  id              String            @id @default(cuid())
-  userId          String
-  user            User              @relation(fields: [userId], references: [id])
-  transactionId   String?           // created/linked target transaction
-  brokerageId     String?
+  id            String  @id @default(cuid())
+  userId        String
+  user          User    @relation(fields: [userId], references: [id])
+  transactionId String? // created/linked target transaction
+  brokerageId   String?
 
-  dotloopLoopId   String?           // original dotloop loop id if present in export
-  sourceFormat    String            @default("dotloop_json")  // dotloop_json | dotloop_pdf | other
-  rawJson         Json              // full export blob
-  parsedData      Json?             // normalized Loop Data Model (buyer/seller/property/financials/dates)
-  documentsIndex  Json?             // [{ fileName, blobUrl, status }]
-  status          LoopImportStatus  @default(PENDING)
-  errorMessage    String?           @db.Text
+  dotloopLoopId  String? // original dotloop loop id if present in export
+  sourceFormat   String           @default("dotloop_json") // dotloop_json | dotloop_pdf | other
+  rawJson        Json // full export blob
+  parsedData     Json? // normalized Loop Data Model (buyer/seller/property/financials/dates)
+  documentsIndex Json? // [{ fileName, blobUrl, status }]
+  status         LoopImportStatus @default(PENDING)
+  errorMessage   String?          @db.Text
 
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  importedAt      DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  importedAt DateTime?
 
-  envelopes       AirSignEnvelope[]
+  envelopes AirSignEnvelope[]
 
   @@index([userId, status])
   @@index([dotloopLoopId])
@@ -1605,41 +1609,86 @@ model LoopImport {
 // ============== v2: AirSign Reminders ==============
 
 model AirSignReminder {
-  id           String          @id @default(cuid())
-  envelopeId   String
-  envelope     AirSignEnvelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
-  signerId     String?                           // null = all unsigned signers
-  sendAt       DateTime
-  sentAt       DateTime?
-  kind         String          @default("REMINDER")  // REMINDER | EXPIRATION_WARNING | FINAL_NOTICE
-  createdAt    DateTime        @default(now())
+  id         String          @id @default(cuid())
+  envelopeId String
+  envelope   AirSignEnvelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+  signerId   String? // null = all unsigned signers
+  sendAt     DateTime
+  sentAt     DateTime?
+  kind       String          @default("REMINDER") // REMINDER | EXPIRATION_WARNING | FINAL_NOTICE
+  createdAt  DateTime        @default(now())
 
   @@index([sendAt, sentAt])
   @@index([envelopeId])
 }
 
 model BrokerageMember {
-  id            String    @id @default(cuid())
-  brokerageId   String
-  brokerage     Brokerage @relation(fields: [brokerageId], references: [id])
-  userId        String    @unique
-  user          User      @relation(fields: [userId], references: [id])
-  role          String    // "OWNER" | "BROKER" | "TC" | "AGENT" | "ASSISTANT"
-  teamId        String?
-  team          Team?     @relation(fields: [teamId], references: [id])
-  joinedAt      DateTime  @default(now())
+  id          String    @id @default(cuid())
+  brokerageId String
+  brokerage   Brokerage @relation(fields: [brokerageId], references: [id])
+  userId      String    @unique
+  user        User      @relation(fields: [userId], references: [id])
+  role        String // "OWNER" | "BROKER" | "TC" | "AGENT" | "ASSISTANT"
+  teamId      String?
+  team        Team?     @relation(fields: [teamId], references: [id])
+  joinedAt    DateTime  @default(now())
 
   @@index([brokerageId])
 }
 
 model Team {
-  id            String    @id @default(cuid())
-  brokerageId   String
-  brokerage     Brokerage @relation(fields: [brokerageId], references: [id])
-  name          String
-  leaderUserId  String?
+  id           String    @id @default(cuid())
+  brokerageId  String
+  brokerage    Brokerage @relation(fields: [brokerageId], references: [id])
+  name         String
+  leaderUserId String?
 
-  members       BrokerageMember[]
+  members BrokerageMember[]
 
   @@index([brokerageId])
+}
+
+// ============== Client Consent (TCPA gate) ==============
+// Required before AIRE sends SMS/voice to any real client.
+// One row per (user, phone, channel). Revocation sets revokedAt; downstream
+// senders must check `active()` helper, not just row existence.
+
+enum ConsentChannel {
+  SMS
+  VOICE
+  EMAIL
+}
+
+enum ConsentMethod {
+  VERBAL
+  WRITTEN
+  DIGITAL_CHECKBOX
+  AGENT_ATTESTATION
+}
+
+model ClientConsent {
+  id            String       @id @default(cuid())
+  userId        String
+  user          User         @relation(fields: [userId], references: [id])
+  transactionId String?
+  transaction   Transaction? @relation(fields: [transactionId], references: [id], onDelete: SetNull)
+
+  clientName  String
+  clientPhone String?
+  clientEmail String?
+  channel     ConsentChannel
+  method      ConsentMethod  @default(AGENT_ATTESTATION)
+
+  consentedAt     DateTime  @default(now())
+  revokedAt       DateTime?
+  agentAttestedBy String?
+  notes           String?   @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([transactionId])
+  @@index([clientPhone])
+  @@index([userId, clientPhone, channel])
 }

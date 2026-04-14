@@ -88,13 +88,13 @@ export async function POST(req: NextRequest) {
 
     let results
     if (targetRole === "all") {
-      results = await notifyAllParties(templateType, ctx, allParties)
+      results = await notifyAllParties(templateType, ctx, allParties, transactionId, user.id)
     } else {
       const party = allParties.find(p => p.role === targetRole)
       if (!party) {
         return NextResponse.json({ error: `No ${targetRole} found on this transaction` }, { status: 400 })
       }
-      const r = await sendPartyUpdate(templateType, ctx, party)
+      const r = await sendPartyUpdate(templateType, ctx, party, transactionId, user.id)
       results = [r]
     }
 

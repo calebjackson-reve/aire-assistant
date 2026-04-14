@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
               email: signer.email,
               phone: signer.phone || undefined,
               role: "buyer",
-            })
+            }, envelope.transactionId ?? undefined, envelope.userId)
             results.push(`notified:${signer.name}`)
           } catch (notifyErr) {
             console.error(`[AirSign Webhook] Step 3 (notify ${signer.name}) failed:`, notifyErr)
