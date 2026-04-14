@@ -101,7 +101,7 @@ export default async function MorningBriefPage() {
             Morning Brief
           </h1>
           <div className="sm:text-right">
-            <p className="text-[#1e2416] text-sm">{dateStr}</p>
+            <p className="font-mono text-[#1e2416] text-sm">{dateStr}</p>
             {brief && (
               <div className="flex items-center gap-2 mt-1.5 sm:justify-end">
                 <span className={`w-1.5 h-1.5 rounded-full ${
