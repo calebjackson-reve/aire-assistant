@@ -5,6 +5,7 @@ import { WorkflowTimeline } from "@/components/dashboard/WorkflowTimeline"
 import { WorkflowAdvance } from "@/components/dashboard/WorkflowAdvance"
 import { TransactionTimeline } from "@/components/tc/TransactionTimeline"
 import { getSmartSuggestions, type SmartSuggestion } from "@/lib/tc/smart-suggestions"
+import { CopilotDrawer } from "@/components/tc/CopilotDrawer"
 import Link from "next/link"
 
 interface Deadline {
@@ -263,6 +264,7 @@ export function TransactionDetail({ transaction: initial }: { transaction: Trans
   const [dragOver, setDragOver] = useState(false)
   const [folderFilter, setFolderFilter] = useState<string>("all")
   const [inspectionAnalysis, setInspectionAnalysis] = useState<InspectionAnalysis | null>(null)
+  const [copilotOpen, setCopilotOpen] = useState(false)
 
   const now = new Date()
   const activeDeadlines = txn.deadlines.filter(d => !d.completedAt)
@@ -410,9 +412,29 @@ export function TransactionDetail({ transaction: initial }: { transaction: Trans
               {txn.mlsNumber && <span className="ml-2 font-mono text-[11px] text-[#6b7d52]/70">MLS {txn.mlsNumber}</span>}
             </p>
           </div>
-          <span className={`text-xs px-2.5 py-1 rounded-full ${STATUS_COLORS[txn.status] || ""}`}>
-            {STATUS_LABELS[txn.status] || txn.status}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className={`text-xs px-2.5 py-1 rounded-full ${STATUS_COLORS[txn.status] || ""}`}>
+              {STATUS_LABELS[txn.status] || txn.status}
+            </span>
+            <button
+              onClick={() => setCopilotOpen(true)}
+              title="Ask AIRE about this deal"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200"
+              style={{
+                backgroundColor: "#1e2416",
+                color: "#f5f2ea",
+                fontFamily: "'Space Grotesk', sans-serif",
+                transform: "translateY(0)",
+              }}
+              onMouseEnter={e => (e.currentTarget.style.transform = "translateY(-1px)")}
+              onMouseLeave={e => (e.currentTarget.style.transform = "translateY(0)")}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+              Ask AIRE
+            </button>
+          </div>
         </div>
 
         {/* Key stats row — high contrast: labels olive, values deep forest */}
@@ -924,6 +946,26 @@ export function TransactionDetail({ transaction: initial }: { transaction: Trans
           </div>
         </div>
       </div>
+
+      {/* ===== AI COPILOT DRAWER ===== */}
+      <CopilotDrawer
+        isOpen={copilotOpen}
+        onClose={() => setCopilotOpen(false)}
+        context={{
+          address: txn.propertyAddress,
+          city: txn.propertyCity,
+          state: txn.propertyState,
+          status: txn.status,
+          buyerName: txn.buyerName,
+          sellerName: txn.sellerName,
+          acceptedPrice: txn.acceptedPrice,
+          closingDate: txn.closingDate,
+          contractDate: txn.contractDate,
+          overdueDeadlines: overdueDeadlines.length,
+          upcomingDeadlines: upcomingDeadlines.length,
+          documentCount: txn.documents.length,
+        }}
+      />
     </div>
   )
 }
