@@ -2241,60 +2241,83 @@ function structureListing(mlsId: string, m: Record<string, string>): ListingDeta
 }
 
 /** Types MLS# into Power Search and dispatches click on the autocomplete
- *  listing row. Deep-link nav to Report.mvc fails because the Paragon
- *  shell intercepts and re-renders the home (Wizard). This flow works —
- *  verified via Chrome DevTools MCP. */
+ *  listing row. Verified via DevTools MCP — Playwright-side tightened:
+ *  - No offsetParent visibility check (jQuery UI autocomplete is absolute-
+ *    positioned body-child; offsetParent can be null even when visible)
+ *  - Walk all frames, not just main
+ *  - Broader selector: also ui-menu (jQuery UI newer) and [role=listbox] */
 async function powerSearchOpenListing(popup: Page, mlsId: string): Promise<{ ok: boolean; reason: string | null }> {
   await injectNameShim(popup)
-  const focused = await popup.evaluate(() => {
-    const candidates = [
-      'input[role=searchbox]',
-      'input[aria-label*="POWER SEARCH" i]',
-      'input[aria-label*="POWER" i]',
-    ]
-    for (const sel of candidates) {
-      const el = document.querySelector(sel) as HTMLInputElement | null
-      if (el && el.offsetParent !== null) {
-        el.focus()
-        el.value = ""
-        return true
+  // Focus the Power Search input (search ALL frames)
+  let focused = false
+  for (const f of [popup.mainFrame(), ...popup.frames().filter((x) => x !== popup.mainFrame())]) {
+    await injectNameShim(f)
+    const ok = await f.evaluate(() => {
+      const candidates = [
+        'input[role=searchbox]',
+        'input[aria-label*="POWER SEARCH" i]',
+        'input[aria-label*="POWER" i]',
+        'input[placeholder*="POWER" i]',
+      ]
+      for (const sel of candidates) {
+        const el = document.querySelector(sel) as HTMLInputElement | null
+        if (el) {
+          el.focus()
+          el.value = ""
+          return true
+        }
       }
-    }
-    return false
-  })
+      return false
+    }).catch(() => false)
+    if (ok) { focused = true; break }
+  }
   if (!focused) return { ok: false, reason: "Power Search input not found" }
 
   await popup.keyboard.type(mlsId, { delay: 40 })
 
-  const deadline = Date.now() + 5000
-  let ready = false
-  while (Date.now() < deadline && !ready) {
-    ready = await popup.evaluate((needle) => {
-      const dropdown = document.querySelector("ul.ui-autocomplete") as HTMLElement | null
-      if (!dropdown || !dropdown.offsetParent) return false
-      const items = Array.from(dropdown.querySelectorAll("li"))
-      return items.some((i) => (i.textContent || "").includes(String(needle)))
-    }, mlsId)
-    if (!ready) await popup.waitForTimeout(300)
+  // Poll all frames for a populated autocomplete dropdown
+  const deadline = Date.now() + 8000
+  let readyInFrame: import("playwright").Frame | null = null
+  while (Date.now() < deadline && !readyInFrame) {
+    for (const f of popup.frames()) {
+      const ready = await f.evaluate((needle) => {
+        const selectors = ["ul.ui-autocomplete", "ul.ui-menu", "[role=listbox]"]
+        for (const sel of selectors) {
+          const lists = Array.from(document.querySelectorAll(sel))
+          for (const list of lists) {
+            const items = Array.from(list.querySelectorAll("li, [role=option]"))
+            if (items.some((i) => (i.textContent || "").includes(String(needle)))) return true
+          }
+        }
+        return false
+      }, mlsId).catch(() => false)
+      if (ready) { readyInFrame = f; break }
+    }
+    if (!readyInFrame) await popup.waitForTimeout(300)
   }
-  if (!ready) return { ok: false, reason: "Autocomplete dropdown never populated" }
+  if (!readyInFrame) return { ok: false, reason: "Autocomplete dropdown never populated" }
 
-  const clicked = await popup.evaluate((needle) => {
-    const dropdown = document.querySelector("ul.ui-autocomplete") as HTMLElement | null
-    if (!dropdown) return false
-    const items = Array.from(dropdown.querySelectorAll("li")) as HTMLElement[]
-    const target =
-      items.find((el) => {
-        const t = (el.textContent || "").trim()
-        return t.includes(String(needle)) && !/Run Classic Search/i.test(t)
-      }) || items[items.length - 1]
-    if (!target) return false
-    target.scrollIntoView?.({ block: "center" })
-    target.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, cancelable: true, view: window }))
-    target.dispatchEvent(new MouseEvent("mouseup", { bubbles: true, cancelable: true, view: window }))
-    target.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }))
-    return true
-  }, mlsId)
+  const clicked = await readyInFrame.evaluate((needle) => {
+    const selectors = ["ul.ui-autocomplete", "ul.ui-menu", "[role=listbox]"]
+    for (const sel of selectors) {
+      const lists = Array.from(document.querySelectorAll(sel))
+      for (const list of lists) {
+        const items = Array.from(list.querySelectorAll("li, [role=option]")) as HTMLElement[]
+        const target =
+          items.find((el) => {
+            const t = (el.textContent || "").trim()
+            return t.includes(String(needle)) && !/Run Classic Search/i.test(t)
+          }) || items.find((el) => (el.textContent || "").includes(String(needle))) || items[items.length - 1]
+        if (!target) continue
+        target.scrollIntoView?.({ block: "center" })
+        target.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, cancelable: true, view: window }))
+        target.dispatchEvent(new MouseEvent("mouseup", { bubbles: true, cancelable: true, view: window }))
+        target.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }))
+        return true
+      }
+    }
+    return false
+  }, mlsId).catch(() => false)
   if (!clicked) return { ok: false, reason: "Could not click autocomplete item" }
   return { ok: true, reason: null }
 }
