@@ -2,6 +2,50 @@ import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
 import prisma from "@/lib/prisma"
 import Link from "next/link"
+import { HairlineDivider } from "@/components/ui/primitives/HairlineDivider"
+import { SectionLabel } from "@/components/ui/primitives/SectionLabel"
+
+type StatusTone = "active" | "pending" | "overdue" | "info" | "closing"
+
+const STATUS_TO_LABEL: Record<string, { label: string; tone: StatusTone }> = {
+  DRAFT: { label: "Draft", tone: "info" },
+  ACTIVE: { label: "Active", tone: "active" },
+  PENDING_INSPECTION: { label: "Inspection", tone: "pending" },
+  PENDING_APPRAISAL: { label: "Appraisal", tone: "pending" },
+  PENDING_FINANCING: { label: "Financing", tone: "pending" },
+  CLOSING: { label: "Closing", tone: "closing" },
+  CLOSED: { label: "Closed", tone: "info" },
+  CANCELLED: { label: "Cancelled", tone: "overdue" },
+}
+
+const STATUS_DOT: Record<StatusTone, string> = {
+  active: "#9aab7e",
+  pending: "#d4944c",
+  overdue: "#c4787a",
+  closing: "#6b7d52",
+  info: "rgba(30,36,22,0.30)",
+}
+
+const STATUS_LABEL_COLOR: Record<StatusTone, string> = {
+  active: "#4a5638",
+  pending: "#9a6b2c",
+  overdue: "#8a3a3a",
+  closing: "#4a5638",
+  info: "rgba(30,36,22,0.45)",
+}
+
+function formatDueIn(due: Date, now: Date): string {
+  const diff = due.getTime() - now.getTime()
+  if (diff < 0) return "overdue"
+  if (due.toDateString() === now.toDateString()) return "today"
+  const days = Math.ceil(diff / 86_400_000)
+  return `${days}d`
+}
+
+const URGENCY_DOT: Record<string, string> = {
+  overdue: "#c4787a",
+  today: "#d4944c",
+}
 
 export default async function AirePage() {
   const { userId } = await auth()
@@ -16,311 +60,349 @@ export default async function AirePage() {
           deadlines: { where: { completedAt: null }, orderBy: { dueDate: "asc" }, take: 5 },
         },
         orderBy: { updatedAt: "desc" },
-        take: 10,
+        take: 20,
       },
     },
   })
-
   if (!user) redirect("/sign-in")
 
   const now = new Date()
-  const threeDays = new Date(now.getTime() + 3 * 86400000)
-  const urgentCount = user.transactions.reduce(
-    (a: number, t) => a + t.deadlines.filter((d) => new Date(d.dueDate) <= threeDays).length, 0
-  )
-  const pipelineValue = user.transactions.reduce(
-    (a: number, t) => a + (t.acceptedPrice || t.listPrice || 0), 0
-  )
+  const threeDays = new Date(now.getTime() + 3 * 86_400_000)
+  const sevenDays = new Date(now.getTime() + 7 * 86_400_000)
 
-  const dateStr = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })
-  const firstName = user.firstName || "Agent"
+  const urgentCount = user.transactions.reduce(
+    (a, t) => a + t.deadlines.filter((d) => new Date(d.dueDate) <= threeDays).length,
+    0,
+  )
+  const overdueCount = user.transactions.reduce(
+    (a, t) => a + t.deadlines.filter((d) => new Date(d.dueDate) < now).length,
+    0,
+  )
+  const closingCount = user.transactions.filter(
+    (t) => t.closingDate && new Date(t.closingDate) <= sevenDays,
+  ).length
+  const pipelineValue = user.transactions.reduce(
+    (a, t) => a + (t.acceptedPrice || t.listPrice || 0),
+    0,
+  )
+  const pipelineMillions = pipelineValue / 1_000_000
+  const pipelineLabel =
+    pipelineMillions >= 1
+      ? `$${pipelineMillions.toFixed(2)}M`
+      : `$${Math.round(pipelineValue / 1_000)}K`
 
   const briefDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const brief = await prisma.morningBrief.findUnique({
     where: { userId_briefDate: { userId: user.id, briefDate } },
   })
 
-  // Collect all urgent deadlines across transactions
-  const allUrgentDeadlines = user.transactions.flatMap((txn) =>
-    txn.deadlines
-      .filter((d) => new Date(d.dueDate) <= threeDays)
-      .map((d) => ({ ...d, address: txn.propertyAddress }))
-  ).sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+  const urgentDeadlines = user.transactions
+    .flatMap((txn) =>
+      txn.deadlines
+        .filter((d) => new Date(d.dueDate) <= threeDays)
+        .map((d) => ({
+          id: d.id,
+          name: d.name,
+          dueDate: d.dueDate,
+          address: txn.propertyAddress,
+          txnId: txn.id,
+        })),
+    )
+    .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+    .slice(0, 5)
 
-  const timeGreeting = now.getHours() < 12 ? "Good morning" : now.getHours() < 17 ? "Good afternoon" : "Good evening"
+  const firstName = user.firstName || "Agent"
+  const timeGreeting =
+    now.getHours() < 12 ? "Good morning" : now.getHours() < 17 ? "Good afternoon" : "Good evening"
+  const dateStr = now.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  })
+
+  const headlineSentence = (() => {
+    if (overdueCount > 0)
+      return `${overdueCount} deadline${overdueCount === 1 ? "" : "s"} overdue. Clear those first.`
+    if (urgentCount > 0)
+      return `${urgentCount} move${urgentCount === 1 ? "" : "s"} today. The day clears after.`
+    if (closingCount > 0)
+      return `${closingCount} closing${closingCount === 1 ? "" : "s"} this week. Steady run.`
+    return "Nothing urgent. Quiet pipeline — time to build."
+  })()
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
-      {/* Header */}
-      <div className="flex items-start justify-between mb-8">
-        <div>
-          <h1 className="font-[family-name:var(--font-cormorant)] italic text-[#1e2416] text-3xl sm:text-4xl font-light leading-tight">
-            {timeGreeting}, {firstName}.
-          </h1>
-          <p className="font-[family-name:var(--font-ibm-mono)] text-[10px] text-[#9a9a90] tracking-[0.2em] uppercase mt-2">{dateStr}</p>
-          {urgentCount > 0 && (
-            <p className="text-[#c45c5c] text-sm mt-2 flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#c45c5c] opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#c45c5c]" />
-              </span>
-              {urgentCount} deadline{urgentCount > 1 ? "s" : ""} need attention
-            </p>
-          )}
-        </div>
-        <div className="text-right shrink-0 ml-4">
-          <p className="font-[family-name:var(--font-ibm-mono)] text-[10px] text-[#9a9a90] tracking-wider uppercase">Pipeline</p>
-          <p className="font-[family-name:var(--font-ibm-mono)] text-2xl sm:text-3xl text-[#1e2416] font-light tracking-tight mt-0.5">
-            ${pipelineValue >= 1_000_000
-              ? `${(pipelineValue / 1_000_000).toFixed(2)}M`
-              : `${(pipelineValue / 1000).toFixed(0)}K`}
+    <div data-theme="daylight" className="min-h-screen bg-[#f5f2ea]">
+      <div className="max-w-3xl mx-auto px-4 sm:px-8 py-12 sm:py-16">
+
+        {/* ── Header ── */}
+        <header className="mb-12">
+          <p className="font-mono text-[10px] text-[#6b7d52] tracking-[0.3em] uppercase mb-4">
+            AIRE Intelligence
           </p>
-        </div>
-      </div>
-
-      {/* Stats Row */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        <StatCard label="Active Deals" value={String(user.transactions.length)} icon="folder" />
-        <StatCard label="Urgent" value={String(urgentCount)} highlight={urgentCount > 0} icon="alert" />
-        <StatCard label="Avg Value" value={user.transactions.length > 0 ? `$${Math.round(pipelineValue / user.transactions.length / 1000)}K` : "$0"} icon="dollar" />
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-8">
-        <QuickAction href="/aire/transactions/new" label="New Transaction" shortcut="T" />
-        <QuickAction href="/aire/contracts/new" label="Write Contract" shortcut="C" />
-        <QuickAction href="/airsign/new" label="Send for Signing" shortcut="S" />
-        <QuickAction href="/aire/compliance" label="Compliance Scan" shortcut="R" />
-      </div>
-
-      {/* Welcome card for first-time users */}
-      {user.transactions.length === 0 && (
-        <div className="bg-white border border-[#6b7d52]/15 rounded-xl p-6 mb-6">
-          <h3 className="font-[family-name:var(--font-cormorant)] italic text-[#1e2416] text-xl mb-2">
-            Welcome to AIRE, {firstName}
-          </h3>
-          <p className="text-[#6a6a60] text-sm mb-4">
-            Here&apos;s how to get started in the next 5 minutes:
-          </p>
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <span className="w-6 h-6 rounded-full bg-[#6b7d52]/15 text-[#6b7d52] text-xs flex items-center justify-center font-medium">1</span>
-              <span className="text-[#1e2416] text-sm">Create your first transaction</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="w-6 h-6 rounded-full bg-[#6b7d52]/15 text-[#6b7d52] text-xs flex items-center justify-center font-medium">2</span>
-              <span className="text-[#1e2416] text-sm">Upload a document to auto-classify it</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="w-6 h-6 rounded-full bg-[#6b7d52]/15 text-[#6b7d52] text-xs flex items-center justify-center font-medium">3</span>
-              <span className="text-[#1e2416] text-sm">Try a voice command: &quot;Show my pipeline&quot;</span>
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <h1 className="font-[family-name:var(--font-cormorant)] italic text-[#1e2416] text-4xl sm:text-5xl leading-[1.1]">
+              {timeGreeting}, {firstName}.
+            </h1>
+            <div className="sm:text-right">
+              <p className="text-[#1e2416] text-sm">{dateStr}</p>
+              <div className="flex items-center gap-2 mt-1.5 sm:justify-end">
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    overdueCount > 0
+                      ? "bg-[#c4787a] animate-pulse"
+                      : urgentCount > 0
+                        ? "bg-[#d4944c] animate-pulse"
+                        : "bg-[#6b7d52]/60"
+                  }`}
+                />
+                <span className="font-mono text-[10px] text-[#6b7d52]/70 uppercase tracking-wider">
+                  {user.transactions.length} active · {pipelineLabel} pipeline
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+          <p className="mt-4 font-[family-name:var(--font-cormorant)] italic text-[#6b7d52]/80 text-lg leading-snug">
+            {headlineSentence}
+          </p>
+          <div className="mt-6">
+            <HairlineDivider tone="light" />
+          </div>
+        </header>
 
-      {/* Two column grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6">
-        {/* LEFT COLUMN */}
-        <div className="space-y-4">
-          {/* Morning brief */}
-          {brief && (
-            <Link href="/aire/morning-brief" className="block group">
-              <div className="bg-[#f5f2ea] border border-[#d4c8b8]/50 rounded-xl p-5 hover:border-[#6b7d52]/30 transition-all duration-200 hover:shadow-sm">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2.5">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#6b7d52] opacity-50" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#6b7d52]" />
-                    </span>
-                    <span className="font-mono text-[10px] text-[#9a9a90] tracking-[0.15em] uppercase">
-                      Morning Brief
-                    </span>
-                  </div>
-                  <span className={`font-mono text-[10px] px-2 py-0.5 rounded-full ${
-                    brief.status === "pending"
-                      ? "bg-[#E8B44C]/15 text-[#E8B44C]"
-                      : "bg-[#6b7d52]/10 text-[#6b7d52]/60"
-                  }`}>
-                    {brief.status}
-                  </span>
-                </div>
-                <h3 className="font-[family-name:var(--font-cormorant)] italic text-[#1e2416] text-lg leading-snug mb-1">
-                  Today&apos;s Intelligence
-                </h3>
-                <p className="text-[#6a6a60] text-sm leading-relaxed line-clamp-3">
-                  {brief.summary || "Brief ready for review."}
-                </p>
-                <p className="text-[#6b7d52] text-xs mt-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                  Read full brief &rarr;
-                </p>
-              </div>
+        {user.transactions.length === 0 ? (
+          <div className="py-24 text-center">
+            <p className="font-[family-name:var(--font-cormorant)] italic text-[#1e2416]/30 text-2xl mb-3">
+              No active transactions
+            </p>
+            <p className="text-[#6b7d52]/60 text-sm leading-relaxed max-w-sm mx-auto mb-6">
+              Create your first deal to start using AIRE.
+            </p>
+            <Link
+              href="/aire/transactions/new"
+              className="inline-block text-[11px] uppercase tracking-[0.14em] rounded-md px-5 py-2.5 bg-[#6b7d52] text-[#f5f2ea] font-medium hover:bg-[#5a6b43] transition-colors"
+            >
+              + New transaction
             </Link>
-          )}
+            <div className="mt-8 h-px w-16 bg-[#e8e4d8] mx-auto" />
+          </div>
+        ) : (
+          <div className="space-y-14">
 
-          {/* Urgent deadlines */}
-          {allUrgentDeadlines.length > 0 && (
-            <div className="bg-white border border-[#6b7d52]/15 rounded-xl p-5">
-              <p className="font-mono text-[10px] text-[#9a9a90] tracking-[0.15em] uppercase mb-4">
-                Upcoming Deadlines
-              </p>
-              <div className="space-y-3">
-                {allUrgentDeadlines.slice(0, 6).map((d, i) => {
-                  const due = new Date(d.dueDate)
-                  const isOverdue = due < now
-                  const isToday = due.toDateString() === now.toDateString()
+            {/* ── 01 Pipeline ── */}
+            <section>
+              <SectionLabel number="01" title="Pipeline" />
+              <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-0.5">
+                <div className="px-4 py-4">
+                  <p
+                    className="font-mono text-[28px] sm:text-[32px] leading-none tabular-nums text-[#1e2416]"
+                    style={{ fontWeight: 500, letterSpacing: "-0.02em" }}
+                  >
+                    {pipelineLabel}
+                  </p>
+                  <p className="font-mono text-[9px] text-[#6b7d52]/50 uppercase tracking-[0.18em] mt-2">
+                    Total value
+                  </p>
+                </div>
+                <div className="px-4 py-4">
+                  <p className="font-mono text-[28px] sm:text-[32px] leading-none tabular-nums text-[#1e2416]" style={{ fontWeight: 500 }}>
+                    {user.transactions.length}
+                  </p>
+                  <p className="font-mono text-[9px] text-[#6b7d52]/50 uppercase tracking-[0.18em] mt-2">
+                    Active deals
+                  </p>
+                </div>
+                <div className="px-4 py-4">
+                  <p
+                    className={`font-mono text-[28px] sm:text-[32px] leading-none tabular-nums ${
+                      closingCount > 0 ? "text-[#6b7d52]" : "text-[#1e2416]/30"
+                    }`}
+                    style={{ fontWeight: 500 }}
+                  >
+                    {closingCount}
+                  </p>
+                  <p className="font-mono text-[9px] text-[#6b7d52]/50 uppercase tracking-[0.18em] mt-2">
+                    Closing ≤ 7d
+                  </p>
+                </div>
+                <div className="px-4 py-4">
+                  <p
+                    className={`font-mono text-[28px] sm:text-[32px] leading-none tabular-nums ${
+                      overdueCount > 0 ? "text-[#c4787a]" : "text-[#1e2416]/30"
+                    }`}
+                    style={{ fontWeight: 500 }}
+                  >
+                    {overdueCount}
+                  </p>
+                  <p className="font-mono text-[9px] text-[#6b7d52]/50 uppercase tracking-[0.18em] mt-2">
+                    Overdue
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <hr className="border-0 h-px bg-[#e8e4d8]" />
+
+            {/* ── 02 Today's moves (only if any urgent) ── */}
+            {urgentDeadlines.length > 0 && (
+              <>
+                <section>
+                  <SectionLabel number="02" title="Today's moves" count={urgentDeadlines.length} />
+                  <div className="mt-5 space-y-0.5">
+                    {urgentDeadlines.map((d) => {
+                      const due = new Date(d.dueDate)
+                      const urgency = formatDueIn(due, now)
+                      const dotColor = URGENCY_DOT[urgency] || "#9aab7e"
+                      return (
+                        <Link
+                          key={d.id}
+                          href={`/aire/transactions/${d.txnId}`}
+                          className="group grid grid-cols-[8px_1fr_auto] gap-x-4 px-4 py-3.5 items-center rounded-lg hover:bg-[#e8e4d8]/45 transition-colors"
+                        >
+                          <span
+                            className="w-2 h-2 rounded-full"
+                            style={{ background: dotColor }}
+                          />
+                          <div className="min-w-0">
+                            <p className="text-[#1e2416] text-sm leading-snug truncate group-hover:text-[#6b7d52] transition-colors">
+                              {d.name}
+                            </p>
+                            <p className="font-mono text-[10px] text-[#6b7d52]/50 uppercase tracking-wider mt-0.5 truncate">
+                              {d.address}
+                            </p>
+                          </div>
+                          <span
+                            className="font-mono text-[11px] whitespace-nowrap tabular-nums"
+                            style={{
+                              color:
+                                urgency === "overdue"
+                                  ? "#8a3a3a"
+                                  : urgency === "today"
+                                    ? "#9a6b2c"
+                                    : "#1e2416",
+                            }}
+                          >
+                            {urgency}
+                          </span>
+                        </Link>
+                      )
+                    })}
+                  </div>
+                </section>
+                <hr className="border-0 h-px bg-[#e8e4d8]" />
+              </>
+            )}
+
+            {/* ── 03 Active transactions ── */}
+            <section>
+              <SectionLabel
+                number={urgentDeadlines.length > 0 ? "03" : "02"}
+                title="Active transactions"
+                count={user.transactions.length}
+              />
+              <div className="mt-5 space-y-0.5">
+                {user.transactions.slice(0, 10).map((t) => {
+                  const nextDeadline = t.deadlines[0]
+                  const dueIn = nextDeadline
+                    ? formatDueIn(new Date(nextDeadline.dueDate), now)
+                    : "—"
+                  const statusMeta =
+                    STATUS_TO_LABEL[t.status] ?? { label: t.status, tone: "info" as StatusTone }
+                  const priceStr = t.acceptedPrice
+                    ? `$${Math.round(t.acceptedPrice / 1000)}K`
+                    : t.listPrice
+                      ? `$${Math.round(t.listPrice / 1000)}K`
+                      : "—"
                   return (
-                    <div key={i} className="flex items-start gap-3 group/item">
-                      <div className="shrink-0 mt-1.5">
-                        <span className={`w-2 h-2 rounded-full block ${
-                          isOverdue ? "bg-[#D45B5B]" : isToday ? "bg-[#E8B44C]" : "bg-[#6b7d52]"
-                        }`} />
+                    <Link
+                      key={t.id}
+                      href={`/aire/transactions/${t.id}`}
+                      className="group grid grid-cols-[8px_1fr_auto_80px] gap-x-4 px-4 py-3.5 items-center rounded-lg hover:bg-[#e8e4d8]/45 transition-colors"
+                    >
+                      <span
+                        className="w-2 h-2 rounded-full"
+                        style={{ background: STATUS_DOT[statusMeta.tone] }}
+                      />
+                      <div className="min-w-0">
+                        <p className="text-[#1e2416] text-sm leading-snug truncate group-hover:text-[#6b7d52] transition-colors">
+                          {t.propertyAddress}
+                        </p>
+                        <p className="font-mono text-[10px] text-[#6b7d52]/50 uppercase tracking-wider mt-0.5 truncate">
+                          {t.buyerName || t.sellerName || "—"}
+                          {nextDeadline ? ` · ${nextDeadline.name} ${dueIn}` : ""}
+                        </p>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[#1e2416] text-sm truncate">{d.name}</p>
-                        <p className="text-[#9a9a90] text-xs truncate">{d.address}</p>
-                      </div>
-                      <span className={`font-mono text-[11px] shrink-0 ${
-                        isOverdue ? "text-[#D45B5B]" : isToday ? "text-[#E8B44C]" : "text-[#9a9a90]"
-                      }`}>
-                        {isOverdue ? "Overdue" : isToday ? "Today" : due.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      <span
+                        className="font-mono text-[10px] uppercase tracking-[0.14em] whitespace-nowrap hidden sm:block"
+                        style={{ color: STATUS_LABEL_COLOR[statusMeta.tone] }}
+                      >
+                        {statusMeta.label}
                       </span>
-                    </div>
+                      <span className="font-mono text-[11px] text-[#1e2416]/65 text-right tabular-nums">
+                        {priceStr}
+                      </span>
+                    </Link>
                   )
                 })}
-              </div>
-            </div>
-          )}
-
-          {/* No deadlines? Show system status */}
-          {allUrgentDeadlines.length === 0 && (
-            <div className="bg-white border border-[#6b7d52]/15 rounded-xl p-5 text-center">
-              <p className="text-[#6a6a60] text-sm">No urgent deadlines</p>
-              <p className="text-[#9a9a90] text-xs mt-1">All clear for the next 3 days</p>
-            </div>
-          )}
-        </div>
-
-        {/* RIGHT COLUMN — Transactions */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-[#1e2416] text-sm font-medium tracking-wide" style={{ fontFamily: "var(--font-body)", fontStyle: "normal" }}>
-              Active Transactions
-            </h2>
-            <Link href="/aire/transactions" className="font-mono text-[10px] text-[#6b7d52]/60 tracking-wider uppercase hover:text-[#6b7d52] transition-colors">
-              View all
-            </Link>
-          </div>
-
-          {user.transactions.length === 0 ? (
-            <div className="bg-white border border-[#6b7d52]/15 rounded-xl p-12 text-center">
-              <div className="w-12 h-12 rounded-full bg-[#9aab7e]/10 flex items-center justify-center mx-auto mb-4">
-                <svg className="w-5 h-5 text-[#6b7d52]/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                </svg>
-              </div>
-              <p className="text-[#6a6a60] text-sm mb-1">No active transactions</p>
-              <p className="text-[#9a9a90] text-xs">Create your first deal to get started</p>
-              <Link
-                href="/aire/transactions/new"
-                className="inline-block mt-5 bg-[#6b7d52]/15 text-[#6b7d52] text-xs font-medium px-4 py-2 rounded-lg hover:bg-[#6b7d52]/25 transition-all duration-200"
-              >
-                + New Transaction
-              </Link>
-            </div>
-          ) : (
-            <div className="space-y-1.5">
-              {user.transactions.slice(0, 8).map((txn) => {
-                const urgent = txn.deadlines.filter((d) => new Date(d.dueDate) <= threeDays)
-                const daysToClose = txn.closingDate
-                  ? Math.ceil((new Date(txn.closingDate).getTime() - Date.now()) / 86400000)
-                  : null
-                const borderClass = urgent.length > 0 ? "txn-border-overdue" : (txn.status === "PENDING_INSPECTION" || txn.status === "PENDING_APPRAISAL" || txn.status === "PENDING_FINANCING") ? "txn-border-pending" : "txn-border-active"
-
-                return (
+                {user.transactions.length > 10 && (
                   <Link
-                    key={txn.id}
-                    href={`/aire/transactions/${txn.id}`}
-                    className={`block bg-white border border-[#6b7d52]/15 rounded-xl p-4 hover:border-[#6b7d52]/30 hover:shadow-sm transition-all duration-200 group/txn ${borderClass}`}
+                    href="/aire/transactions"
+                    className="block px-4 py-3 text-center font-mono text-[10px] text-[#6b7d52]/60 uppercase tracking-[0.2em] hover:text-[#6b7d52] transition-colors"
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <p className="text-[#1e2416] text-sm font-medium truncate group-hover/txn:text-[#6b7d52] transition-colors">
-                            {txn.propertyAddress}
-                          </p>
-                          {urgent.length > 0 && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#D45B5B]/15 text-[#D45B5B] shrink-0 font-mono">
-                              {urgent.length} due
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-[#9a9a90] text-xs">
-                            {txn.buyerName || txn.sellerName || "\u2014"}
-                          </span>
-                          <span className="text-[#d4c8b8] text-xs">&middot;</span>
-                          <span className="font-mono text-[10px] text-[#9a9a90] uppercase tracking-wider">
-                            {txn.status.replace(/_/g, " ").toLowerCase()}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="text-right shrink-0 ml-4">
-                        <p className="font-mono text-sm text-[#1e2416]">
-                          {txn.acceptedPrice ? `$${(txn.acceptedPrice / 1000).toFixed(0)}K` : "TBD"}
-                        </p>
-                        {daysToClose !== null && daysToClose >= 0 && (
-                          <p className="font-mono text-[10px] text-[#9a9a90] mt-0.5">{daysToClose}d to close</p>
-                        )}
-                      </div>
-                    </div>
+                    View all {user.transactions.length} →
                   </Link>
-                )
-              })}
+                )}
+              </div>
+            </section>
+
+            <hr className="border-0 h-px bg-[#e8e4d8]" />
+
+            {/* ── 04 Quick actions ── */}
+            <section>
+              <SectionLabel
+                number={urgentDeadlines.length > 0 ? "04" : "03"}
+                title="Quick actions"
+              />
+              <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-0.5">
+                {[
+                  { href: "/aire/transactions/new", label: "New transaction", hint: "Start a deal" },
+                  { href: "/aire/contracts/new", label: "Write contract", hint: "LREC forms via natural language" },
+                  { href: "/airsign/new", label: "Send for signing", hint: "Upload PDF, place fields, invite" },
+                  { href: "/aire/compliance", label: "Compliance scan", hint: "Louisiana rules engine" },
+                  { href: "/aire/morning-brief", label: "Morning brief", hint: brief ? "Today's intelligence" : "Generate now" },
+                  { href: "/aire/email", label: "Triage inbox", hint: "Reply-or-archive queue" },
+                ].map((a) => (
+                  <Link
+                    key={a.href}
+                    href={a.href}
+                    className="group flex items-center justify-between gap-3 px-4 py-3.5 rounded-lg hover:bg-[#e8e4d8]/45 transition-colors"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-[#1e2416] text-sm leading-snug truncate group-hover:text-[#6b7d52] transition-colors">
+                        {a.label}
+                      </p>
+                      <p className="font-mono text-[10px] text-[#6b7d52]/50 uppercase tracking-wider mt-0.5 truncate">
+                        {a.hint}
+                      </p>
+                    </div>
+                    <span className="font-mono text-[12px] text-[#6b7d52]/40 group-hover:text-[#6b7d52] group-hover:translate-x-0.5 transition-all">
+                      →
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </section>
+
+            {/* ── Footer ── */}
+            <div className="pt-8 text-center">
+              <div className="h-px w-12 bg-[#e8e4d8] mx-auto mb-4" />
+              <p className="font-mono text-[9px] text-[#6b7d52]/30 uppercase tracking-[0.3em]">
+                AIRE · {user.transactions.length} active · {pipelineLabel}
+              </p>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
-  )
-}
-
-function StatCard({ label, value, highlight, icon }: { label: string; value: string; highlight?: boolean; icon: string }) {
-  return (
-    <div className="bg-white border border-[#6b7d52]/15 rounded-xl p-4 stat-card-hover">
-      <div className="flex items-center gap-2 mb-2">
-        {icon === "folder" && (
-          <svg className="w-3.5 h-3.5 text-[#6b7d52]/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-          </svg>
-        )}
-        {icon === "alert" && (
-          <svg className="w-3.5 h-3.5 text-[#6b7d52]/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-        )}
-        {icon === "dollar" && (
-          <svg className="w-3.5 h-3.5 text-[#6b7d52]/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-          </svg>
-        )}
-        <p className="font-mono text-[10px] text-[#9a9a90] tracking-wider uppercase">{label}</p>
-      </div>
-      <p className={`font-mono text-2xl font-light tracking-tight ${highlight ? "text-[#D45B5B]" : "text-[#1e2416]"}`}>
-        {value}
-      </p>
-    </div>
-  )
-}
-
-function QuickAction({ href, label, shortcut }: { href: string; label: string; shortcut: string }) {
-  return (
-    <Link
-      href={href}
-      className="group bg-white border border-[#6b7d52]/15 rounded-xl p-3 text-center hover:border-[#6b7d52]/30 hover:shadow-sm transition-all duration-200"
-    >
-      <p className="text-[#1e2416]/80 text-xs font-medium group-hover:text-[#6b7d52] transition-colors">{label}</p>
-      <p className="font-mono text-[9px] text-[#9a9a90] mt-0.5 tracking-wider">{shortcut}</p>
-    </Link>
   )
 }
