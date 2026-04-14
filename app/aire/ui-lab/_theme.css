@@ -1,0 +1,10 @@
+/* Theme scope stub — referenced by app/aire/layout.tsx to enable
+   data-theme="nocturne" cascade on /aire/*. Runtime tokens are
+   authored in app/globals.css; this file exists so the layout's
+   side-effect import resolves. Safe to extend with ui-lab-scoped
+   overrides later. */
+
+.ui-lab-scope {
+  background-color: var(--canvas);
+  color: var(--ink);
+}
