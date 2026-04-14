@@ -136,10 +136,11 @@ function BillingContent() {
           {PLANS.map((plan) => (
             <div
               key={plan.tier}
-              className={`relative rounded-2xl p-8 flex flex-col ${
+              style={{ transition: "transform 240ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 240ms ease" }}
+              className={`relative rounded-2xl p-8 flex flex-col hover:-translate-y-1 ${
                 plan.popular
-                  ? "bg-white border-2 border-[#6b7d52] shadow-[0_4px_24px_rgba(107,125,82,0.12)]"
-                  : "bg-white border border-[#9aab7e]/20"
+                  ? "bg-[#f0ece2] border-2 border-[#6b7d52] shadow-[0_4px_24px_rgba(30,36,22,0.10)]"
+                  : "bg-[#f5f2ea] border border-[#9aab7e]/20 shadow-[0_1px_3px_rgba(30,36,22,0.06)]"
               }`}
             >
               {plan.popular && (
@@ -148,9 +149,9 @@ function BillingContent() {
                 </div>
               )}
 
-              <h2 className="text-[#1e2416] text-xl font-semibold mb-1">{plan.name}</h2>
+              <h2 className="font-(family-name:--font-cormorant) italic text-[#1e2416] text-2xl font-medium mb-1">{plan.name}</h2>
               <div className="mb-6">
-                <span className="text-[#1e2416] text-4xl font-bold">{plan.price}</span>
+                <span className="font-mono text-[#1e2416] text-4xl font-semibold">{plan.price}</span>
                 <span className="text-[#6b7d52]/50 text-sm">{plan.period}</span>
               </div>
 
