@@ -226,3 +226,26 @@ All env vars are configured in `.env.local`. No missing vars.
 - `app/airsign/page.tsx:23` — Added `DECLINED: 0` to EnvelopeStatus counts object (missing enum variant)
 - `app/components/layout/Navbar.tsx:68` — Removed `afterSignOutUrl` prop from `<UserButton />` (deprecated in Clerk v7)
 - `tsc --noEmit` returns 0 errors, `next build` passes clean
+
+## Overnight Routines
+
+**Pattern:** Claude Code Cloud scheduled agent (the Conductor) runs nightly at 23:00 CT. Dispatches ≤3 parallel subagents against `docs/routines/queue.yaml`, ships ≤3 PRs, writes `docs/routines/<DATE>-report.md` in the morning.
+
+**Operator protocol (every morning, ~10 min):**
+1. Read `docs/routines/<newest-date>-report.md`
+2. Merge or close the 1–3 PRs
+3. Review any `halted_for_caleb` entries in `queue.yaml`
+
+**Kill switches:**
+- `docs/routines/queue.yaml` → set `paused: true` to skip a night
+- Delete scheduled agent on Claude Code Cloud dashboard to stop entirely
+
+**Local utilities:**
+- `npm run routine:dry-run` — simulate tonight's dispatch
+- `npm run paragon:lookup -- "<field>"` — <30s Paragon field lookup
+- `npm run field-index:build` — rebuild field index from dom_maps
+
+**Full design:** `docs/superpowers/specs/2026-04-14-overnight-routines-design.md`
+**Master prompt:** `docs/routines/conductor.md`
+**Error contract:** `docs/routines/error-loop.md`
+**Local skill:** `.claude/skills/aire-routine/SKILL.md` (auto-loads when routine keywords fire)
