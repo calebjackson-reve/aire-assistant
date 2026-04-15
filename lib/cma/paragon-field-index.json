@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "last_updated": "2026-04-15T03:06:16.277Z",
+  "fields": {
+    "undefined": {
+      "surfaces": [
+        "listing_detail"
+      ],
+      "dom_map_refs": [
+        "dom_maps/listing_detail.dom.json#fields.identifiers",
+        "dom_maps/listing_detail.dom.json#fields.address",
+        "dom_maps/listing_detail.dom.json#fields.physical",
+        "dom_maps/listing_detail.dom.json#fields.rooms",
+        "dom_maps/listing_detail.dom.json#fields.features",
+        "dom_maps/listing_detail.dom.json#fields.dates",
+        "dom_maps/listing_detail.dom.json#fields.agents",
+        "dom_maps/listing_detail.dom.json#fields.financial",
+        "dom_maps/listing_detail.dom.json#fields.narrative",
+        "dom_maps/listing_detail.dom.json#fields.media",
+        "dom_maps/listing_detail.dom.json#fields.third_party_integrations"
+      ]
+    }
+  }
+}

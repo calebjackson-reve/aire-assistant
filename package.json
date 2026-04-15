@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "field-index:build": "tsx scripts/field-index-build.ts",
+    "paragon:lookup": "tsx scripts/paragon-lookup.ts",
+    "routine:dry-run": "tsx scripts/routine-dry-run.ts",
+    "routine:test": "tsx --test lib/cma/field-index/*.test.ts scripts/routine-dry-run.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
@@ -38,6 +42,7 @@
     "svix": "^1.89.0",
     "three": "^0.183.2",
     "uuid": "^13.0.0",
+    "yaml": "^2.8.3",
     "zod": "^4.3.6"
   },
   "prisma": {
