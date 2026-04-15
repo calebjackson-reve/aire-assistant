@@ -44,8 +44,9 @@ AIRE-KEY-SETUP-GUIDE.html
 
 .vercel
 
-# Claude Code settings (local only)
-.claude/
+# Claude Code settings (local only) — except project skills which ship with the repo
+.claude/*
+!.claude/skills/
 .env*.local
 public/_unused/
 .playwright-mcp/
