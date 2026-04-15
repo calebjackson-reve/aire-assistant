@@ -1,0 +1,214 @@
+version: 1
+updated: 2026-04-14T00:00:00Z
+paused: false
+dry_run: false
+max_prs_per_night: 3
+max_paragon_tasks_per_night: 1
+
+seed_tasks:
+  - id: branch-triage-sweep
+    domain: platform
+    skill: null
+    priority: 10
+    status: pending
+    depends_on: []
+    created_at: 2026-04-14
+    max_attempts: 2
+    attempts: 0
+    brief: |
+      Inventory all local worktrees and branches. For each:
+      - Last commit author + date
+      - Ahead/behind main
+      - Open PR if any
+      Write docs/routines/branch-inventory-<DATE>.md with recommendations per branch:
+      - MERGE (if clean + valuable)
+      - REBASE (if divergent but valuable)
+      - ARCHIVE (if abandoned)
+      - DELETE (if superseded)
+      DO NOT execute any destructive git operations. Recommendations only.
+    acceptance:
+      - docs/routines/branch-inventory-<DATE>.md exists
+      - Report covers all 16 unmerged branches listed in HANDOFF_PHASE_B.md
+      - No `git branch -D` or `git push --force` executed
+
+  - id: paragon-field-index-backfill
+    domain: paragon
+    skill: aire-paragon-operator
+    priority: 10
+    status: pending
+    depends_on: []
+    created_at: 2026-04-14
+    max_attempts: 2
+    attempts: 0
+    brief: |
+      READ-ONLY. Walk lib/cma/scrapers/dom_maps/*.dom.json and confirm
+      lib/cma/paragon-field-index.json covers every field documented in the maps.
+      If gaps: update field-index/build.ts to cover them, re-run, commit updated index.
+      No live Paragon traffic. No new surface mapping.
+    acceptance:
+      - npm run field-index:build exits 0
+      - Every field in every dom_map.json appears in paragon-field-index.json
+      - npm run paragon:lookup -- "beds" returns a result
+
+  - id: dogfood-smoke-regression
+    domain: platform
+    skill: null
+    priority: 9
+    status: pending
+    depends_on: []
+    created_at: 2026-04-14
+    max_attempts: 2
+    attempts: 0
+    brief: |
+      Run tests/smoke-dogfood Playwright suite. Compare results to last green run.
+      Write docs/routines/dogfood-regression-<DATE>.md with pass/fail per flow.
+      If any flow fails: capture screenshot + console, append to error-log, create
+      GitHub issue (not PR — this is diagnosis, not fix).
+    acceptance:
+      - docs/routines/dogfood-regression-<DATE>.md exists
+      - Playwright report artifact attached
+      - Any regressions tracked as issues
+
+  - id: paragon-p5-listing-detail
+    domain: paragon
+    skill: aire-paragon-operator
+    priority: 9
+    status: pending
+    depends_on: [paragon-field-index-backfill]
+    created_at: 2026-04-14
+    max_attempts: 2
+    attempts: 0
+    brief: |
+      Phase 5 of PARAGON_MASTERY_PLAN.md — Listing Detail page.
+      Follow paragon-operator safety rules exactly. Single-shot. One address.
+      Capture: Beds, Baths, Year, Lot Size, Style, Subdivision, Schools,
+      Mineral Rights, Foundation, Room Dimensions, Features, Photos, History.
+    acceptance:
+      - dom_maps/listing_detail.dom.json extended (current file is partial)
+      - lib/cma/scrapers/mls.ts has scrapeListingDetail(mlsId)
+      - scripts/test-cma-paragon-listing-detail.ts passes single-shot
+      - snapshots/mls_paragon/listing_detail/<mlsId>.json written
+      - SOURCE_INTELLIGENCE.md field dictionary updated
+
+  - id: airsign-e2e-audit
+    domain: platform
+    skill: null
+    priority: 8
+    status: pending
+    depends_on: []
+    created_at: 2026-04-14
+    max_attempts: 2
+    attempts: 0
+    brief: |
+      Run Playwright over: create envelope → upload PDF → place fields →
+      add signer → send → sign → verify seal.
+      Use tests/smoke-dogfood as reference harness.
+      Report broken steps in docs/routines/airsign-audit-<DATE>.md.
+    acceptance:
+      - Report exists with pass/fail per step
+      - Broken steps have screenshots + console logs
+      - Regressions opened as GitHub issues (not PRs)
+
+  - id: voice-offline-fastpath-audit
+    domain: platform
+    skill: null
+    priority: 8
+    status: pending
+    depends_on: []
+    created_at: 2026-04-14
+    max_attempts: 2
+    attempts: 0
+    brief: |
+      Replay fixture utterances against lib/voice-pipeline.ts offline fastpath.
+      Measure hit rate across the 28 regex patterns. Report misses with suggested
+      new patterns.
+    acceptance:
+      - docs/routines/voice-fastpath-<DATE>.md with hit rate
+      - Miss analysis with suggested patterns
+
+  - id: tc-workflow-audit
+    domain: platform
+    skill: null
+    priority: 7
+    status: pending
+    depends_on: []
+    created_at: 2026-04-14
+    max_attempts: 2
+    attempts: 0
+    brief: |
+      Exercise every state transition in lib/workflow/state-machine.ts using
+      a seeded test transaction. Verify WorkflowEvent rows written correctly.
+    acceptance:
+      - docs/routines/tc-workflow-<DATE>.md with state-coverage matrix
+      - Any broken transitions filed as issues
+
+  - id: paragon-p6-customize-columns
+    domain: paragon
+    skill: aire-paragon-operator
+    priority: 7
+    status: pending
+    depends_on: [paragon-p5-listing-detail]
+    created_at: 2026-04-14
+    max_attempts: 2
+    attempts: 0
+    brief: |
+      Phase 6 of PARAGON_MASTERY_PLAN.md — Customize Columns dialog.
+      Goal: add hidden columns (Beds, Baths, Year Built, DOM, Sold Date)
+      to comp grid so future harvests are richer.
+    acceptance:
+      - dom_maps/customize_columns.dom.json committed
+      - lib/cma/scrapers/mls.ts has customizeCompColumns(cols[])
+      - scripts/test-cma-paragon-customize-columns.ts passes
+      - SOURCE_INTELLIGENCE.md updated
+
+  - id: nightly-type-build-probe
+    domain: platform
+    skill: null
+    priority: 7
+    status: pending
+    depends_on: []
+    created_at: 2026-04-14
+    max_attempts: 2
+    attempts: 0
+    brief: |
+      Run `npx tsc --noEmit` then `npm run build`. If errors, capture the first
+      10 errors and open GitHub issue per error group.
+    acceptance:
+      - docs/routines/build-probe-<DATE>.md
+      - tsc --noEmit exit code recorded
+      - next build exit code recorded
+
+  - id: error-log-analyzer
+    domain: platform
+    skill: null
+    priority: 6
+    status: pending
+    depends_on: []
+    created_at: 2026-04-14
+    max_attempts: 2
+    attempts: 0
+    brief: |
+      Cluster last 14 days of error-log.md entries by failure signature.
+      Propose systemic fixes (e.g. "4 Paragon selector-drift errors → add DOM
+      map diff check to Conductor Step 3"). Write docs/routines/error-analysis-<DATE>.md.
+    acceptance:
+      - Analysis report exists
+      - At least 3 proposed systemic fixes OR "no systemic patterns detected"
+
+  - id: remote-claude-branch-triage
+    domain: platform
+    skill: null
+    priority: 5
+    status: pending
+    depends_on: [branch-triage-sweep]
+    created_at: 2026-04-14
+    max_attempts: 2
+    attempts: 0
+    brief: |
+      Read-only review of origin/claude/* branches. For each: summarize diff
+      vs main, flag MERGE / ARCHIVE / NEEDS-REVIEW.
+    acceptance:
+      - docs/routines/remote-claude-branches-<DATE>.md exists
+
+failed_tasks: []
+learned_rules: []
